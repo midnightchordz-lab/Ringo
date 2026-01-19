@@ -826,73 +826,101 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         temp_dir = Path("/tmp/contentflow")
         temp_dir.mkdir(exist_ok=True)
         
-        # IMPORTANT: Due to YouTube's bot detection, we'll use a workaround
-        # Get video info without downloading first
-        info_opts = {
-            'quiet': False,
-            'no_warnings': False,
-            'skip_download': True,
-            'format': 'best[height<=720][ext=mp4]',  # Lower quality to avoid detection
-            'extractor_args': {
-                'youtube': {
-                    'player_client': ['android'],  # Android client is more reliable
+        video_url = f"https://www.youtube.com/watch?v={video_id}"
+        downloaded_file = None
+        video_title = "video"
+        video_duration = 0
+        
+        # Try pytubefix first (better at bypassing bot detection)
+        logging.info(f"🎬 Attempting download with pytubefix for {video_id}...")
+        try:
+            from pytubefix import YouTube
+            from pytubefix.cli import on_progress
+            
+            yt = YouTube(video_url, on_progress_callback=on_progress)
+            video_title = yt.title
+            video_duration = yt.length
+            
+            logging.info(f"📹 Video: {video_title} ({video_duration}s)")
+            
+            # Get stream - try 720p or lower for reliability
+            stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+            
+            if not stream:
+                # Try any available stream
+                stream = yt.streams.filter(file_extension='mp4').first()
+            
+            if not stream:
+                stream = yt.streams.get_highest_resolution()
+            
+            if stream:
+                logging.info(f"📥 Downloading: {stream.resolution} - {stream.mime_type}")
+                downloaded_file = stream.download(output_path=str(temp_dir), filename=f"{video_id}.mp4")
+                logging.info(f"✅ Downloaded via pytubefix: {downloaded_file}")
+            else:
+                raise Exception("No suitable stream found")
+                
+        except Exception as pytube_error:
+            logging.warning(f"⚠️ pytubefix failed: {str(pytube_error)}")
+            logging.info("🔄 Falling back to yt-dlp...")
+            
+            # Fallback to yt-dlp
+            info_opts = {
+                'quiet': False,
+                'no_warnings': False,
+                'skip_download': True,
+                'format': 'best[height<=720][ext=mp4]',
+                'extractor_args': {
+                    'youtube': {
+                        'player_client': ['android'],
+                    }
                 }
             }
-        }
+            
+            with yt_dlp.YoutubeDL(info_opts) as ydl:
+                info = ydl.extract_info(video_url, download=False)
+                video_title = info.get('title', 'video')
+                video_duration = info.get('duration', 0)
+            
+            output_template = str(temp_dir / f"{video_id}.%(ext)s")
+            download_opts = {
+                'format': 'best[height<=720][ext=mp4]/best[height<=720]',
+                'outtmpl': output_template,
+                'quiet': False,
+                'no_warnings': False,
+                'retries': 3,
+                'fragment_retries': 3,
+                'user_agent': 'com.google.android.youtube/19.51.41 (Linux; U; Android 14) gzip',
+                'extractor_args': {
+                    'youtube': {
+                        'player_client': ['android', 'ios'],
+                        'player_skip': ['webpage']
+                    }
+                },
+                'http_headers': {
+                    'User-Agent': 'com.google.android.youtube/19.51.41 (Linux; U; Android 14) gzip',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                },
+                'geo_bypass': True,
+                'nocheckcertificate': True,
+            }
+            
+            try:
+                with yt_dlp.YoutubeDL(download_opts) as ydl:
+                    ydl.download([video_url])
+                    downloaded_file = ydl.prepare_filename(info)
+            except Exception as download_error:
+                logging.error(f"yt-dlp download error: {str(download_error)}")
+                possible_files = list(temp_dir.glob(f"{video_id}.*"))
+                if possible_files:
+                    downloaded_file = str(possible_files[0])
         
-        logging.info(f"Fetching video info for {video_id}...")
-        with yt_dlp.YoutubeDL(info_opts) as ydl:
-            info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
-            video_title = info.get('title', 'video')
-            video_duration = info.get('duration', 0)
-        
-        # Use AI analysis if requested
-        ai_analysis = None
-        if use_ai:
-            ai_analysis = await analyze_video_with_ai(
-                video_id, 
-                video_title,
-                info.get('description', ''),
-                video_duration
-            )
-            start_time = ai_analysis['recommended_start']
-            duration = ai_analysis['recommended_duration']
-            logging.info(f"✨ AI recommended: start={start_time}s, duration={duration}s - {ai_analysis['reasoning']}")
-        
-        # Download with retry logic and better settings
-        output_template = str(temp_dir / f"{video_id}.%(ext)s")
-        download_opts = {
-            'format': 'best[height<=720][ext=mp4]/best[height<=720]',  # 720p is more reliable
-            'outtmpl': output_template,
-            'quiet': False,
-            'no_warnings': False,
-            'retries': 3,
-            'fragment_retries': 3,
-            'user_agent': 'com.google.android.youtube/19.51.41 (Linux; U; Android 14) gzip',
-            'extractor_args': {
-                'youtube': {
-                    'player_client': ['android', 'ios'],
-                    'player_skip': ['webpage']
-                }
-            },
-            'http_headers': {
-                'User-Agent': 'com.google.android.youtube/19.51.41 (Linux; U; Android 14) gzip',
-                'Accept-Language': 'en-US,en;q=0.9',
-            },
-            'geo_bypass': True,
-            'nocheckcertificate': True,
-        }
-        
-        logging.info(f"📥 Downloading video {video_id} (this may take a minute)...")
-        try:
-            with yt_dlp.YoutubeDL(download_opts) as ydl:
-                ydl.download([f"https://www.youtube.com/watch?v={video_id}"])
-                downloaded_file = ydl.prepare_filename(info)
-        except Exception as download_error:
-            logging.error(f"Download error: {str(download_error)}")
-            # Try to find any downloaded file
+        # Verify download
+        if not downloaded_file or not Path(downloaded_file).exists():
             possible_files = list(temp_dir.glob(f"{video_id}.*"))
-            if not possible_files:
+            if possible_files:
+                downloaded_file = str(possible_files[0])
+            else:
                 raise Exception(
                     "⚠️ YouTube blocked the download. This happens when:\n"
                     "1. Too many downloads in short time\n"
@@ -901,18 +929,23 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
                     "💡 Solutions:\n"
                     "- Wait 5-10 minutes and try again\n"
                     "- Try a different video\n"
-                    "- The video might need manual download permissions"
+                    "- The video might have download restrictions"
                 )
-            downloaded_file = str(possible_files[0])
         
-        if not Path(downloaded_file).exists():
-            possible_files = list(temp_dir.glob(f"{video_id}.*"))
-            if possible_files:
-                downloaded_file = str(possible_files[0])
-            else:
-                raise Exception("Downloaded file not found after download attempt")
+        logging.info(f"✅ Video downloaded to: {downloaded_file}")
         
-        logging.info(f"✅ Downloaded to: {downloaded_file}")
+        # Use AI analysis if requested
+        ai_analysis = None
+        if use_ai:
+            ai_analysis = await analyze_video_with_ai(
+                video_id, 
+                video_title,
+                "",  # description
+                video_duration
+            )
+            start_time = ai_analysis['recommended_start']
+            duration = ai_analysis['recommended_duration']
+            logging.info(f"✨ AI recommended: start={start_time}s, duration={duration}s - {ai_analysis['reasoning']}")
         
         clip_id = str(uuid.uuid4())
         output_clip = temp_dir / f"clip_{clip_id}.mp4"
