@@ -34,6 +34,13 @@ export const Register = () => {
         full_name: fullName
       });
 
+      // Check if email verification is required
+      if (response.data.access_token === 'pending_verification') {
+        toast.success('Account created! Please check your email to verify your account.');
+        navigate(`/pending-verification?email=${encodeURIComponent(email)}`);
+        return;
+      }
+
       // Store token and user info
       localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
