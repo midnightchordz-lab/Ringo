@@ -254,29 +254,35 @@ async def register(user_data: UserRegister):
     # Create new user
     user_id = str(uuid.uuid4())
     hashed_password = get_password_hash(user_data.password)
+    verification_token = secrets.token_urlsafe(32)
     
     new_user = {
         "_id": user_id,
         "email": user_data.email,
         "full_name": user_data.full_name,
         "hashed_password": hashed_password,
+        "email_verified": False,
+        "verification_token": verification_token,
+        "auth_provider": "email",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "is_active": True
     }
     
     await db.users.insert_one(new_user)
     
-    # Create access token
-    access_token = create_access_token(data={"sub": user_id})
+    # Send verification email (non-blocking)
+    asyncio.create_task(send_verification_email(user_data.email, verification_token, user_data.full_name))
     
+    # Don't return token yet - user needs to verify email first
     return {
-        "access_token": access_token,
+        "access_token": "pending_verification",
         "token_type": "bearer",
         "user": {
             "id": user_id,
             "email": user_data.email,
             "full_name": user_data.full_name,
-            "created_at": new_user["created_at"]
+            "created_at": new_user["created_at"],
+            "email_verified": False
         }
     }
 
