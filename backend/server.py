@@ -429,35 +429,74 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         temp_dir = Path("/tmp/contentflow")
         temp_dir.mkdir(exist_ok=True)
         
-        output_template = str(temp_dir / f"{video_id}.%(ext)s")
+        # Get video info first
+        ydl_opts = {'quiet': True, 'no_warnings': True, 'skip_download': True}
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+            video_title = info.get('title', 'video')
+            video_duration = info.get('duration', 0)
         
-        ydl_opts = {
+        # Use AI analysis if requested
+        if use_ai:
+            ai_analysis = await analyze_video_with_ai(
+                video_id, 
+                video_title,
+                info.get('description', ''),
+                video_duration
+            )
+            start_time = ai_analysis['recommended_start']
+            duration = ai_analysis['recommended_duration']
+            logging.info(f"AI recommended: start={start_time}s, duration={duration}s - {ai_analysis['reasoning']}")
+        
+        # Download video
+        output_template = str(temp_dir / f"{video_id}.%(ext)s")
+        download_opts = {
             'format': 'best[height<=1080]',
             'outtmpl': output_template,
             'quiet': True,
         }
         
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
+        with yt_dlp.YoutubeDL(download_opts) as ydl:
+            ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
             downloaded_file = ydl.prepare_filename(info)
         
         clip_id = str(uuid.uuid4())
         output_clip = temp_dir / f"clip_{clip_id}.mp4"
+        output_thumbnail = temp_dir / f"thumb_{clip_id}.jpg"
         
+        # Create 9:16 vertical clip (1080x1920) with black bars if needed
         ffmpeg_cmd = [
             'ffmpeg', '-i', downloaded_file,
             '-ss', str(start_time),
             '-t', str(duration),
+            # Scale and pad to 9:16 format (1080x1920)
+            '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black',
             '-c:v', 'libx264',
+            '-preset', 'fast',
+            '-crf', '23',
             '-c:a', 'aac',
-            '-strict', 'experimental',
             '-b:a', '128k',
+            '-ar', '44100',
             '-y',
             str(output_clip)
         ]
         
         subprocess.run(ffmpeg_cmd, check=True, capture_output=True)
         
+        # Generate thumbnail at 2 seconds into the clip
+        thumb_cmd = [
+            'ffmpeg', '-i', str(output_clip),
+            '-ss', '2',
+            '-vframes', '1',
+            '-vf', 'scale=1080:1920',
+            '-q:v', '2',
+            '-y',
+            str(output_thumbnail)
+        ]
+        
+        subprocess.run(thumb_cmd, check=True, capture_output=True)
+        
+        # Clean up source file
         if Path(downloaded_file).exists():
             Path(downloaded_file).unlink()
         
@@ -467,8 +506,11 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
             "start_time": start_time,
             "duration": duration,
             "file_path": str(output_clip),
+            "thumbnail_path": str(output_thumbnail),
+            "format": "9:16 (1080x1920)",
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "status": "ready"
+            "status": "ready",
+            "ai_analysis": ai_analysis if use_ai else None
         }
         
         await db.processed_clips.insert_one(clip_data)
