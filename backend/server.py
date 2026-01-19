@@ -54,8 +54,9 @@ class VideoMetadata(BaseModel):
 
 class ClipRequest(BaseModel):
     video_id: str
-    start_time: int
-    duration: int
+    start_time: int = 0
+    duration: int = 45
+    use_ai_analysis: bool = True  # Enable AI by default
 
 class PostRequest(BaseModel):
     clip_id: str
