@@ -223,17 +223,17 @@ export const Dashboard = () => {
             ))}
           </div>
         ) : (
-          <div className=\"glass-card p-16 text-center bg-gradient-to-br from-violet-50 to-purple-50\">
-            <div className=\"w-24 h-24 mx-auto mb-6 gradient-primary rounded-3xl flex items-center justify-center shadow-xl\">
-              <Video className=\"w-12 h-12 text-white\" strokeWidth={2} />
+          <div className="glass-card p-16 text-center bg-gradient-to-br from-violet-50 to-purple-50">
+            <div className="w-24 h-24 mx-auto mb-6 gradient-primary rounded-3xl flex items-center justify-center shadow-xl">
+              <Video className="w-12 h-12 text-white" strokeWidth={2} />
             </div>
-            <h3 className=\"text-2xl font-bold text-slate-900 mb-3\">No videos yet!</h3>
-            <p className=\"text-slate-600 mb-6 text-lg\">Start discovering amazing CC content</p>
-            <Link to=\"/discover\">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">No videos yet!</h3>
+            <p className="text-slate-600 mb-6 text-lg">Start discovering amazing CC content</p>
+            <Link to="/discover">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
-                  data-testid=\"start-discovering-button\"
-                  className=\"gradient-primary text-white font-bold rounded-xl px-8 py-4 text-lg shadow-xl shadow-violet-500/30\"
+                  data-testid="start-discovering-button"
+                  className="gradient-primary text-white font-bold rounded-xl px-8 py-4 text-lg shadow-xl shadow-violet-500/30"
                 >
                   Start Discovering ✨
                 </Button>
@@ -245,11 +245,11 @@ export const Dashboard = () => {
 
       {/* Recent Activity */}
       <div>
-        <h2 className=\"text-3xl font-bold text-slate-900 mb-6\" style={{ fontFamily: 'Sora, sans-serif' }}>
+        <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: 'Sora, sans-serif' }}>
           📊 Recent Posts
         </h2>
         {stats?.recent_posts && stats.recent_posts.length > 0 ? (
-          <div className=\"glass-card overflow-hidden\">
+          <div className="glass-card overflow-hidden">
             <div className=\"overflow-x-auto\">
               <table className=\"w-full\">
                 <thead className=\"bg-gradient-to-r from-violet-100 to-purple-100\">
