@@ -21,27 +21,31 @@ api.interceptors.request.use(
   }
 );
 
-// Handle 401 errors (token expired) - but only for non-auth endpoints
+// Handle 401 errors - but DON'T auto-redirect, let components handle it
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Only redirect to login if:
-    // 1. It's a 401 error
-    // 2. Not already on login/register page
-    // 3. Not an auth-related endpoint (to prevent logout loops)
-    const isAuthEndpoint = error.config?.url?.includes('/auth/');
-    const isOnAuthPage = window.location.pathname === '/login' || 
-                         window.location.pathname === '/register' ||
-                         window.location.pathname === '/verify-email';
-    
-    if (error.response?.status === 401 && !isAuthEndpoint && !isOnAuthPage) {
-      // Double check if token exists - if it does, might be a race condition
-      const token = localStorage.getItem('token');
-      if (!token) {
-        // No token, redirect to login
-        window.location.href = '/login';
+    // Log 401 errors for debugging but don't auto-logout
+    // This prevents race conditions during navigation
+    if (error.response?.status === 401) {
+      console.warn('401 Unauthorized response:', error.config?.url);
+      // Only clear credentials if it's NOT a timing issue
+      // (i.e., if we made a request without a token at all)
+      const requestHadToken = error.config?.headers?.Authorization;
+      if (!requestHadToken) {
+        // Request was made without token - redirect to login
+        const isOnAuthPage = window.location.pathname.includes('/login') || 
+                             window.location.pathname.includes('/register') ||
+                             window.location.pathname.includes('/verify-email') ||
+                             window.location.pathname.includes('/auth/callback');
+        if (!isOnAuthPage) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+        }
       }
-      // If token exists but got 401, it might be expired - let the component handle it
+      // If request had token but got 401, token might be expired
+      // Don't auto-redirect - let user retry or the component handle it
     }
     return Promise.reject(error);
   }
