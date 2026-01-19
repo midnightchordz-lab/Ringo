@@ -42,6 +42,7 @@ function AppRouter() {
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="discover" element={<Discover />} />
+        <Route path="images" element={<Images />} />
         <Route path="video/:videoId" element={<VideoPreview />} />
         <Route path="history" element={<History />} />
         <Route path="settings" element={<Settings />} />
