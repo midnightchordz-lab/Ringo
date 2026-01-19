@@ -1,15 +1,109 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import { 
-  Search, BookOpen, GraduationCap, Music, FileText, Scroll, 
-  ExternalLink, Heart, Filter, Library, Sparkles, Globe,
+  Search, BookOpen, GraduationCap, FileText, 
+  ExternalLink, Heart, Library, Sparkles, Globe,
   Baby, School, Building2, University, BookMarked, Mic,
-  PenTool, FlaskConical, History, ChevronDown, ClipboardList, Download
+  PenTool, FlaskConical, History, ChevronDown, ClipboardList,
+  ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+
+// License Types with metadata
+const LICENSE_TYPES = {
+  'public-domain': {
+    name: 'Public Domain',
+    shortName: 'PD',
+    commercial: true,
+    derivatives: true,
+    attribution: false,
+    color: 'bg-green-500',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: 'No restrictions. Free to use for any purpose.'
+  },
+  'cc-by': {
+    name: 'CC BY',
+    shortName: 'CC BY',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-green-500',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: 'Commercial use allowed. Attribution required.'
+  },
+  'unsplash': {
+    name: 'Unsplash License',
+    shortName: 'Free',
+    commercial: true,
+    derivatives: true,
+    attribution: false,
+    color: 'bg-green-500',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: 'Free for commercial use. No attribution required.'
+  },
+  'cc-by-nc': {
+    name: 'CC BY-NC',
+    shortName: 'NC',
+    commercial: false,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-amber-500',
+    textColor: 'text-amber-400',
+    borderColor: 'border-amber-500/50',
+    description: 'Non-commercial use only. Attribution required.'
+  },
+  'cc-by-nc-sa': {
+    name: 'CC BY-NC-SA',
+    shortName: 'NC-SA',
+    commercial: false,
+    derivatives: true,
+    attribution: true,
+    shareAlike: true,
+    color: 'bg-amber-500',
+    textColor: 'text-amber-400',
+    borderColor: 'border-amber-500/50',
+    description: 'Non-commercial only. Must share adaptations under same license.'
+  },
+  'cc-by-nd': {
+    name: 'CC BY-ND',
+    shortName: 'ND',
+    commercial: true,
+    derivatives: false,
+    attribution: true,
+    color: 'bg-blue-500',
+    textColor: 'text-blue-400',
+    borderColor: 'border-blue-500/50',
+    description: 'Commercial use allowed. No modifications permitted.'
+  },
+  'edu-only': {
+    name: 'Educational Use Only',
+    shortName: 'EDU',
+    commercial: false,
+    derivatives: false,
+    attribution: false,
+    color: 'bg-orange-500',
+    textColor: 'text-orange-400',
+    borderColor: 'border-orange-500/50',
+    description: 'Free for educational/personal use only. No commercial redistribution.'
+  },
+  'varies': {
+    name: 'Varies by Content',
+    shortName: 'Varies',
+    commercial: null,
+    derivatives: null,
+    attribution: null,
+    color: 'bg-zinc-500',
+    textColor: 'text-zinc-400',
+    borderColor: 'border-zinc-500/50',
+    description: 'Each item has its own license. Check before use.'
+  }
+};
 
 // Content Categories
 const CATEGORIES = [
@@ -24,7 +118,7 @@ const CATEGORIES = [
   { id: 'historical', name: 'Historical Documents', icon: History, color: 'from-amber-500 to-yellow-500' },
 ];
 
-// Education Levels - Updated with individual grades
+// Education Levels
 const EDUCATION_LEVELS = [
   { id: 'all', name: 'All Levels', icon: Library },
   { id: 'preschool', name: 'Pre-school / Kindergarten', icon: Baby },
@@ -44,7 +138,7 @@ const EDUCATION_LEVELS = [
   { id: 'university', name: 'University / Higher Ed', icon: University },
 ];
 
-// Curated Resources Database
+// Curated Resources Database with License Information
 const CURATED_RESOURCES = [
   // ==================== ACTIVITY SHEETS / WORKSHEETS ====================
   {
@@ -56,7 +150,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
     featured: true,
     logo: '📝',
-    contentCount: '10,000+ Worksheets'
+    contentCount: '10,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'mathdrills',
@@ -67,7 +162,8 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
     featured: true,
     logo: '🔢',
-    contentCount: '50,000+ Worksheets'
+    contentCount: '50,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'worksheetfun',
@@ -78,7 +174,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
     featured: false,
     logo: '🎨',
-    contentCount: '2,000+ Worksheets'
+    contentCount: '2,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'commoncoresheets',
@@ -89,7 +186,8 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
     featured: true,
     logo: '📋',
-    contentCount: '20,000+ Worksheets'
+    contentCount: '20,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'dadsworksheets',
@@ -100,7 +198,8 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
     featured: false,
     logo: '➕',
-    contentCount: '15,000+ Worksheets'
+    contentCount: '15,000+ Worksheets',
+    license: 'cc-by'
   },
   {
     id: 'mathworksheets4kids',
@@ -111,7 +210,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
     featured: true,
     logo: '📐',
-    contentCount: '30,000+ Worksheets'
+    contentCount: '30,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'worksheetworks',
@@ -122,7 +222,8 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
     featured: false,
     logo: '⚙️',
-    contentCount: 'Custom Generator'
+    contentCount: 'Custom Generator',
+    license: 'edu-only'
   },
   {
     id: 'softschools',
@@ -133,7 +234,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
     featured: false,
     logo: '🎮',
-    contentCount: '5,000+ Resources'
+    contentCount: '5,000+ Resources',
+    license: 'edu-only'
   },
   {
     id: 'superteacher',
@@ -144,7 +246,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'primary', 'middle'],
     featured: true,
     logo: '🦸',
-    contentCount: '1,000+ Free Sheets'
+    contentCount: '1,000+ Free Sheets',
+    license: 'edu-only'
   },
   {
     id: 'edhelper',
@@ -155,7 +258,8 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
     featured: false,
     logo: '🆘',
-    contentCount: '3,000+ Free Sheets'
+    contentCount: '3,000+ Free Sheets',
+    license: 'edu-only'
   },
   {
     id: 'turtlediary',
@@ -166,7 +270,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
     featured: false,
     logo: '🐢',
-    contentCount: '4,000+ Worksheets'
+    contentCount: '4,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'mathgoodies',
@@ -177,7 +282,8 @@ const CURATED_RESOURCES = [
     levels: ['grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'middle', 'high'],
     featured: false,
     logo: '🍬',
-    contentCount: '1,000+ Worksheets'
+    contentCount: '1,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'kidslearningstation',
@@ -188,7 +294,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'primary'],
     featured: false,
     logo: '🚂',
-    contentCount: '2,500+ Printables'
+    contentCount: '2,500+ Printables',
+    license: 'edu-only'
   },
   {
     id: 'helpingwithmath',
@@ -199,7 +306,8 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
     featured: false,
     logo: '🤝',
-    contentCount: '8,000+ Worksheets'
+    contentCount: '8,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'superstarworksheets',
@@ -210,7 +318,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
     featured: true,
     logo: '⭐',
-    contentCount: '10,000+ Worksheets'
+    contentCount: '10,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'liveworksheets',
@@ -221,7 +330,8 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
     featured: true,
     logo: '💻',
-    contentCount: '1M+ Interactive Sheets'
+    contentCount: '1M+ Interactive Sheets',
+    license: 'varies'
   },
   {
     id: 'englishworksheetsland',
@@ -232,7 +342,8 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
     featured: false,
     logo: '📖',
-    contentCount: '15,000+ Worksheets'
+    contentCount: '15,000+ Worksheets',
+    license: 'edu-only'
   },
   {
     id: 'scienceworksheets',
@@ -243,10 +354,10 @@ const CURATED_RESOURCES = [
     levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
     featured: false,
     logo: '🔬',
-    contentCount: '10,000+ Worksheets'
+    contentCount: '10,000+ Worksheets',
+    license: 'edu-only'
   },
-  // ==================== EXISTING RESOURCES ====================
-  // Project Gutenberg
+  // ==================== BOOKS & LITERATURE ====================
   {
     id: 'gutenberg',
     name: 'Project Gutenberg',
@@ -256,9 +367,9 @@ const CURATED_RESOURCES = [
     levels: ['middle', 'high', 'university'],
     featured: true,
     logo: '📚',
-    contentCount: '70,000+ eBooks'
+    contentCount: '70,000+ eBooks',
+    license: 'public-domain'
   },
-  // Open Library
   {
     id: 'openlibrary',
     name: 'Open Library',
@@ -268,33 +379,9 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high', 'university'],
     featured: true,
     logo: '📖',
-    contentCount: '3M+ Books'
+    contentCount: '3M+ Books',
+    license: 'varies'
   },
-  // Khan Academy
-  {
-    id: 'khan',
-    name: 'Khan Academy',
-    description: 'Free courses in math, science, computing, history, art, economics, and more.',
-    url: 'https://www.khanacademy.org',
-    categories: ['educational', 'textbooks'],
-    levels: ['preschool', 'primary', 'middle', 'high', 'university'],
-    featured: true,
-    logo: '🎓',
-    contentCount: '10,000+ Videos'
-  },
-  // MIT OpenCourseWare
-  {
-    id: 'mit',
-    name: 'MIT OpenCourseWare',
-    description: 'Free lecture notes, exams, and videos from MIT. University-level courses.',
-    url: 'https://ocw.mit.edu',
-    categories: ['textbooks', 'educational', 'research'],
-    levels: ['university'],
-    featured: true,
-    logo: '🏛️',
-    contentCount: '2,500+ Courses'
-  },
-  // LibriVox
   {
     id: 'librivox',
     name: 'LibriVox',
@@ -304,9 +391,9 @@ const CURATED_RESOURCES = [
     levels: ['middle', 'high', 'university'],
     featured: true,
     logo: '🎧',
-    contentCount: '18,000+ Audiobooks'
+    contentCount: '18,000+ Audiobooks',
+    license: 'public-domain'
   },
-  // Poetry Foundation
   {
     id: 'poetry',
     name: 'Poetry Foundation',
@@ -316,9 +403,9 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high', 'university'],
     featured: true,
     logo: '✨',
-    contentCount: '50,000+ Poems'
+    contentCount: '50,000+ Poems',
+    license: 'varies'
   },
-  // Storynory
   {
     id: 'storynory',
     name: 'Storynory',
@@ -328,9 +415,9 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'primary'],
     featured: false,
     logo: '🧚',
-    contentCount: '700+ Stories'
+    contentCount: '700+ Stories',
+    license: 'cc-by-nc'
   },
-  // International Children\'s Digital Library
   {
     id: 'icdl',
     name: "Int'l Children's Digital Library",
@@ -340,9 +427,34 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'primary'],
     featured: false,
     logo: '🌍',
-    contentCount: '4,600+ Books'
+    contentCount: '4,600+ Books',
+    license: 'varies'
   },
-  // CK-12
+  // ==================== EDUCATIONAL COURSES ====================
+  {
+    id: 'khan',
+    name: 'Khan Academy',
+    description: 'Free courses in math, science, computing, history, art, economics, and more.',
+    url: 'https://www.khanacademy.org',
+    categories: ['educational', 'textbooks'],
+    levels: ['preschool', 'primary', 'middle', 'high', 'university'],
+    featured: true,
+    logo: '🎓',
+    contentCount: '10,000+ Videos',
+    license: 'cc-by-nc-sa'
+  },
+  {
+    id: 'mit',
+    name: 'MIT OpenCourseWare',
+    description: 'Free lecture notes, exams, and videos from MIT. University-level courses.',
+    url: 'https://ocw.mit.edu',
+    categories: ['textbooks', 'educational', 'research'],
+    levels: ['university'],
+    featured: true,
+    logo: '🏛️',
+    contentCount: '2,500+ Courses',
+    license: 'cc-by-nc-sa'
+  },
   {
     id: 'ck12',
     name: 'CK-12 Foundation',
@@ -352,9 +464,9 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high'],
     featured: true,
     logo: '📘',
-    contentCount: '5,000+ Resources'
+    contentCount: '5,000+ Resources',
+    license: 'cc-by-nc'
   },
-  // OpenStax
   {
     id: 'openstax',
     name: 'OpenStax',
@@ -364,81 +476,9 @@ const CURATED_RESOURCES = [
     levels: ['high', 'university'],
     featured: true,
     logo: '📕',
-    contentCount: '50+ Textbooks'
+    contentCount: '50+ Textbooks',
+    license: 'cc-by'
   },
-  // CORE
-  {
-    id: 'core',
-    name: 'CORE',
-    description: 'Aggregator of open access research papers. Millions of full-text articles.',
-    url: 'https://core.ac.uk',
-    categories: ['research'],
-    levels: ['university'],
-    featured: false,
-    logo: '🔬',
-    contentCount: '200M+ Papers'
-  },
-  // arXiv
-  {
-    id: 'arxiv',
-    name: 'arXiv',
-    description: 'Open access archive for scholarly articles in physics, math, CS, and more.',
-    url: 'https://arxiv.org',
-    categories: ['research'],
-    levels: ['university'],
-    featured: true,
-    logo: '📄',
-    contentCount: '2M+ Papers'
-  },
-  // DOAJ
-  {
-    id: 'doaj',
-    name: 'DOAJ',
-    description: 'Directory of Open Access Journals. Quality-controlled scientific journals.',
-    url: 'https://doaj.org',
-    categories: ['research'],
-    levels: ['university'],
-    featured: false,
-    logo: '📰',
-    contentCount: '9M+ Articles'
-  },
-  // Internet Archive
-  {
-    id: 'archive',
-    name: 'Internet Archive',
-    description: 'Digital library with books, movies, music, and historical web pages.',
-    url: 'https://archive.org',
-    categories: ['stories', 'historical', 'audiobooks', 'educational'],
-    levels: ['middle', 'high', 'university'],
-    featured: true,
-    logo: '🏛️',
-    contentCount: '35M+ Books'
-  },
-  // Europeana
-  {
-    id: 'europeana',
-    name: 'Europeana',
-    description: 'Digital access to European cultural heritage. Art, books, music, videos.',
-    url: 'https://www.europeana.eu',
-    categories: ['historical', 'educational'],
-    levels: ['middle', 'high', 'university'],
-    featured: false,
-    logo: '🇪🇺',
-    contentCount: '50M+ Items'
-  },
-  // World Digital Library
-  {
-    id: 'wdl',
-    name: 'Library of Congress',
-    description: 'Primary source materials from cultures around the world.',
-    url: 'https://www.loc.gov/collections/',
-    categories: ['historical', 'educational'],
-    levels: ['middle', 'high', 'university'],
-    featured: false,
-    logo: '🗽',
-    contentCount: '170M+ Items'
-  },
-  // Coursera (Free Courses)
   {
     id: 'coursera',
     name: 'Coursera (Free Courses)',
@@ -448,9 +488,9 @@ const CURATED_RESOURCES = [
     levels: ['high', 'university'],
     featured: false,
     logo: '🎯',
-    contentCount: '5,000+ Courses'
+    contentCount: '5,000+ Courses',
+    license: 'varies'
   },
-  // edX
   {
     id: 'edx',
     name: 'edX',
@@ -460,9 +500,9 @@ const CURATED_RESOURCES = [
     levels: ['high', 'university'],
     featured: true,
     logo: '🎓',
-    contentCount: '3,000+ Courses'
+    contentCount: '3,000+ Courses',
+    license: 'varies'
   },
-  // PBS LearningMedia
   {
     id: 'pbs',
     name: 'PBS LearningMedia',
@@ -472,9 +512,9 @@ const CURATED_RESOURCES = [
     levels: ['preschool', 'primary', 'middle', 'high'],
     featured: false,
     logo: '📺',
-    contentCount: '100,000+ Resources'
+    contentCount: '100,000+ Resources',
+    license: 'edu-only'
   },
-  // Smithsonian Learning Lab
   {
     id: 'smithsonian',
     name: 'Smithsonian Learning Lab',
@@ -484,9 +524,9 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high'],
     featured: false,
     logo: '🏛️',
-    contentCount: '4M+ Resources'
+    contentCount: '4M+ Resources',
+    license: 'edu-only'
   },
-  // National Geographic Education
   {
     id: 'natgeo',
     name: 'National Geographic Education',
@@ -496,9 +536,9 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high'],
     featured: false,
     logo: '🌎',
-    contentCount: '1,000+ Resources'
+    contentCount: '1,000+ Resources',
+    license: 'edu-only'
   },
-  // Lit2Go
   {
     id: 'lit2go',
     name: 'Lit2Go',
@@ -508,9 +548,9 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high'],
     featured: false,
     logo: '📖',
-    contentCount: '200+ Books'
+    contentCount: '200+ Books',
+    license: 'public-domain'
   },
-  // ReadWorks
   {
     id: 'readworks',
     name: 'ReadWorks',
@@ -520,9 +560,9 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high'],
     featured: false,
     logo: '📝',
-    contentCount: '3,000+ Passages'
+    contentCount: '3,000+ Passages',
+    license: 'edu-only'
   },
-  // CommonLit
   {
     id: 'commonlit',
     name: 'CommonLit',
@@ -532,18 +572,132 @@ const CURATED_RESOURCES = [
     levels: ['primary', 'middle', 'high'],
     featured: false,
     logo: '📚',
-    contentCount: '2,000+ Texts'
+    contentCount: '2,000+ Texts',
+    license: 'edu-only'
+  },
+  // ==================== RESEARCH PAPERS ====================
+  {
+    id: 'core',
+    name: 'CORE',
+    description: 'Aggregator of open access research papers. Millions of full-text articles.',
+    url: 'https://core.ac.uk',
+    categories: ['research'],
+    levels: ['university'],
+    featured: false,
+    logo: '🔬',
+    contentCount: '200M+ Papers',
+    license: 'varies'
+  },
+  {
+    id: 'arxiv',
+    name: 'arXiv',
+    description: 'Open access archive for scholarly articles in physics, math, CS, and more.',
+    url: 'https://arxiv.org',
+    categories: ['research'],
+    levels: ['university'],
+    featured: true,
+    logo: '📄',
+    contentCount: '2M+ Papers',
+    license: 'varies'
+  },
+  {
+    id: 'doaj',
+    name: 'DOAJ',
+    description: 'Directory of Open Access Journals. Quality-controlled scientific journals.',
+    url: 'https://doaj.org',
+    categories: ['research'],
+    levels: ['university'],
+    featured: false,
+    logo: '📰',
+    contentCount: '9M+ Articles',
+    license: 'varies'
+  },
+  // ==================== HISTORICAL ====================
+  {
+    id: 'archive',
+    name: 'Internet Archive',
+    description: 'Digital library with books, movies, music, and historical web pages.',
+    url: 'https://archive.org',
+    categories: ['stories', 'historical', 'audiobooks', 'educational'],
+    levels: ['middle', 'high', 'university'],
+    featured: true,
+    logo: '🏛️',
+    contentCount: '35M+ Books',
+    license: 'varies'
+  },
+  {
+    id: 'europeana',
+    name: 'Europeana',
+    description: 'Digital access to European cultural heritage. Art, books, music, videos.',
+    url: 'https://www.europeana.eu',
+    categories: ['historical', 'educational'],
+    levels: ['middle', 'high', 'university'],
+    featured: false,
+    logo: '🇪🇺',
+    contentCount: '50M+ Items',
+    license: 'varies'
+  },
+  {
+    id: 'wdl',
+    name: 'Library of Congress',
+    description: 'Primary source materials from cultures around the world.',
+    url: 'https://www.loc.gov/collections/',
+    categories: ['historical', 'educational'],
+    levels: ['middle', 'high', 'university'],
+    featured: false,
+    logo: '🗽',
+    contentCount: '170M+ Items',
+    license: 'public-domain'
   },
 ];
 
+// License Badge Component
+const LicenseBadge = ({ license, showFull = false }) => {
+  const licenseInfo = LICENSE_TYPES[license] || LICENSE_TYPES['varies'];
+  
+  return (
+    <div className="flex items-center gap-1.5" title={licenseInfo.description}>
+      <span className={`px-2 py-0.5 rounded text-xs font-bold ${licenseInfo.color} text-white`}>
+        {showFull ? licenseInfo.name : licenseInfo.shortName}
+      </span>
+      {licenseInfo.commercial === true && (
+        <ShieldCheck className="w-3.5 h-3.5 text-green-400" title="Commercial use allowed" />
+      )}
+      {licenseInfo.commercial === false && (
+        <ShieldAlert className="w-3.5 h-3.5 text-amber-400" title="Non-commercial only" />
+      )}
+    </div>
+  );
+};
+
+// Warning Banner Component
+const NonCommercialWarning = ({ license }) => {
+  const licenseInfo = LICENSE_TYPES[license];
+  if (!licenseInfo || licenseInfo.commercial !== false) return null;
+  
+  return (
+    <div className="mt-3 p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-2">
+      <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+      <div className="text-xs text-amber-300">
+        <span className="font-bold">Non-Commercial Only:</span> {licenseInfo.description}
+      </div>
+    </div>
+  );
+};
+
 const ResourceCard = ({ resource, onFavorite, isFavorited }) => {
+  const licenseInfo = LICENSE_TYPES[resource.license] || LICENSE_TYPES['varies'];
+  const isCommercialSafe = licenseInfo.commercial === true;
+  
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="glass-card p-5 hover:border-violet-500/50 transition-all group"
+      className={`glass-card p-5 hover:border-violet-500/50 transition-all group ${
+        !isCommercialSafe && licenseInfo.commercial === false ? `border-l-4 ${licenseInfo.borderColor}` : ''
+      }`}
       data-testid="resource-card"
     >
       <div className="flex items-start justify-between mb-3">
@@ -571,11 +725,19 @@ const ResourceCard = ({ resource, onFavorite, isFavorited }) => {
         </button>
       </div>
       
-      <p className="text-zinc-400 text-sm mb-4 line-clamp-2">
+      {/* License Badge */}
+      <div className="mb-3">
+        <LicenseBadge license={resource.license} />
+      </div>
+      
+      <p className="text-zinc-400 text-sm mb-3 line-clamp-2">
         {resource.description}
       </p>
       
-      <div className="flex flex-wrap gap-1 mb-4">
+      {/* Non-Commercial Warning */}
+      <NonCommercialWarning license={resource.license} />
+      
+      <div className="flex flex-wrap gap-1 mb-4 mt-3">
         {resource.categories.slice(0, 3).map((cat) => {
           const category = CATEGORIES.find(c => c.id === cat);
           return (
@@ -623,8 +785,7 @@ export const ContentLibrary = () => {
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
-  const [gutenbergBooks, setGutenbergBooks] = useState([]);
-  const [loadingBooks, setLoadingBooks] = useState(false);
+  const [commercialSafeOnly, setCommercialSafeOnly] = useState(false);
 
   useEffect(() => {
     fetchFavorites();
@@ -636,22 +797,6 @@ export const ContentLibrary = () => {
       setFavorites(response.data.favorites || []);
     } catch (error) {
       console.error('Error fetching favorites:', error);
-    }
-  };
-
-  const searchGutenberg = async () => {
-    if (!searchQuery.trim()) return;
-    
-    setLoadingBooks(true);
-    try {
-      const response = await api.get('/content-library/gutenberg/search', {
-        params: { query: searchQuery, limit: 12 }
-      });
-      setGutenbergBooks(response.data.books || []);
-    } catch (error) {
-      console.error('Error searching Gutenberg:', error);
-    } finally {
-      setLoadingBooks(false);
     }
   };
 
@@ -694,7 +839,11 @@ export const ContentLibrary = () => {
       resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    return matchesCategory && matchesLevel && matchesSearch;
+    // Commercial safe filter
+    const licenseInfo = LICENSE_TYPES[resource.license] || LICENSE_TYPES['varies'];
+    const matchesCommercial = !commercialSafeOnly || licenseInfo.commercial === true;
+    
+    return matchesCategory && matchesLevel && matchesSearch && matchesCommercial;
   });
 
   if (showFavorites) {
@@ -705,6 +854,12 @@ export const ContentLibrary = () => {
   const otherResources = filteredResources.filter(r => !r.featured);
 
   const selectedLevelInfo = EDUCATION_LEVELS.find(l => l.id === selectedLevel);
+
+  // Count commercial safe resources
+  const commercialSafeCount = CURATED_RESOURCES.filter(r => {
+    const licenseInfo = LICENSE_TYPES[r.license];
+    return licenseInfo?.commercial === true;
+  }).length;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
@@ -717,6 +872,34 @@ export const ContentLibrary = () => {
           </h1>
         </div>
         <p className="text-zinc-500">Copyright-free educational resources for all learning levels</p>
+      </div>
+
+      {/* License Legend */}
+      <div className="glass-card p-4 mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Info className="w-4 h-4 text-violet-400" />
+          <span className="text-sm font-semibold text-white">License Guide</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-green-500 text-white">PD / CC BY</span>
+            <ShieldCheck className="w-4 h-4 text-green-400" />
+            <span className="text-xs text-zinc-400">Commercial OK</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-amber-500 text-white">NC / NC-SA</span>
+            <ShieldAlert className="w-4 h-4 text-amber-400" />
+            <span className="text-xs text-zinc-400">Non-Commercial</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-500 text-white">ND</span>
+            <span className="text-xs text-zinc-400">No Derivatives</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-orange-500 text-white">EDU</span>
+            <span className="text-xs text-zinc-400">Educational Only</span>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -755,7 +938,7 @@ export const ContentLibrary = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-50 top-14 left-0 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden"
+                  className="absolute z-50 top-14 left-0 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden max-h-80 overflow-y-auto"
                 >
                   {EDUCATION_LEVELS.map((level) => (
                     <button
@@ -777,6 +960,20 @@ export const ContentLibrary = () => {
             </AnimatePresence>
           </div>
 
+          {/* Commercial Safe Toggle */}
+          <Button
+            onClick={() => setCommercialSafeOnly(!commercialSafeOnly)}
+            className={`h-12 px-6 rounded-lg flex items-center gap-2 ${
+              commercialSafeOnly 
+                ? 'bg-green-600 hover:bg-green-500 text-white' 
+                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+            }`}
+            data-testid="commercial-safe-toggle"
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Commercial Safe ({commercialSafeCount})
+          </Button>
+
           {/* Favorites Toggle */}
           <Button
             onClick={() => setShowFavorites(!showFavorites)}
@@ -788,7 +985,7 @@ export const ContentLibrary = () => {
             data-testid="favorites-toggle"
           >
             <Heart className="w-4 h-4" fill={showFavorites ? 'currentColor' : 'none'} />
-            My Favorites ({favorites.length})
+            Favorites ({favorites.length})
           </Button>
         </div>
       </div>
@@ -820,11 +1017,11 @@ export const ContentLibrary = () => {
       <div className="flex items-center justify-between mb-6 px-2">
         <p className="text-zinc-500">
           Showing <span className="text-[#BEF264] font-bold">{filteredResources.length}</span> resources
-          {selectedCategory !== 'all' && (
-            <span className="text-zinc-600"> in {CATEGORIES.find(c => c.id === selectedCategory)?.name}</span>
-          )}
-          {selectedLevel !== 'all' && (
-            <span className="text-zinc-600"> for {EDUCATION_LEVELS.find(l => l.id === selectedLevel)?.name}</span>
+          {commercialSafeOnly && (
+            <span className="ml-2 text-green-400 text-sm">
+              <ShieldCheck className="w-4 h-4 inline mr-1" />
+              Commercial-safe only
+            </span>
           )}
         </p>
       </div>
@@ -885,7 +1082,9 @@ export const ContentLibrary = () => {
           <p className="text-zinc-500 mb-6">
             {showFavorites 
               ? 'Click the heart icon on resources to save them here'
-              : 'Try adjusting your filters or search term'}
+              : commercialSafeOnly 
+                ? 'No commercial-safe resources match your filters. Try disabling the filter.'
+                : 'Try adjusting your filters or search term'}
           </p>
           {showFavorites && (
             <Button
@@ -895,11 +1094,19 @@ export const ContentLibrary = () => {
               Browse Resources
             </Button>
           )}
+          {commercialSafeOnly && !showFavorites && (
+            <Button
+              onClick={() => setCommercialSafeOnly(false)}
+              className="bg-green-600 hover:bg-green-500 text-white rounded-full px-6"
+            >
+              Show All Resources
+            </Button>
+          )}
         </div>
       )}
 
       {/* Quick Access Section */}
-      {!showFavorites && selectedCategory === 'all' && selectedLevel === 'all' && !searchQuery && (
+      {!showFavorites && selectedCategory === 'all' && selectedLevel === 'all' && !searchQuery && !commercialSafeOnly && (
         <div className="mt-12">
           {/* Quick Access for Grades 1-10 */}
           <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
