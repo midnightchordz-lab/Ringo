@@ -88,6 +88,69 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+async def send_verification_email(email: str, token: str, full_name: str):
+    """Send email verification link"""
+    if not RESEND_API_KEY:
+        logging.warning("No Resend API key configured, skipping email")
+        return
+    
+    verification_link = f"{FRONTEND_URL}/verify-email?token={token}"
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }}
+            .container {{ max-width: 600px; margin: 40px auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }}
+            .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; }}
+            .header h1 {{ color: white; margin: 0; font-size: 32px; font-weight: 800; }}
+            .content {{ padding: 40px; }}
+            .content h2 {{ color: #1a202c; font-size: 24px; margin-bottom: 16px; }}
+            .content p {{ color: #4a5568; font-size: 16px; line-height: 1.6; margin: 16px 0; }}
+            .button {{ display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 18px; margin: 24px 0; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }}
+            .footer {{ background: #f7fafc; padding: 24px; text-align: center; color: #718096; font-size: 14px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>✨ ContentFlow</h1>
+            </div>
+            <div class="content">
+                <h2>Welcome, {full_name}!</h2>
+                <p>Thanks for signing up for ContentFlow! We're excited to have you on board.</p>
+                <p>To get started, please verify your email address by clicking the button below:</p>
+                <div style="text-align: center;">
+                    <a href="{verification_link}" class="button">Verify Email Address</a>
+                </div>
+                <p style="font-size: 14px; color: #718096; margin-top: 32px;">
+                    If you didn't create an account, you can safely ignore this email.
+                </p>
+            </div>
+            <div class="footer">
+                <p>© 2025 ContentFlow. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    try:
+        params = {
+            "from": SENDER_EMAIL,
+            "to": [email],
+            "subject": "Verify your ContentFlow account ✨",
+            "html": html_content
+        }
+        
+        await asyncio.to_thread(resend.Emails.send, params)
+        logging.info(f"Verification email sent to {email}")
+    except Exception as e:
+        logging.error(f"Failed to send verification email: {str(e)}")
+        # Don't raise exception - registration should still succeed
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
