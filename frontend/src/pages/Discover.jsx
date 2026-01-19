@@ -27,22 +27,22 @@ const VideoCard = ({ video }) => (
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <Play className="w-16 h-16 text-[#BEF264]" fill="#BEF264" />
         </div>
+        <div className="absolute top-3 left-3 flex gap-2">
+          {video.is_cc_licensed ? (
+            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-green-500/30 text-green-300 border border-green-400/50 backdrop-blur-sm">
+              CC BY
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-yellow-500/30 text-yellow-300 border border-yellow-400/50 backdrop-blur-sm">
+              Standard
+            </span>
+          )}
+        </div>
         <div className="absolute top-3 right-3">
           <span className="viral-badge flex items-center space-x-1">
             <TrendingUp className="w-3 h-3" />
             <span>{video.viral_score}</span>
           </span>
-        </div>
-        <div className="absolute bottom-3 left-3 flex gap-2">
-          {video.is_cc_licensed ? (
-            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
-              CC BY
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-              Standard
-            </span>
-          )}
         </div>
       </div>
       <div className="p-4">
