@@ -1397,6 +1397,142 @@ async def remove_favorite_image(
         logging.error(f"Error removing favorite: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ==================== CONTENT LIBRARY ENDPOINTS ====================
+
+class ContentLibraryFavorite(BaseModel):
+    resource_id: str
+    name: str
+    description: str
+    url: str
+    logo: str
+    categories: list
+    levels: list
+
+@api_router.get("/content-library/favorites")
+async def get_content_library_favorites(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get user's favorite content library resources"""
+    try:
+        user_id = current_user.get("user_id") or str(current_user.get("_id"))
+        
+        favorites = await db.content_library_favorites.find(
+            {"user_id": user_id},
+            {"_id": 0}
+        ).to_list(length=100)
+        
+        return {"favorites": favorites, "total": len(favorites)}
+    
+    except Exception as e:
+        logging.error(f"Error getting content library favorites: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/content-library/favorites")
+async def add_content_library_favorite(
+    resource: ContentLibraryFavorite,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add a resource to content library favorites"""
+    try:
+        user_id = current_user.get("user_id") or str(current_user.get("_id"))
+        
+        # Check if already favorited
+        existing = await db.content_library_favorites.find_one({
+            "user_id": user_id,
+            "resource_id": resource.resource_id
+        })
+        
+        if existing:
+            raise HTTPException(status_code=400, detail="Resource already in favorites")
+        
+        favorite = {
+            "user_id": user_id,
+            "resource_id": resource.resource_id,
+            "name": resource.name,
+            "description": resource.description,
+            "url": resource.url,
+            "logo": resource.logo,
+            "categories": resource.categories,
+            "levels": resource.levels,
+            "added_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.content_library_favorites.insert_one(favorite)
+        
+        return {"success": True, "message": "Resource added to favorites"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error adding content library favorite: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/content-library/favorites/{resource_id}")
+async def remove_content_library_favorite(
+    resource_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Remove a resource from content library favorites"""
+    try:
+        user_id = current_user.get("user_id") or str(current_user.get("_id"))
+        
+        result = await db.content_library_favorites.delete_one({
+            "user_id": user_id,
+            "resource_id": resource_id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Resource not found in favorites")
+        
+        return {"success": True, "message": "Resource removed from favorites"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error removing content library favorite: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/content-library/gutenberg/search")
+async def search_gutenberg(
+    query: str = Query(..., description="Search query"),
+    limit: int = Query(default=12, le=50),
+    current_user: dict = Depends(get_current_user)
+):
+    """Search Project Gutenberg for books"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://gutendex.com/books/",
+                params={"search": query, "page": 1},
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                books = []
+                for book in data.get("results", [])[:limit]:
+                    books.append({
+                        "id": book["id"],
+                        "title": book["title"],
+                        "authors": [a["name"] for a in book.get("authors", [])],
+                        "subjects": book.get("subjects", [])[:3],
+                        "languages": book.get("languages", []),
+                        "download_count": book.get("download_count", 0),
+                        "formats": {
+                            "html": book.get("formats", {}).get("text/html", ""),
+                            "epub": book.get("formats", {}).get("application/epub+zip", ""),
+                            "txt": book.get("formats", {}).get("text/plain; charset=utf-8", "")
+                        },
+                        "cover": book.get("formats", {}).get("image/jpeg", "")
+                    })
+                return {"books": books, "total": data.get("count", 0)}
+            else:
+                return {"books": [], "total": 0}
+    
+    except Exception as e:
+        logging.error(f"Error searching Gutenberg: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
 
 app.add_middleware(
