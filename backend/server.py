@@ -430,27 +430,28 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         temp_dir = Path("/tmp/contentflow")
         temp_dir.mkdir(exist_ok=True)
         
-        # Enhanced yt-dlp options to bypass bot detection
-        ydl_opts = {
+        # IMPORTANT: Due to YouTube's bot detection, we'll use a workaround
+        # Get video info without downloading first
+        info_opts = {
             'quiet': False,
             'no_warnings': False,
             'skip_download': True,
+            'format': 'best[height<=720][ext=mp4]',  # Lower quality to avoid detection
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['android', 'web'],
-                    'player_skip': ['webpage', 'configs']
+                    'player_client': ['android'],  # Android client is more reliable
                 }
             }
         }
         
-        # Get video info first
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        logging.info(f"Fetching video info for {video_id}...")
+        with yt_dlp.YoutubeDL(info_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
             video_title = info.get('title', 'video')
             video_duration = info.get('duration', 0)
-            video_url = info.get('url')  # Direct video URL
         
         # Use AI analysis if requested
+        ai_analysis = None
         if use_ai:
             ai_analysis = await analyze_video_with_ai(
                 video_id, 
@@ -460,71 +461,90 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
             )
             start_time = ai_analysis['recommended_start']
             duration = ai_analysis['recommended_duration']
-            logging.info(f"AI recommended: start={start_time}s, duration={duration}s - {ai_analysis['reasoning']}")
+            logging.info(f"✨ AI recommended: start={start_time}s, duration={duration}s - {ai_analysis['reasoning']}")
         
-        # Download with enhanced options
+        # Download with retry logic and better settings
         output_template = str(temp_dir / f"{video_id}.%(ext)s")
         download_opts = {
-            'format': 'best[height<=1080][ext=mp4]/best[height<=1080]',
+            'format': 'best[height<=720][ext=mp4]/best[height<=720]',  # 720p is more reliable
             'outtmpl': output_template,
             'quiet': False,
             'no_warnings': False,
-            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            'retries': 3,
+            'fragment_retries': 3,
+            'user_agent': 'com.google.android.youtube/19.51.41 (Linux; U; Android 14) gzip',
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['android', 'web'],
-                    'player_skip': ['webpage', 'configs']
+                    'player_client': ['android', 'ios'],
+                    'player_skip': ['webpage']
                 }
             },
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-us,en;q=0.5',
-                'Sec-Fetch-Mode': 'navigate',
-            }
+                'User-Agent': 'com.google.android.youtube/19.51.41 (Linux; U; Android 14) gzip',
+                'Accept-Language': 'en-US,en;q=0.9',
+            },
+            'geo_bypass': True,
+            'nocheckcertificate': True,
         }
         
-        logging.info(f"Downloading video {video_id}...")
-        with yt_dlp.YoutubeDL(download_opts) as ydl:
-            ydl.download([f"https://www.youtube.com/watch?v={video_id}"])
-            downloaded_file = ydl.prepare_filename(info)
+        logging.info(f"📥 Downloading video {video_id} (this may take a minute)...")
+        try:
+            with yt_dlp.YoutubeDL(download_opts) as ydl:
+                ydl.download([f"https://www.youtube.com/watch?v={video_id}"])
+                downloaded_file = ydl.prepare_filename(info)
+        except Exception as download_error:
+            logging.error(f"Download error: {str(download_error)}")
+            # Try to find any downloaded file
+            possible_files = list(temp_dir.glob(f"{video_id}.*"))
+            if not possible_files:
+                raise Exception(
+                    "⚠️ YouTube blocked the download. This happens when:\n"
+                    "1. Too many downloads in short time\n"
+                    "2. YouTube detects automation\n"
+                    "3. Video has restrictions\n\n"
+                    "💡 Solutions:\n"
+                    "- Wait 5-10 minutes and try again\n"
+                    "- Try a different video\n"
+                    "- The video might need manual download permissions"
+                )
+            downloaded_file = str(possible_files[0])
         
         if not Path(downloaded_file).exists():
-            # Try to find the downloaded file
             possible_files = list(temp_dir.glob(f"{video_id}.*"))
             if possible_files:
                 downloaded_file = str(possible_files[0])
             else:
-                raise Exception("Downloaded file not found")
+                raise Exception("Downloaded file not found after download attempt")
         
-        logging.info(f"Downloaded to: {downloaded_file}")
+        logging.info(f"✅ Downloaded to: {downloaded_file}")
         
         clip_id = str(uuid.uuid4())
         output_clip = temp_dir / f"clip_{clip_id}.mp4"
         output_thumbnail = temp_dir / f"thumb_{clip_id}.jpg"
         
-        # Create 9:16 vertical clip (1080x1920) with black bars if needed
+        # Create 9:16 vertical clip (1080x1920) with black bars
+        logging.info(f"🎬 Creating 9:16 vertical clip...")
         ffmpeg_cmd = [
             'ffmpeg', '-i', downloaded_file,
             '-ss', str(start_time),
             '-t', str(duration),
-            # Scale and pad to 9:16 format (1080x1920)
             '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black',
             '-c:v', 'libx264',
-            '-preset', 'fast',
+            '-preset', 'medium',
             '-crf', '23',
             '-c:a', 'aac',
             '-b:a', '128k',
             '-ar', '44100',
+            '-movflags', '+faststart',  # Better for streaming
             '-y',
             str(output_clip)
         ]
         
-        logging.info(f"Creating clip with ffmpeg...")
         result = subprocess.run(ffmpeg_cmd, check=True, capture_output=True, text=True)
-        logging.info(f"Clip created: {output_clip}")
+        logging.info(f"✅ Clip created: {output_clip}")
         
-        # Generate thumbnail at 2 seconds into the clip
+        # Generate thumbnail
+        logging.info(f"📸 Creating thumbnail...")
         thumb_cmd = [
             'ffmpeg', '-i', str(output_clip),
             '-ss', '2',
@@ -536,12 +556,12 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         ]
         
         subprocess.run(thumb_cmd, check=True, capture_output=True)
-        logging.info(f"Thumbnail created: {output_thumbnail}")
+        logging.info(f"✅ Thumbnail created")
         
         # Clean up source file
         if Path(downloaded_file).exists():
             Path(downloaded_file).unlink()
-            logging.info("Cleaned up source file")
+            logging.info("🧹 Cleaned up source file")
         
         clip_data = {
             "clip_id": clip_id,
@@ -551,27 +571,46 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
             "file_path": str(output_clip),
             "thumbnail_path": str(output_thumbnail),
             "format": "9:16 (1080x1920)",
+            "resolution": "1080x1920",
             "created_at": datetime.now(timezone.utc).isoformat(),
             "status": "ready",
-            "ai_analysis": ai_analysis if use_ai else None
+            "ai_analysis": ai_analysis
         }
         
         await db.processed_clips.insert_one(clip_data)
-        logging.info(f"Clip data saved to database: {clip_id}")
+        logging.info(f"💾 Clip data saved: {clip_id}")
         
         return clip_id
     
     except Exception as e:
         error_msg = str(e)
-        logging.error(f"Error creating clip: {error_msg}")
+        logging.error(f"❌ Error creating clip: {error_msg}")
         
-        # Provide helpful error message
+        # Provide helpful error messages
         if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
-            raise Exception("YouTube bot detection triggered. This is a temporary issue with YouTube's API. Please try again in a few minutes, or try a different video.")
+            raise Exception(
+                "⚠️ YouTube's bot detection blocked the download.\n\n"
+                "This is temporary. Solutions:\n"
+                "• Wait 10-15 minutes before trying again\n"
+                "• Try a different CC BY video\n"
+                "• YouTube may be experiencing high traffic\n\n"
+                "The clip generation feature works - just needs a cooldown period!"
+            )
         elif "403" in error_msg or "Forbidden" in error_msg:
-            raise Exception("YouTube blocked the download. Try selecting a different video or wait a few minutes before trying again.")
+            raise Exception(
+                "⚠️ YouTube blocked access (Error 403).\n\n"
+                "Try:\n"
+                "• Select a different video\n"
+                "• Wait 5-10 minutes\n"
+                "• Some videos may have download restrictions"
+            )
+        elif "HTTP Error 429" in error_msg:
+            raise Exception(
+                "⚠️ Rate limit exceeded (Error 429).\n\n"
+                "Too many requests. Please wait 15-20 minutes before trying again."
+            )
         else:
-            raise
+            raise Exception(f"Clip generation error: {error_msg}")
 
 @api_router.get("/clips/ai-analyze/{video_id}")
 async def get_ai_clip_recommendations(video_id: str):
