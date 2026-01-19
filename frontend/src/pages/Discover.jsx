@@ -62,6 +62,8 @@ export const Discover = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [minViews, setMinViews] = useState(1000);
+  const [maxResults, setMaxResults] = useState(50);
 
   const handleSearch = async () => {
     if (!searchQuery.trim() && videos.length > 0) return;
@@ -71,7 +73,8 @@ export const Discover = () => {
       const response = await axios.get(`${API}/discover`, {
         params: {
           query: searchQuery,
-          max_results: 20
+          max_results: maxResults,
+          min_views: minViews
         }
       });
       setVideos(response.data.videos);
