@@ -4,7 +4,7 @@ import {
   Search, BookOpen, GraduationCap, Music, FileText, Scroll, 
   ExternalLink, Heart, Filter, Library, Sparkles, Globe,
   Baby, School, Building2, University, BookMarked, Mic,
-  PenTool, FlaskConical, History, ChevronDown
+  PenTool, FlaskConical, History, ChevronDown, ClipboardList, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 // Content Categories
 const CATEGORIES = [
   { id: 'all', name: 'All Content', icon: Library, color: 'from-violet-500 to-purple-500' },
+  { id: 'worksheets', name: 'Activity Sheets', icon: ClipboardList, color: 'from-lime-500 to-green-500' },
   { id: 'stories', name: 'Stories & Fiction', icon: BookOpen, color: 'from-blue-500 to-cyan-500' },
   { id: 'poetry', name: 'Poetry', icon: PenTool, color: 'from-pink-500 to-rose-500' },
   { id: 'educational', name: 'Educational Articles', icon: GraduationCap, color: 'from-green-500 to-emerald-500' },
@@ -23,10 +24,20 @@ const CATEGORIES = [
   { id: 'historical', name: 'Historical Documents', icon: History, color: 'from-amber-500 to-yellow-500' },
 ];
 
-// Education Levels
+// Education Levels - Updated with individual grades
 const EDUCATION_LEVELS = [
   { id: 'all', name: 'All Levels', icon: Library },
   { id: 'preschool', name: 'Pre-school / Kindergarten', icon: Baby },
+  { id: 'grade1', name: 'Grade 1', icon: School },
+  { id: 'grade2', name: 'Grade 2', icon: School },
+  { id: 'grade3', name: 'Grade 3', icon: School },
+  { id: 'grade4', name: 'Grade 4', icon: School },
+  { id: 'grade5', name: 'Grade 5', icon: School },
+  { id: 'grade6', name: 'Grade 6', icon: Building2 },
+  { id: 'grade7', name: 'Grade 7', icon: Building2 },
+  { id: 'grade8', name: 'Grade 8', icon: Building2 },
+  { id: 'grade9', name: 'Grade 9', icon: GraduationCap },
+  { id: 'grade10', name: 'Grade 10', icon: GraduationCap },
   { id: 'primary', name: 'Primary School (1-5)', icon: School },
   { id: 'middle', name: 'Middle School (6-8)', icon: Building2 },
   { id: 'high', name: 'High School (9-12)', icon: GraduationCap },
@@ -35,6 +46,206 @@ const EDUCATION_LEVELS = [
 
 // Curated Resources Database
 const CURATED_RESOURCES = [
+  // ==================== ACTIVITY SHEETS / WORKSHEETS ====================
+  {
+    id: 'k5learning',
+    name: 'K5 Learning',
+    description: 'Free printable worksheets for K-5. Math, reading, spelling, grammar, science, and vocabulary.',
+    url: 'https://www.k5learning.com/free-worksheets',
+    categories: ['worksheets', 'educational'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
+    featured: true,
+    logo: '📝',
+    contentCount: '10,000+ Worksheets'
+  },
+  {
+    id: 'mathdrills',
+    name: 'Math-Drills.com',
+    description: 'Free math worksheets covering all topics from basic operations to algebra and geometry.',
+    url: 'https://www.math-drills.com',
+    categories: ['worksheets'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
+    featured: true,
+    logo: '🔢',
+    contentCount: '50,000+ Worksheets'
+  },
+  {
+    id: 'worksheetfun',
+    name: 'Worksheet Fun',
+    description: 'Free printable worksheets for preschool through 5th grade. Tracing, coloring, math, and more.',
+    url: 'https://www.worksheetfun.com',
+    categories: ['worksheets'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
+    featured: false,
+    logo: '🎨',
+    contentCount: '2,000+ Worksheets'
+  },
+  {
+    id: 'commoncoresheets',
+    name: 'Common Core Sheets',
+    description: 'Free Common Core aligned worksheets for math, ELA, science, and social studies.',
+    url: 'https://www.commoncoresheets.com',
+    categories: ['worksheets', 'educational'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
+    featured: true,
+    logo: '📋',
+    contentCount: '20,000+ Worksheets'
+  },
+  {
+    id: 'dadsworksheets',
+    name: "Dad's Worksheets",
+    description: 'Free printable math worksheets including multiplication, division, fractions, and word problems.',
+    url: 'https://www.dadsworksheets.com',
+    categories: ['worksheets'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
+    featured: false,
+    logo: '➕',
+    contentCount: '15,000+ Worksheets'
+  },
+  {
+    id: 'mathworksheets4kids',
+    name: 'Math Worksheets 4 Kids',
+    description: 'Free math worksheets organized by grade and topic. From counting to calculus.',
+    url: 'https://www.mathworksheets4kids.com',
+    categories: ['worksheets'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
+    featured: true,
+    logo: '📐',
+    contentCount: '30,000+ Worksheets'
+  },
+  {
+    id: 'worksheetworks',
+    name: 'WorksheetWorks.com',
+    description: 'Generate custom worksheets for math, writing, puzzles, and geography.',
+    url: 'https://www.worksheetworks.com',
+    categories: ['worksheets'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
+    featured: false,
+    logo: '⚙️',
+    contentCount: 'Custom Generator'
+  },
+  {
+    id: 'softschools',
+    name: 'SoftSchools',
+    description: 'Free worksheets, games, and quizzes for math, grammar, science, and social studies.',
+    url: 'https://www.softschools.com/worksheets/',
+    categories: ['worksheets', 'educational'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
+    featured: false,
+    logo: '🎮',
+    contentCount: '5,000+ Resources'
+  },
+  {
+    id: 'superteacher',
+    name: 'Super Teacher Worksheets',
+    description: 'Printable worksheets for reading, math, writing, science, and holidays. Some free content.',
+    url: 'https://www.superteacherworksheets.com/full-free.html',
+    categories: ['worksheets', 'educational'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'primary', 'middle'],
+    featured: true,
+    logo: '🦸',
+    contentCount: '1,000+ Free Sheets'
+  },
+  {
+    id: 'edhelper',
+    name: 'edHelper',
+    description: 'Free worksheets for reading comprehension, math, spelling, and critical thinking.',
+    url: 'https://www.edhelper.com/teacher-free-stuff.htm',
+    categories: ['worksheets', 'educational'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
+    featured: false,
+    logo: '🆘',
+    contentCount: '3,000+ Free Sheets'
+  },
+  {
+    id: 'turtlediary',
+    name: 'Turtle Diary',
+    description: 'Free printable worksheets and games for pre-K through 5th grade in all subjects.',
+    url: 'https://www.turtlediary.com/worksheets.html',
+    categories: ['worksheets'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
+    featured: false,
+    logo: '🐢',
+    contentCount: '4,000+ Worksheets'
+  },
+  {
+    id: 'mathgoodies',
+    name: 'Math Goodies',
+    description: 'Free interactive math lessons and worksheets for grades 5-12. Algebra, geometry, statistics.',
+    url: 'https://www.mathgoodies.com/worksheets',
+    categories: ['worksheets'],
+    levels: ['grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'middle', 'high'],
+    featured: false,
+    logo: '🍬',
+    contentCount: '1,000+ Worksheets'
+  },
+  {
+    id: 'kidslearningstation',
+    name: 'Kids Learning Station',
+    description: 'Free educational printables for toddlers through 2nd grade. ABCs, numbers, shapes.',
+    url: 'https://www.kidslearningstation.com',
+    categories: ['worksheets'],
+    levels: ['preschool', 'grade1', 'grade2', 'primary'],
+    featured: false,
+    logo: '🚂',
+    contentCount: '2,500+ Printables'
+  },
+  {
+    id: 'helpingwithmath',
+    name: 'Helping With Math',
+    description: 'Free math worksheets, lessons, and homework help for K-10.',
+    url: 'https://www.helpingwithmath.com/worksheets/',
+    categories: ['worksheets'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
+    featured: false,
+    logo: '🤝',
+    contentCount: '8,000+ Worksheets'
+  },
+  {
+    id: 'superstarworksheets',
+    name: 'Superstar Worksheets',
+    description: 'Free printable worksheets for pre-K through 8th grade in all subjects.',
+    url: 'https://www.superstarworksheets.com',
+    categories: ['worksheets', 'educational'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
+    featured: true,
+    logo: '⭐',
+    contentCount: '10,000+ Worksheets'
+  },
+  {
+    id: 'liveworksheets',
+    name: 'Live Worksheets',
+    description: 'Interactive worksheets that students can complete online. All subjects, all grades.',
+    url: 'https://www.liveworksheets.com',
+    categories: ['worksheets', 'educational'],
+    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
+    featured: true,
+    logo: '💻',
+    contentCount: '1M+ Interactive Sheets'
+  },
+  {
+    id: 'englishworksheetsland',
+    name: 'English Worksheets Land',
+    description: 'Free ELA worksheets: grammar, reading, writing, vocabulary for all grades.',
+    url: 'https://www.englishworksheetsland.com',
+    categories: ['worksheets'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
+    featured: false,
+    logo: '📖',
+    contentCount: '15,000+ Worksheets'
+  },
+  {
+    id: 'scienceworksheets',
+    name: 'Easy Teacher Worksheets',
+    description: 'Free science, math, and language arts worksheets for all grade levels.',
+    url: 'https://www.easyteacherworksheets.com',
+    categories: ['worksheets', 'educational'],
+    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
+    featured: false,
+    logo: '🔬',
+    contentCount: '10,000+ Worksheets'
+  },
+  // ==================== EXISTING RESOURCES ====================
   // Project Gutenberg
   {
     id: 'gutenberg',
