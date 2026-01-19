@@ -65,7 +65,7 @@ export const Discover = () => {
     
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/discover`, {
+      const response = await api.get('/discover', {
         params: {
           query: searchQuery,
           max_results: maxResults,
