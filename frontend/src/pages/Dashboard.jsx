@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TrendingUp, Video, Upload, BarChart3, Play, Trash2, AlertCircle, Zap, Star } from 'lucide-react';
+import { TrendingUp, Video, Upload, BarChart3, Play, Trash2, AlertCircle, Zap, Star, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
