@@ -1189,6 +1189,209 @@ async def get_api_keys():
         logging.error(f"Error getting API keys: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ==================== IMAGE SEARCH ENDPOINTS ====================
+
+class FavoriteImageModel(BaseModel):
+    image_id: str
+    url: str
+    thumbnail: str
+    title: str
+    photographer: str
+    source: str  # 'unsplash' or 'pexels'
+    download_url: str
+    width: int
+    height: int
+
+@api_router.get("/images/search")
+async def search_images(
+    query: str = Query(..., description="Search query for images"),
+    page: int = Query(default=1, ge=1),
+    per_page: int = Query(default=30, le=50),
+    current_user: dict = Depends(get_current_user)
+):
+    """Search for copyright-free images from Unsplash and Pexels"""
+    try:
+        images = []
+        
+        # Search Unsplash
+        async with httpx.AsyncClient() as client:
+            try:
+                unsplash_response = await client.get(
+                    "https://api.unsplash.com/search/photos",
+                    params={
+                        "query": query,
+                        "page": page,
+                        "per_page": per_page // 2,
+                        "orientation": "landscape"
+                    },
+                    headers={
+                        "Authorization": "Client-ID AAixfeNvsTzLqWVgKJs_EL3mSYMPdCfL_TU_uobmzr4"
+                    },
+                    timeout=10.0
+                )
+                if unsplash_response.status_code == 200:
+                    unsplash_data = unsplash_response.json()
+                    for photo in unsplash_data.get("results", []):
+                        images.append({
+                            "id": f"unsplash_{photo['id']}",
+                            "url": photo["urls"]["regular"],
+                            "thumbnail": photo["urls"]["small"],
+                            "title": photo.get("description") or photo.get("alt_description") or "Untitled",
+                            "photographer": photo["user"]["name"],
+                            "photographer_url": photo["user"]["links"]["html"],
+                            "source": "unsplash",
+                            "download_url": photo["urls"]["full"],
+                            "width": photo["width"],
+                            "height": photo["height"],
+                            "color": photo.get("color", "#000000"),
+                            "likes": photo.get("likes", 0)
+                        })
+            except Exception as e:
+                logging.warning(f"Unsplash API error: {str(e)}")
+            
+            # Search Pexels
+            try:
+                pexels_response = await client.get(
+                    "https://api.pexels.com/v1/search",
+                    params={
+                        "query": query,
+                        "page": page,
+                        "per_page": per_page // 2
+                    },
+                    headers={
+                        "Authorization": "QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq"
+                    },
+                    timeout=10.0
+                )
+                if pexels_response.status_code == 200:
+                    pexels_data = pexels_response.json()
+                    for photo in pexels_data.get("photos", []):
+                        images.append({
+                            "id": f"pexels_{photo['id']}",
+                            "url": photo["src"]["large"],
+                            "thumbnail": photo["src"]["medium"],
+                            "title": photo.get("alt") or "Untitled",
+                            "photographer": photo["photographer"],
+                            "photographer_url": photo["photographer_url"],
+                            "source": "pexels",
+                            "download_url": photo["src"]["original"],
+                            "width": photo["width"],
+                            "height": photo["height"],
+                            "color": photo.get("avg_color", "#000000"),
+                            "likes": 0
+                        })
+            except Exception as e:
+                logging.warning(f"Pexels API error: {str(e)}")
+        
+        # Interleave results from both sources
+        unsplash_images = [img for img in images if img["source"] == "unsplash"]
+        pexels_images = [img for img in images if img["source"] == "pexels"]
+        
+        combined = []
+        max_len = max(len(unsplash_images), len(pexels_images))
+        for i in range(max_len):
+            if i < len(unsplash_images):
+                combined.append(unsplash_images[i])
+            if i < len(pexels_images):
+                combined.append(pexels_images[i])
+        
+        return {
+            "images": combined,
+            "total": len(combined),
+            "page": page,
+            "query": query
+        }
+    
+    except Exception as e:
+        logging.error(f"Error searching images: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/images/favorites")
+async def add_favorite_image(
+    image: FavoriteImageModel,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add an image to user's favorites"""
+    try:
+        user_id = current_user.get("user_id") or str(current_user.get("_id"))
+        
+        # Check if already favorited
+        existing = await db.favorite_images.find_one({
+            "user_id": user_id,
+            "image_id": image.image_id
+        })
+        
+        if existing:
+            raise HTTPException(status_code=400, detail="Image already in favorites")
+        
+        favorite = {
+            "user_id": user_id,
+            "image_id": image.image_id,
+            "url": image.url,
+            "thumbnail": image.thumbnail,
+            "title": image.title,
+            "photographer": image.photographer,
+            "source": image.source,
+            "download_url": image.download_url,
+            "width": image.width,
+            "height": image.height,
+            "added_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.favorite_images.insert_one(favorite)
+        
+        return {"success": True, "message": "Image added to favorites"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error adding favorite: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/images/favorites")
+async def get_favorite_images(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get user's favorite images"""
+    try:
+        user_id = current_user.get("user_id") or str(current_user.get("_id"))
+        
+        favorites = await db.favorite_images.find(
+            {"user_id": user_id},
+            {"_id": 0}
+        ).sort("added_at", -1).to_list(length=100)
+        
+        return {"favorites": favorites, "total": len(favorites)}
+    
+    except Exception as e:
+        logging.error(f"Error getting favorites: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/images/favorites/{image_id}")
+async def remove_favorite_image(
+    image_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Remove an image from user's favorites"""
+    try:
+        user_id = current_user.get("user_id") or str(current_user.get("_id"))
+        
+        result = await db.favorite_images.delete_one({
+            "user_id": user_id,
+            "image_id": image_id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Image not found in favorites")
+        
+        return {"success": True, "message": "Image removed from favorites"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error removing favorite: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
 
 app.add_middleware(
