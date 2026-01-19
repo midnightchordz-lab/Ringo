@@ -790,7 +790,7 @@ async def get_ai_clip_recommendations(video_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/clips/generate")
-async def generate_clip(clip_request: ClipRequest, background_tasks: BackgroundTasks):
+async def generate_clip(clip_request: ClipRequest, background_tasks: BackgroundTasks, current_user: dict = Depends(get_current_user)):
     try:
         if not clip_request.use_ai_analysis:
             # Manual timing validation
