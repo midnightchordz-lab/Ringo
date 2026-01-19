@@ -1,0 +1,176 @@
+{
+  "identity": {
+    "name": "ViralFlow Studio",
+    "persona": "The Electric Editor",
+    "tone": "High-Voltage, Precision, Viral-Focused",
+    "aesthetic": "Dark Mode, Neon Accents, Glassmorphism, Data-Dense"
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Oswald, sans-serif",
+      "weights": ["500", "700"],
+      "usage": "Page titles, Viral Scores, Key Metrics",
+      "letter_spacing": "tracking-tight"
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "General text, tables, descriptions",
+      "letter_spacing": "tracking-normal"
+    },
+    "mono": {
+      "font_family": "JetBrains Mono, monospace",
+      "usage": "Timestamps, IDs, Code snippets"
+    }
+  },
+  "colors": {
+    "theme": "dark",
+    "palette": {
+      "background": {
+        "default": "#09090B",
+        "paper": "#18181B",
+        "subtle": "#27272A"
+      },
+      "primary": {
+        "main": "#BEF264",
+        "light": "#D9F99D",
+        "dark": "#A3E635",
+        "foreground": "#1A2E05"
+      },
+      "secondary": {
+        "main": "#A855F7",
+        "light": "#C084FC",
+        "dark": "#9333EA",
+        "foreground": "#FFFFFF"
+      },
+      "accent": {
+        "youtube": "#EF4444",
+        "instagram": "#EC4899",
+        "viral_high": "#BEF264",
+        "viral_med": "#FACC15",
+        "viral_low": "#F87171"
+      },
+      "text": {
+        "primary": "#FAFAFA",
+        "secondary": "#A1A1AA",
+        "muted": "#52525B"
+      },
+      "border": {
+        "default": "#27272A",
+        "active": "#3F3F46"
+      }
+    },
+    "gradients": {
+      "viral_glow": "linear-gradient(135deg, #BEF264 0%, #84CC16 100%)",
+      "glass_surface": "linear-gradient(180deg, rgba(24, 24, 27, 0.6) 0%, rgba(24, 24, 27, 0.8) 100%)"
+    }
+  },
+  "layout": {
+    "spacing_scale": "px-4, px-6, px-8, px-12, px-16",
+    "container": {
+      "max_width": "max-w-7xl",
+      "padding": "px-4 sm:px-6 lg:px-8"
+    },
+    "grid_system": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
+      "cards": "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    },
+    "bento_grid": {
+      "hero": "col-span-full lg:col-span-8 row-span-2",
+      "stat": "col-span-1 sm:col-span-2 lg:col-span-4",
+      "list": "col-span-full lg:col-span-4 row-span-2"
+    }
+  },
+  "components": {
+    "cards": {
+      "style": "glass",
+      "classes": "bg-zinc-900/50 backdrop-blur-md border border-white/10 rounded-xl shadow-xl hover:border-white/20 transition-all duration-300",
+      "hover_effect": "hover:-translate-y-1 hover:shadow-2xl"
+    },
+    "buttons": {
+      "primary": "bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-full px-6 py-2 shadow-[0_0_15px_rgba(190,242,100,0.3)] hover:shadow-[0_0_25px_rgba(190,242,100,0.5)] transition-all",
+      "secondary": "bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700 rounded-full px-6 py-2",
+      "ghost": "text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg px-4 py-2"
+    },
+    "inputs": {
+      "style": "minimal",
+      "classes": "bg-zinc-950/50 border-zinc-800 focus:border-[#BEF264] focus:ring-1 focus:ring-[#BEF264] rounded-lg text-white placeholder:text-zinc-600"
+    },
+    "navigation": {
+      "sidebar": "bg-zinc-950 border-r border-zinc-800 w-64 hidden lg:block fixed h-full",
+      "mobile_nav": "lg:hidden fixed bottom-0 w-full bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-800 z-50"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-black/40 border border-white/10",
+    "neon_glow": "shadow-[0_0_20px_rgba(190,242,100,0.15)]",
+    "noise_texture": "url('/assets/noise.png') opacity-5",
+    "borders": "border border-white/5"
+  },
+  "motion": {
+    "page_transition": {
+      "initial": { "opacity": 0, "y": 20 },
+      "animate": { "opacity": 1, "y": 0 },
+      "exit": { "opacity": 0, "y": -20 },
+      "transition": { "duration": 0.3, "ease": "easeOut" }
+    },
+    "hover_scale": {
+      "scale": 1.02,
+      "transition": { "duration": 0.2 }
+    }
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "style": "stroke-width={1.5}"
+    },
+    "images": {
+      "placeholders": {
+        "video_thumbnails": [
+          "https://images.unsplash.com/photo-1632931612792-fbaacfd952f6?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1683201681321-1415b8794e73?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1733681198831-eb4b838c6f77?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1694878982378-4fc7fb9ca415?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ],
+        "avatars": [
+          "https://images.unsplash.com/photo-1754643128657-cbf034a77202?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1754643127643-6b05da592b92?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1754643128759-a2279dc0de4e?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ],
+        "social_icons_3d": [
+          "https://images.unsplash.com/photo-1683721003111-070bcc053d8b?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1694109010480-2f7aa9ceb339?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ]
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. INSTALLATION: Run 'npm install lucide-react recharts framer-motion clsx tailwind-merge' immediately.",
+    "2. FONTS: Add '@import url(\"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Oswald:wght@500;700&family=JetBrains+Mono&display=swap\");' to index.css.",
+    "3. THEME: Force dark mode in tailwind.config.js or apply 'dark' class to html/body by default.",
+    "4. LAYOUT: Use the 'Bento Grid' strategy for the Dashboard Home. Don't just stack cards.",
+    "5. VIRAL SCORE: Always display the 'Viral Score' prominently using the primary neon color (#BEF264).",
+    "6. GLASSMORPHISM: Use the provided glass classes for all cards and overlays. Do not use solid opaque backgrounds for cards.",
+    "7. CHARTS: Use Recharts. Customize the Tooltip to be a glass card. Hide grid lines or make them very subtle (#ffffff10).",
+    "8. IMAGES: Use the provided Unsplash URLs for placeholders. Do not leave empty image blocks.",
+    "9. NAVIGATION: Create a sidebar for desktop and a bottom nav for mobile. Use Lucide icons.",
+    "10. DATA-TESTID: Add data-testid to all interactive elements (buttons, inputs, cards)."
+  ],
+  "universal_guidelines": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms.",
+    "You MUST NOT center align the app container.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations.",
+    "NEVER use AI assistant Emoji characters for icons.",
+    "Every interaction needs micro-animations - hover states, transitions.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Components MUST use named exports.",
+    "Pages MUST use default exports.",
+    "Use sonner for toasts."
+  ]
+}
