@@ -1,6 +1,8 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Search, Clock, Settings, Sparkles, TrendingUp } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Search, Clock, Settings, Sparkles, TrendingUp, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Dashboard' },
@@ -11,6 +13,16 @@ const navItems = [
 
 export const Layout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
