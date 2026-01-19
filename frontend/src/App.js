@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import Layout from '@/components/Layout';
 import Dashboard from '@/pages/Dashboard';
@@ -6,14 +6,27 @@ import Discover from '@/pages/Discover';
 import VideoPreview from '@/pages/VideoPreview';
 import History from '@/pages/History';
 import Settings from '@/pages/Settings';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
 import '@/App.css';
+
+// Protected Route wrapper
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" replace />;
+};
 
 function App() {
   return (
-    <div className="App min-h-screen bg-zinc-950">
+    <div className="App min-h-screen">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          {/* Protected routes */}
+          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="discover" element={<Discover />} />
             <Route path="video/:videoId" element={<VideoPreview />} />
