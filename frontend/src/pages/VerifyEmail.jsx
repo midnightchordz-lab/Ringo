@@ -1,13 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 export const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
@@ -15,21 +11,9 @@ export const VerifyEmail = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = searchParams.get('token');
-
-    if (!token) {
-      setStatus('error');
-      setMessage('Invalid verification link');
-      return;
-    }
-
-    verifyEmail(token);
-  }, []);
-
-  const verifyEmail = async (token) => {
+  const verifyEmail = useCallback(async (token) => {
     try {
-      const response = await axios.get(`${API}/auth/verify-email`, {
+      const response = await api.get('/auth/verify-email', {
         params: { token }
       });
 
@@ -53,7 +37,19 @@ export const VerifyEmail = () => {
       setStatus('error');
       setMessage(error.response?.data?.detail || 'Verification failed');
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+
+    if (!token) {
+      setStatus('error');
+      setMessage('Invalid verification link');
+      return;
+    }
+
+    verifyEmail(token);
+  }, [searchParams, verifyEmail]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -78,7 +74,7 @@ export const VerifyEmail = () => {
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
-              Email Verified! 🎉
+              Email Verified!
             </h1>
             <p className="text-slate-600 mb-6">{message}</p>
             <p className="text-sm text-slate-500">Redirecting to dashboard...</p>
