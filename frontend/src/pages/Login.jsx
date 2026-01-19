@@ -31,7 +31,11 @@ export const Login = () => {
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
       toast.success(`Welcome back, ${response.data.user.full_name}!`);
-      navigate('/');
+      
+      // Small delay to ensure localStorage is synced before navigation
+      setTimeout(() => {
+        navigate('/');
+      }, 100);
     } catch (error) {
       console.error('Login error:', error);
       toast.error(error.response?.data?.detail || 'Login failed');
