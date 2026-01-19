@@ -33,10 +33,14 @@ const VideoCard = ({ video }) => (
             <span>{video.viral_score}</span>
           </span>
         </div>
-        <div className="absolute bottom-3 left-3">
-          {video.is_cc_licensed && (
+        <div className="absolute bottom-3 left-3 flex gap-2">
+          {video.is_cc_licensed ? (
             <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
               CC BY
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+              Standard
             </span>
           )}
         </div>
