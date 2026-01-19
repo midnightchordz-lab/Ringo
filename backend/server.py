@@ -294,11 +294,14 @@ async def login(user_data: UserLogin):
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     
-    # Check if email provider (skip password check for OAuth users)
+    # Check if OAuth provider (skip password check for OAuth users)
     if user.get("auth_provider") == "google":
         raise HTTPException(status_code=400, detail="Please sign in with Google")
     
-    # Verify password
+    # Verify password (check if hashed_password exists)
+    if not user.get("hashed_password"):
+        raise HTTPException(status_code=400, detail="Invalid account configuration. Please contact support.")
+    
     if not verify_password(user_data.password, user["hashed_password"]):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     
@@ -310,13 +313,13 @@ async def login(user_data: UserLogin):
         )
     
     # Create access token
-    access_token = create_access_token(data={"sub": user["_id"]})
+    access_token = create_access_token(data={"sub": user.get("_id") or user.get("user_id")})
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "user": {
-            "id": user["_id"],
+            "id": user.get("_id") or user.get("user_id"),
             "email": user["email"],
             "full_name": user["full_name"],
             "created_at": user["created_at"]
