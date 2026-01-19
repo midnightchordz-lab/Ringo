@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { TrendingUp, Video, Upload, BarChart3, Play, Trash2, AlertCircle, Zap, Star, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const StatCard = ({ icon: Icon, label, value, trend, gradient }) => (
   <motion.div
