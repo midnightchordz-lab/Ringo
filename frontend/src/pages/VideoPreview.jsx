@@ -138,32 +138,7 @@ export const VideoPreview = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card overflow-hidden">
             <div className="aspect-video bg-zinc-900 relative">
-              {videoId ? (
-                <ReactPlayer
-                  url={`https://www.youtube.com/watch?v=${videoId}`}
-                  width="100%"
-                  height="100%"
-                  controls={true}
-                  playing={false}
-                  light={false}
-                  config={{
-                    youtube: {
-                      playerVars: { 
-                        showinfo: 1,
-                        modestbranding: 1,
-                        rel: 0,
-                        autoplay: 0
-                      }
-                    }
-                  }}
-                  onError={(e) => console.error('Video player error:', e)}
-                  onReady={() => console.log('Video player ready')}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-zinc-500">Loading video...</p>
-                </div>
-              )}
+              <YouTubePlayer videoId={videoId} />
             </div>
           </div>
 
