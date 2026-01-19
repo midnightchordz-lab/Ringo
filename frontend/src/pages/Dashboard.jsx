@@ -91,7 +91,7 @@ export const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get(`${API}/stats`);
+      const response = await api.get('/stats');
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -103,7 +103,7 @@ export const Dashboard = () => {
   const handleClearVideos = async () => {
     setClearing(true);
     try {
-      const response = await axios.post(`${API}/clear-videos`);
+      const response = await api.post('/clear-videos');
       toast.success(response.data.message);
       setShowClearModal(false);
       fetchStats();
