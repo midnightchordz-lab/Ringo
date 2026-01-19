@@ -89,7 +89,7 @@ async def discover_videos(
             try:
                 youtube = build('youtube', 'v3', developerKey=youtube_api_key, cache_discovery=False)
                 
-                search_query = f"{query} creative commons" if query else "creative commons"
+                search_query = f"{query}" if query else "creative commons"
                 
                 # Search for videos with Creative Commons license
                 search_request = youtube.search().list(
@@ -97,12 +97,25 @@ async def discover_videos(
                     q=search_query,
                     type='video',
                     videoLicense='creativeCommon',
-                    maxResults=max_results,
-                    order='viewCount'
+                    maxResults=50,
+                    order='viewCount',
+                    videoDuration='medium'  # 4-20 minutes videos
                 )
                 search_response = search_request.execute()
                 
                 video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+                
+                if not video_ids:
+                    # If no CC videos found, try without license filter
+                    search_request = youtube.search().list(
+                        part='id,snippet',
+                        q=f"{search_query} creative commons",
+                        type='video',
+                        maxResults=50,
+                        order='viewCount'
+                    )
+                    search_response = search_request.execute()
+                    video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
                 
                 if not video_ids:
                     return {"videos": [], "total": 0}
@@ -123,9 +136,17 @@ async def discover_videos(
                     likes = int(stats.get('likeCount', 0))
                     comments = int(stats.get('commentCount', 0))
                     
+                    # Apply minimum views filter
+                    if views < min_views:
+                        continue
+                    
                     # Parse duration
                     duration_str = item['contentDetails']['duration']
                     duration_seconds = parse_youtube_duration(duration_str)
+                    
+                    # Skip very short or very long videos
+                    if duration_seconds < 60 or duration_seconds > 3600:
+                        continue
                     
                     # Parse upload date
                     upload_date = snippet['publishedAt']
@@ -137,10 +158,11 @@ async def discover_videos(
                         days_ago = 365
                         upload_date_formatted = upload_date[:10].replace('-', '')
                     
-                    if views < 10000:
-                        continue
-                    
                     viral_score = calculate_viral_score(views, likes, comments, days_ago)
+                    
+                    # Check if it's actually CC licensed
+                    license_type = item.get('status', {}).get('license', 'youtube')
+                    is_cc = license_type == 'creativeCommon'
                     
                     videos.append({
                         'id': item['id'],
@@ -153,12 +175,15 @@ async def discover_videos(
                         'comments': comments,
                         'viral_score': viral_score,
                         'upload_date': upload_date_formatted,
-                        'license': 'Creative Commons',
-                        'is_cc_licensed': True,
+                        'license': 'Creative Commons' if is_cc else 'Standard YouTube',
+                        'is_cc_licensed': is_cc,
                         'description': snippet.get('description', '')[:200]
                     })
                 
                 videos.sort(key=lambda x: x['viral_score'], reverse=True)
+                
+                # Limit to max_results
+                videos = videos[:max_results]
                 
                 await db.discovered_videos.delete_many({})
                 if videos:
