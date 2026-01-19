@@ -128,7 +128,18 @@ export const VideoPreview = () => {
                 url={`https://www.youtube.com/watch?v=${videoId}`}
                 width="100%"
                 height="100%"
-                controls
+                controls={true}
+                playing={false}
+                config={{
+                  youtube: {
+                    playerVars: { 
+                      showinfo: 1,
+                      modestbranding: 1,
+                      rel: 0
+                    }
+                  }
+                }}
+                style={{ backgroundColor: '#18181b' }}
               />
             </div>
           </div>
