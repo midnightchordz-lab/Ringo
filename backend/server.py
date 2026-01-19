@@ -229,7 +229,9 @@ async def discover_videos(
             
             await db.discovered_videos.delete_many({})
             if videos:
+                # Insert and then fetch back without _id
                 await db.discovered_videos.insert_many(videos)
+                videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
             
             return {"videos": videos, "total": len(videos)}
     
