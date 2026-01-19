@@ -525,19 +525,23 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
 @api_router.post("/clips/generate")
 async def generate_clip(clip_request: ClipRequest, background_tasks: BackgroundTasks):
     try:
-        if clip_request.duration < 10 or clip_request.duration > 60:
-            raise HTTPException(status_code=400, detail="Clip duration must be between 10-60 seconds")
+        if not clip_request.use_ai_analysis:
+            # Manual timing validation
+            if clip_request.duration < 10 or clip_request.duration > 60:
+                raise HTTPException(status_code=400, detail="Clip duration must be between 10-60 seconds")
         
         clip_id = await download_and_clip_video(
             clip_request.video_id,
             clip_request.start_time,
-            clip_request.duration
+            clip_request.duration,
+            clip_request.use_ai_analysis
         )
         
         return {
             "success": True,
             "clip_id": clip_id,
-            "message": "Clip generated successfully"
+            "message": "Clip generated successfully with AI analysis!" if clip_request.use_ai_analysis else "Clip generated successfully!",
+            "format": "9:16 (1080x1920) - Perfect for Instagram Reels & YouTube Shorts"
         }
     
     except Exception as e:
