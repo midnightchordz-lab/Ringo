@@ -210,6 +210,7 @@ async def google_oauth_callback(session_id: str = Form(...)):
                 "full_name": oauth_data["name"],
                 "picture": oauth_data.get("picture", ""),
                 "auth_provider": "google",
+                "email_verified": True,  # Google emails are pre-verified
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "is_active": True
             }
