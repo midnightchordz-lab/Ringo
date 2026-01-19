@@ -166,27 +166,27 @@ export const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           icon={Video}
-          label=\"Videos Found\"
+          label="Videos Found"
           value={stats?.total_videos_discovered || 0}
-          gradient=\"bg-gradient-to-br from-violet-100 to-purple-100\"
+          gradient="bg-gradient-to-br from-violet-100 to-purple-100"
         />
         <StatCard
           icon={TrendingUp}
-          label=\"Clips Made\"
+          label="Clips Made"
           value={stats?.total_clips_generated || 0}
-          gradient=\"bg-gradient-to-br from-cyan-100 to-blue-100\"
+          gradient="bg-gradient-to-br from-cyan-100 to-blue-100"
         />
         <StatCard
           icon={Upload}
-          label=\"Posts Live\"
+          label="Posts Live"
           value={stats?.total_posts_published || 0}
-          gradient=\"bg-gradient-to-br from-pink-100 to-rose-100\"
+          gradient="bg-gradient-to-br from-pink-100 to-rose-100"
         />
         <StatCard
           icon={BarChart3}
-          label=\"Viral Score\"
+          label="Viral Score"
           value={stats?.top_videos?.[0]?.viral_score?.toFixed(1) || '0.0'}
-          gradient=\"bg-gradient-to-br from-amber-100 to-orange-100\"
+          gradient="bg-gradient-to-br from-amber-100 to-orange-100"
         />
       </div>
 
