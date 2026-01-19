@@ -28,15 +28,9 @@ const VideoCard = ({ video }) => (
           <Play className="w-16 h-16 text-[#BEF264]" fill="#BEF264" />
         </div>
         <div className="absolute top-3 left-3 flex gap-2">
-          {video.is_cc_licensed ? (
-            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-green-500/30 text-green-300 border border-green-400/50 backdrop-blur-sm">
-              CC BY
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-yellow-500/30 text-yellow-300 border border-yellow-400/50 backdrop-blur-sm">
-              Standard
-            </span>
-          )}
+          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-green-500/30 text-green-300 border border-green-400/50 backdrop-blur-sm">
+            CC BY
+          </span>
         </div>
         <div className="absolute top-3 right-3">
           <span className="viral-badge flex items-center space-x-1">
