@@ -433,7 +433,7 @@ def parse_youtube_duration(duration_str: str) -> int:
     return hours * 3600 + minutes * 60 + seconds
 
 @api_router.post("/clear-videos")
-async def clear_discovered_videos():
+async def clear_discovered_videos(current_user: dict = Depends(get_current_user)):
     try:
         result = await db.discovered_videos.delete_many({})
         return {
@@ -446,7 +446,7 @@ async def clear_discovered_videos():
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/videos/{video_id}")
-async def get_video_details(video_id: str):
+async def get_video_details(video_id: str, current_user: dict = Depends(get_current_user)):
     try:
         video = await db.discovered_videos.find_one({"id": video_id}, {"_id": 0})
         
