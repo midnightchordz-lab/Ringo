@@ -148,12 +148,23 @@ export const VideoPreview = () => {
           <div className="glass-card p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
+                <div className="flex items-center gap-3 mb-3">
+                  {video.is_cc_licensed ? (
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-green-500/30 text-green-300 border border-green-400/50">
+                      ✓ CC BY Licensed
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-yellow-500/30 text-yellow-300 border border-yellow-400/50">
+                      Standard YouTube License
+                    </span>
+                  )}
+                </div>
                 <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Oswald, sans-serif' }}>
                   {video.title}
                 </h1>
                 <p className="text-zinc-500">{video.channel}</p>
               </div>
-              <span className="viral-badge flex items-center space-x-1">
+              <span className="viral-badge flex items-center space-x-1 ml-4">
                 <TrendingUp className="w-4 h-4" />
                 <span>{video.viral_score}</span>
               </span>
