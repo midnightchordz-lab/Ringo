@@ -7,7 +7,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional
+from typing import List, Optional, Dict
 import uuid
 from datetime import datetime, timezone
 import yt_dlp
@@ -19,6 +19,9 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from emergentintegrations.llm.chat import LlmChat, UserMessage
+import json
+import re
 
 
 ROOT_DIR = Path(__file__).parent
