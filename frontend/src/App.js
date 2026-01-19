@@ -9,6 +9,8 @@ import Settings from '@/pages/Settings';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AuthCallback from '@/pages/AuthCallback';
+import VerifyEmail from '@/pages/VerifyEmail';
+import PendingVerification from '@/pages/PendingVerification';
 import '@/App.css';
 
 // Protected Route wrapper
@@ -32,6 +34,8 @@ function AppRouter() {
       {/* Public routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/pending-verification" element={<PendingVerification />} />
       
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
