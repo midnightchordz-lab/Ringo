@@ -25,6 +25,8 @@ import json
 import re
 from passlib.context import CryptContext
 from jose import JWTError, jwt
+import resend
+import secrets
 
 
 ROOT_DIR = Path(__file__).parent
