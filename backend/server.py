@@ -217,7 +217,8 @@ async def discover_videos(
                 # Don't fallback to yt-dlp for CC-only search
                 raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
         
-        # Fallback: Use yt-dlp for search
+        # Fallback: Use yt-dlp for CC search (only if API fails)
+        logging.warning("Using yt-dlp fallback for CC content search")
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
@@ -236,8 +237,12 @@ async def discover_videos(
                     if not entry:
                         continue
                     
-                    license_info = entry.get('license', '')
-                    is_cc = 'creative commons' in str(license_info).lower() or 'cc' in str(license_info).lower()
+                    # STRICT: Only include if explicitly CC licensed
+                    license_info = str(entry.get('license', '')).lower()
+                    is_cc = 'creative commons' in license_info or (license_info and 'cc' in license_info and 'by' in license_info)
+                    
+                    if not is_cc:
+                        continue
                     
                     views = entry.get('view_count', 0) or 0
                     likes = entry.get('like_count', 0) or 0
@@ -266,8 +271,8 @@ async def discover_videos(
                         'comments': comments,
                         'viral_score': viral_score,
                         'upload_date': upload_date,
-                        'license': license_info or 'Unknown',
-                        'is_cc_licensed': is_cc
+                        'license': 'Creative Commons',
+                        'is_cc_licensed': True
                     })
             
             videos.sort(key=lambda x: x['viral_score'], reverse=True)
