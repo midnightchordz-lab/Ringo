@@ -284,38 +284,38 @@ export const Dashboard = () => {
             </div>
           </div>
         ) : (
-          <div className=\"glass-card p-16 text-center bg-gradient-to-br from-pink-50 to-rose-50\">
-            <div className=\"w-24 h-24 mx-auto mb-6 gradient-secondary rounded-3xl flex items-center justify-center shadow-xl\">
-              <Upload className=\"w-12 h-12 text-white\" strokeWidth={2} />
+          <div className="glass-card p-16 text-center bg-gradient-to-br from-pink-50 to-rose-50">
+            <div className="w-24 h-24 mx-auto mb-6 gradient-secondary rounded-3xl flex items-center justify-center shadow-xl">
+              <Upload className="w-12 h-12 text-white" strokeWidth={2} />
             </div>
-            <h3 className=\"text-2xl font-bold text-slate-900 mb-3\">No posts yet!</h3>
-            <p className=\"text-slate-600 text-lg\">Your published content will appear here</p>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">No posts yet!</h3>
+            <p className="text-slate-600 text-lg">Your published content will appear here</p>
           </div>
         )}
       </div>
 
       {/* Clear Confirmation Modal */}
       {showClearModal && (
-        <div className=\"fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4\" onClick={() => setShowClearModal(false)}>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowClearModal(false)}>
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className=\"glass-card p-8 max-w-md w-full shadow-2xl\"
+            className="glass-card p-8 max-w-md w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className=\"flex items-start space-x-4\">
-              <div className=\"w-14 h-14 bg-gradient-to-br from-red-400 to-pink-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg\">
-                <AlertCircle className=\"w-7 h-7 text-white\" strokeWidth={2.5} />
+            <div className="flex items-start space-x-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-pink-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                <AlertCircle className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
-              <div className=\"flex-1\">
-                <h3 className=\"text-2xl font-bold text-slate-900 mb-3\" style={{ fontFamily: 'Sora, sans-serif' }}>Clear All Videos?</h3>
-                <p className=\"text-slate-600 mb-6 font-medium\">
-                  This will remove all <span className=\"font-bold text-violet-600\">{stats?.total_videos_discovered}</span> discovered videos. This action cannot be undone.
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-slate-900 mb-3" style={{ fontFamily: 'Sora, sans-serif' }}>Clear All Videos?</h3>
+                <p className="text-slate-600 mb-6 font-medium">
+                  This will remove all <span className="font-bold text-violet-600">{stats?.total_videos_discovered}</span> discovered videos. This action cannot be undone.
                 </p>
-                <div className=\"flex space-x-3\">
+                <div className="flex space-x-3">
                   <Button
                     onClick={() => setShowClearModal(false)}
-                    className=\"flex-1 bg-slate-200 text-slate-700 hover:bg-slate-300 font-bold rounded-xl py-3\"
+                    className="flex-1 bg-slate-200 text-slate-700 hover:bg-slate-300 font-bold rounded-xl py-3"
                     disabled={clearing}
                   >
                     Cancel
@@ -323,7 +323,7 @@ export const Dashboard = () => {
                   <Button
                     onClick={handleClearVideos}
                     disabled={clearing}
-                    className=\"flex-1 gradient-secondary text-white font-bold rounded-xl py-3 shadow-lg shadow-red-500/30\"
+                    className="flex-1 gradient-secondary text-white font-bold rounded-xl py-3 shadow-lg shadow-red-500/30"
                   >
                     {clearing ? 'Clearing...' : 'Clear Videos'}
                   </Button>
