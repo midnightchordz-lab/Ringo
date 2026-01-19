@@ -48,12 +48,29 @@ export const VideoPreview = () => {
     try {
       const response = await axios.get(`${API}/videos/${videoId}`);
       setVideo(response.data);
-      setCaption(`Check out this viral content! 🎬`);
+      setCaption(`Check out this amazing content! 🎬`);
     } catch (error) {
       console.error('Error fetching video:', error);
       toast.error('Failed to load video');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAIAnalysis = async () => {
+    setAnalyzingAI(true);
+    try {
+      const response = await axios.get(`${API}/clips/ai-analyze/${videoId}`);
+      const analysis = response.data.analysis;
+      setAiAnalysis(analysis);
+      setStartTime(analysis.recommended_start);
+      setClipDuration(analysis.recommended_duration);
+      toast.success(`AI found the perfect moment: ${analysis.reasoning}`);
+    } catch (error) {
+      console.error('Error analyzing with AI:', error);
+      toast.error('AI analysis failed, using default timing');
+    } finally {
+      setAnalyzingAI(false);
     }
   };
 
@@ -63,10 +80,11 @@ export const VideoPreview = () => {
       const response = await axios.post(`${API}/clips/generate`, {
         video_id: videoId,
         start_time: startTime,
-        duration: clipDuration
+        duration: clipDuration,
+        use_ai_analysis: useAI
       });
       setClipId(response.data.clip_id);
-      toast.success('Clip generated successfully!');
+      toast.success(response.data.message);
     } catch (error) {
       console.error('Error generating clip:', error);
       toast.error(error.response?.data?.detail || 'Failed to generate clip');
