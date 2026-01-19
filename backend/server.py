@@ -28,7 +28,7 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-app = FastAPI(title="ViralFlow Studio API")
+app = FastAPI(title="ContentFlow API")
 
 api_router = APIRouter(prefix="/api")
 
@@ -85,28 +85,25 @@ async def discover_videos(
         youtube_api_key = os.environ.get('YOUTUBE_API_KEY')
         
         if youtube_api_key:
-            # Use YouTube Data API v3 for better results
             try:
                 youtube = build('youtube', 'v3', developerKey=youtube_api_key, cache_discovery=False)
                 
                 search_query = f"{query}" if query else "tutorial"
                 
-                # Search ONLY for videos with Creative Commons license
                 search_request = youtube.search().list(
                     part='id,snippet',
                     q=search_query,
                     type='video',
-                    videoLicense='creativeCommon',  # STRICT CC only filter
+                    videoLicense='creativeCommon',
                     maxResults=50,
                     order='viewCount',
-                    videoDuration='medium'  # 4-20 minutes videos
+                    videoDuration='medium'
                 )
                 search_response = search_request.execute()
                 
                 video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
                 
                 if not video_ids:
-                    # Try with different search terms for CC content
                     search_queries = [
                         f"{search_query} creative commons",
                         "creative commons music" if not query else f"{search_query}",
@@ -131,10 +128,9 @@ async def discover_videos(
                     return {
                         "videos": [], 
                         "total": 0,
-                        "message": "No Creative Commons licensed videos found. Try different search terms like 'creative commons music', 'cc by tutorial', etc."
+                        "message": "No Creative Commons licensed videos found. Try different search terms."
                     }
                 
-                # Get detailed statistics - MUST include 'status' to verify CC license
                 videos_request = youtube.videos().list(
                     part='statistics,contentDetails,snippet,status',
                     id=','.join(video_ids)
@@ -147,7 +143,6 @@ async def discover_videos(
                     stats = item['statistics']
                     status = item.get('status', {})
                     
-                    # STRICT CHECK: Only include if license is explicitly 'creativeCommon'
                     license_type = status.get('license', 'youtube')
                     if license_type != 'creativeCommon':
                         continue
@@ -156,19 +151,15 @@ async def discover_videos(
                     likes = int(stats.get('likeCount', 0))
                     comments = int(stats.get('commentCount', 0))
                     
-                    # Apply minimum views filter
                     if views < min_views:
                         continue
                     
-                    # Parse duration
                     duration_str = item['contentDetails']['duration']
                     duration_seconds = parse_youtube_duration(duration_str)
                     
-                    # Skip very short or very long videos
                     if duration_seconds < 60 or duration_seconds > 3600:
                         continue
                     
-                    # Parse upload date
                     upload_date = snippet['publishedAt']
                     try:
                         upload_datetime = datetime.fromisoformat(upload_date.replace('Z', '+00:00'))
@@ -197,13 +188,10 @@ async def discover_videos(
                     })
                 
                 videos.sort(key=lambda x: x['viral_score'], reverse=True)
-                
-                # Limit to max_results
                 videos = videos[:max_results]
                 
                 await db.discovered_videos.delete_many({})
                 if videos:
-                    # Insert and then fetch back without _id
                     await db.discovered_videos.insert_many(videos)
                     videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
                 
@@ -214,10 +202,8 @@ async def discover_videos(
                 logging.error(f"YouTube API error: {error_detail}")
                 if "quotaExceeded" in error_detail:
                     raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later.")
-                # Don't fallback to yt-dlp for CC-only search
                 raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
         
-        # Fallback: Use yt-dlp for CC search (only if API fails)
         logging.warning("Using yt-dlp fallback for CC content search")
         ydl_opts = {
             'quiet': True,
@@ -237,7 +223,6 @@ async def discover_videos(
                     if not entry:
                         continue
                     
-                    # STRICT: Only include if explicitly CC licensed
                     license_info = str(entry.get('license', '')).lower()
                     is_cc = 'creative commons' in license_info or (license_info and 'cc' in license_info and 'by' in license_info)
                     
@@ -279,7 +264,6 @@ async def discover_videos(
             
             await db.discovered_videos.delete_many({})
             if videos:
-                # Insert and then fetch back without _id
                 await db.discovered_videos.insert_many(videos)
                 videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
             
@@ -290,7 +274,6 @@ async def discover_videos(
         raise HTTPException(status_code=500, detail=str(e))
 
 def parse_youtube_duration(duration_str: str) -> int:
-    """Parse ISO 8601 duration format (PT1H2M10S) to seconds"""
     import re
     pattern = r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?'
     match = re.match(pattern, duration_str)
@@ -302,6 +285,19 @@ def parse_youtube_duration(duration_str: str) -> int:
     seconds = int(match.group(3) or 0)
     
     return hours * 3600 + minutes * 60 + seconds
+
+@api_router.post("/clear-videos")
+async def clear_discovered_videos():
+    try:
+        result = await db.discovered_videos.delete_many({})
+        return {
+            "success": True,
+            "message": f"Cleared {result.deleted_count} videos",
+            "deleted_count": result.deleted_count
+        }
+    except Exception as e:
+        logging.error(f"Error clearing videos: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/videos/{video_id}")
 async def get_video_details(video_id: str):
@@ -326,20 +322,20 @@ async def get_video_details(video_id: str):
                 
                 viral_score = calculate_viral_score(views, likes, comments, days_ago)
                 
-                # Ensure all values are JSON serializable
                 video = {
-                    'id': str(video_id),
-                    'title': str(info.get('title', '')),
-                    'channel': str(info.get('uploader', '')),
-                    'thumbnail': str(info.get('thumbnail', '')),
-                    'duration': int(info.get('duration', 0) or 0),
-                    'views': int(views),
-                    'likes': int(likes),
-                    'comments': int(comments),
-                    'viral_score': float(viral_score),
-                    'upload_date': str(upload_date),
-                    'license': str(info.get('license', 'Unknown')),
-                    'description': str(info.get('description', ''))[:500]
+                    'id': video_id,
+                    'title': info.get('title'),
+                    'channel': info.get('uploader'),
+                    'thumbnail': info.get('thumbnail'),
+                    'duration': info.get('duration', 0),
+                    'views': views,
+                    'likes': likes,
+                    'comments': comments,
+                    'viral_score': viral_score,
+                    'upload_date': upload_date,
+                    'license': info.get('license', 'Unknown'),
+                    'description': info.get('description', '')[:500],
+                    'is_cc_licensed': True
                 }
         
         return video
@@ -350,7 +346,7 @@ async def get_video_details(video_id: str):
 
 async def download_and_clip_video(video_id: str, start_time: int, duration: int):
     try:
-        temp_dir = Path("/tmp/viralflow")
+        temp_dir = Path("/tmp/contentflow")
         temp_dir.mkdir(exist_ok=True)
         
         output_template = str(temp_dir / f"{video_id}.%(ext)s")

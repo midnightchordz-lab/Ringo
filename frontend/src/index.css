@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Oswald:wght@500;700&family=JetBrains+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,30 +9,30 @@
     @apply border-border;
   }
   body {
-    @apply bg-zinc-950 text-zinc-50;
-    font-family: 'Manrope', sans-serif;
+    @apply bg-slate-50 text-slate-900;
+    font-family: 'Inter', sans-serif;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Oswald', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     @apply tracking-tight;
-  }
-  code, pre {
-    font-family: 'JetBrains Mono', monospace;
   }
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-zinc-900/50 backdrop-blur-md border border-white/10 rounded-xl shadow-xl;
+    @apply bg-white border border-slate-200 rounded-xl shadow-sm;
   }
   
-  .neon-glow {
-    box-shadow: 0 0 20px rgba(190, 242, 100, 0.15);
+  .card-hover {
+    @apply hover:shadow-md hover:border-indigo-200 transition-all duration-200;
   }
   
   .viral-badge {
-    @apply bg-[#BEF264] text-zinc-900 font-bold px-3 py-1 rounded-full text-sm;
-    box-shadow: 0 0 15px rgba(190, 242, 100, 0.3);
+    @apply bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold px-3 py-1 rounded-full text-sm;
+  }
+  
+  .cc-badge {
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-2 py-1 rounded-md text-xs;
   }
 }
 
@@ -42,13 +42,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-zinc-950;
+  @apply bg-slate-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-zinc-800 rounded-full;
+  @apply bg-slate-300 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-zinc-700;
+  @apply bg-slate-400;
 }
