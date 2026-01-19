@@ -116,20 +116,22 @@ async def discover_videos(
                     
                     viral_score = calculate_viral_score(views, likes, comments, days_ago)
                     
-                    videos.append({
-                        'id': entry.get('id'),
-                        'title': entry.get('title'),
-                        'channel': entry.get('uploader', 'Unknown'),
-                        'thumbnail': entry.get('thumbnail'),
-                        'duration': entry.get('duration', 0),
-                        'views': views,
-                        'likes': likes,
-                        'comments': comments,
-                        'viral_score': viral_score,
-                        'upload_date': upload_date,
-                        'license': license_info or 'Unknown',
-                        'is_cc_licensed': is_cc
-                    })
+                    # Ensure all values are JSON serializable
+                    video_data = {
+                        'id': str(entry.get('id', '')),
+                        'title': str(entry.get('title', '')),
+                        'channel': str(entry.get('uploader', 'Unknown')),
+                        'thumbnail': str(entry.get('thumbnail', '')),
+                        'duration': int(entry.get('duration', 0) or 0),
+                        'views': int(views),
+                        'likes': int(likes),
+                        'comments': int(comments),
+                        'viral_score': float(viral_score),
+                        'upload_date': str(upload_date),
+                        'license': str(license_info or 'Unknown'),
+                        'is_cc_licensed': bool(is_cc)
+                    }
+                    videos.append(video_data)
             
             videos.sort(key=lambda x: x['viral_score'], reverse=True)
             
