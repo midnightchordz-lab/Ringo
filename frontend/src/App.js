@@ -4,6 +4,7 @@ import Layout from '@/components/Layout';
 import Dashboard from '@/pages/Dashboard';
 import Discover from '@/pages/Discover';
 import Images from '@/pages/Images';
+import ContentLibrary from '@/pages/ContentLibrary';
 import VideoPreview from '@/pages/VideoPreview';
 import History from '@/pages/History';
 import Settings from '@/pages/Settings';
