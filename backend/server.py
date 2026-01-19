@@ -91,7 +91,7 @@ def get_password_hash(password):
 async def send_verification_email(email: str, token: str, full_name: str):
     """Send email verification link"""
     if not RESEND_API_KEY:
-        logging.warning("No Resend API key configured, skipping email")
+        logging.warning("No Resend API key configured, skipping email. Get one at https://resend.com/api-keys")
         return
     
     verification_link = f"{FRONTEND_URL}/verify-email?token={token}"
@@ -128,6 +128,9 @@ async def send_verification_email(email: str, token: str, full_name: str):
                 <p style="font-size: 14px; color: #718096; margin-top: 32px;">
                     If you didn't create an account, you can safely ignore this email.
                 </p>
+                <p style="font-size: 12px; color: #a0aec0; margin-top: 16px;">
+                    Or copy and paste this link: {verification_link}
+                </p>
             </div>
             <div class="footer">
                 <p>© 2025 ContentFlow. All rights reserved.</p>
@@ -138,18 +141,21 @@ async def send_verification_email(email: str, token: str, full_name: str):
     """
     
     try:
-        params = {
+        params = {{
             "from": SENDER_EMAIL,
             "to": [email],
             "subject": "Verify your ContentFlow account ✨",
             "html": html_content
-        }
+        }}
         
-        await asyncio.to_thread(resend.Emails.send, params)
-        logging.info(f"Verification email sent to {email}")
+        # Use synchronous call in thread pool
+        response = await asyncio.to_thread(resend.Emails.send, params)
+        logging.info(f"✅ Verification email sent to {email}: {response}")
+        return True
     except Exception as e:
-        logging.error(f"Failed to send verification email: {str(e)}")
-        # Don't raise exception - registration should still succeed
+        logging.error(f"❌ Failed to send verification email to {email}: {str(e)}")
+        logging.error(f"Please add RESEND_API_KEY to .env file. Get it from https://resend.com/api-keys")
+        return False
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
