@@ -132,21 +132,21 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8\">
+    <div className="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
       {/* Header */}
-      <div className=\"mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4\">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <motion.h1 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className=\"text-5xl sm:text-6xl font-black mb-2\" 
+            className="text-5xl sm:text-6xl font-black mb-2" 
             style={{ fontFamily: 'Sora, sans-serif' }}
           >
-            <span className=\"bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent\">
+            <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
               Dashboard
             </span>
           </motion.h1>
-          <p className=\"text-slate-600 text-lg font-medium\">Your content command center ✨</p>
+          <p className="text-slate-600 text-lg font-medium">Your content command center ✨</p>
         </div>
         {stats?.total_videos_discovered > 0 && (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
