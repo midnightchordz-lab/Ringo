@@ -80,16 +80,20 @@ export const Layout = () => {
         </nav>
         
         {/* Stats preview */}
-        <div className="p-4 border-t border-violet-200/50 relative z-10">
+        <div className="p-4 border-t border-violet-200/50 relative z-10 space-y-3">
           <div className="glass-card p-4 bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-300/50">
-            <p className="text-xs font-bold text-violet-600 uppercase tracking-wider mb-2">Quick Stats</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Videos</span>
-                <span className="text-sm font-bold text-violet-600">Active</span>
-              </div>
-            </div>
+            <p className="text-xs font-bold text-violet-600 uppercase tracking-wider mb-2">Logged in as</p>
+            <p className="text-sm font-bold text-slate-900 truncate">{user.full_name || 'User'}</p>
+            <p className="text-xs text-slate-600 truncate">{user.email || ''}</p>
           </div>
+          <Button
+            onClick={handleLogout}
+            className="w-full bg-red-100 text-red-600 hover:bg-red-200 font-bold rounded-xl py-2 flex items-center justify-center"
+            data-testid="logout-button"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
         </div>
       </aside>
 
