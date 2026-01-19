@@ -173,18 +173,39 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    # First, try to decode as JWT (for email/password login)
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
+        
+        # Try to find user by user_id field first, then by _id
+        user = await db.users.find_one({"user_id": user_id})
+        if user is None:
+            user = await db.users.find_one({"_id": user_id})
+        if user is None:
+            raise credentials_exception
+        return user
     except JWTError:
-        raise credentials_exception
+        pass  # Not a valid JWT, try session token lookup
     
-    user = await db.users.find_one({"_id": user_id})
-    if user is None:
-        raise credentials_exception
-    return user
+    # If JWT decode fails, check if it's an Emergent session token (Google OAuth)
+    session = await db.user_sessions.find_one({
+        "session_token": token,
+        "expires_at": {"$gt": datetime.now(timezone.utc)}
+    })
+    
+    if session:
+        user_id = session.get("user_id")
+        user = await db.users.find_one({"user_id": user_id})
+        if user is None:
+            user = await db.users.find_one({"_id": user_id})
+        if user:
+            return user
+    
+    raise credentials_exception
 
 # Authentication endpoints
 @api_router.post("/auth/google-oauth")
