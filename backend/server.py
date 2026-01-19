@@ -1016,22 +1016,15 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         logging.error(f"❌ Error creating clip: {error_msg}")
         
         # Provide helpful error messages
-        if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+        if "Sign in to confirm" in error_msg or "bot" in error_msg.lower() or "403" in error_msg or "Forbidden" in error_msg:
             raise Exception(
-                "⚠️ YouTube's bot detection blocked the download.\n\n"
-                "This is temporary. Solutions:\n"
-                "• Wait 10-15 minutes before trying again\n"
-                "• Try a different CC BY video\n"
-                "• YouTube may be experiencing high traffic\n\n"
-                "The clip generation feature works - just needs a cooldown period!"
-            )
-        elif "403" in error_msg or "Forbidden" in error_msg:
-            raise Exception(
-                "⚠️ YouTube blocked access (Error 403).\n\n"
-                "Try:\n"
-                "• Select a different video\n"
-                "• Wait 5-10 minutes\n"
-                "• Some videos may have download restrictions"
+                "⚠️ YouTube's bot detection is blocking automated downloads.\n\n"
+                "This is a YouTube-wide restriction affecting all download tools.\n\n"
+                "✅ Alternatives:\n"
+                "• Use the 'Preview Clip' feature to see your selected segment\n"
+                "• Download the video manually from YouTube (with proper CC BY attribution)\n"
+                "• Use a browser extension for downloading\n\n"
+                "The AI analysis and clip timing features still work perfectly!"
             )
         elif "HTTP Error 429" in error_msg:
             raise Exception(
@@ -1040,6 +1033,43 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
             )
         else:
             raise Exception(f"Clip generation error: {error_msg}")
+
+# Clip Preview endpoint - provides embed URL with timestamps
+@api_router.get("/clips/preview/{video_id}")
+async def get_clip_preview(
+    video_id: str,
+    start: int = Query(default=0, description="Start time in seconds"),
+    duration: int = Query(default=60, description="Duration in seconds"),
+    current_user: dict = Depends(get_current_user)
+):
+    """Get a preview URL for the clip using YouTube's embed player"""
+    try:
+        end_time = start + duration
+        
+        # YouTube embed URL with start and end parameters
+        embed_url = f"https://www.youtube.com/embed/{video_id}?start={start}&end={end_time}&autoplay=1"
+        
+        # Also provide the direct watch URL with timestamp
+        watch_url = f"https://www.youtube.com/watch?v={video_id}&t={start}s"
+        
+        return {
+            "video_id": video_id,
+            "start_time": start,
+            "end_time": end_time,
+            "duration": duration,
+            "embed_url": embed_url,
+            "watch_url": watch_url,
+            "download_instructions": (
+                "To download this CC BY video:\n"
+                "1. Visit the watch URL\n"
+                "2. Use a browser extension (e.g., Video DownloadHelper)\n"
+                "3. Or use yt-dlp with cookies from your browser\n"
+                "4. Remember to provide attribution to the original creator!"
+            )
+        }
+    except Exception as e:
+        logging.error(f"Error creating clip preview: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/clips/ai-analyze/{video_id}")
 async def get_ai_clip_recommendations(video_id: str):
