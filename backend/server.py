@@ -522,6 +522,41 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         logging.error(f"Error creating clip: {str(e)}")
         raise
 
+@api_router.get("/clips/ai-analyze/{video_id}")
+async def get_ai_clip_recommendations(video_id: str):
+    """Get AI recommendations for best clip moments without generating"""
+    try:
+        # Get video details
+        video = await db.discovered_videos.find_one({"id": video_id}, {"_id": 0})
+        
+        if not video:
+            # Fetch from YouTube
+            ydl_opts = {'quiet': True, 'no_warnings': True, 'skip_download': True}
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+                video = {
+                    'title': info.get('title'),
+                    'description': info.get('description', ''),
+                    'duration': info.get('duration', 0)
+                }
+        
+        analysis = await analyze_video_with_ai(
+            video_id,
+            video.get('title', ''),
+            video.get('description', ''),
+            video.get('duration', 0)
+        )
+        
+        return {
+            "success": True,
+            "video_id": video_id,
+            "analysis": analysis
+        }
+    
+    except Exception as e:
+        logging.error(f"Error in AI analysis: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/clips/generate")
 async def generate_clip(clip_request: ClipRequest, background_tasks: BackgroundTasks):
     try:
