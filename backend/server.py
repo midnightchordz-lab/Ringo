@@ -347,7 +347,84 @@ async def get_video_details(video_id: str):
         logging.error(f"Error getting video details: {str(e)}")
         raise HTTPException(status_code=404, detail="Video not found")
 
-async def download_and_clip_video(video_id: str, start_time: int, duration: int):
+async def analyze_video_with_ai(video_id: str, title: str, description: str, duration: int) -> Dict:
+    """Use AI to analyze video and find best clip moments"""
+    try:
+        emergent_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not emergent_key:
+            logging.warning("No Emergent LLM key found, using default timing")
+            return {
+                "recommended_start": max(0, duration // 4),
+                "recommended_duration": min(45, duration),
+                "reasoning": "Default timing: First quarter of video"
+            }
+        
+        # Initialize AI chat
+        chat = LlmChat(
+            api_key=emergent_key,
+            session_id=f"clip-analysis-{video_id}",
+            system_message="You are an expert video editor who identifies the most engaging and viral moments in videos. Analyze content and suggest optimal clip timings for social media shorts."
+        ).with_model("openai", "gpt-5.2")
+        
+        # Create analysis prompt
+        prompt = f"""Analyze this YouTube video and recommend the BEST 30-60 second segment for a viral short:
+
+Title: {title}
+Description: {description[:500]}
+Total Duration: {duration} seconds
+
+Identify:
+1. Hook moments (first 3-5 seconds that grab attention)
+2. Peak engagement points (emotional peaks, punchlines, key information)
+3. Natural start/end points for a cohesive clip
+
+Respond ONLY with JSON (no markdown, no explanation):
+{{
+  "recommended_start": <seconds>,
+  "recommended_duration": <30-60 seconds>,
+  "reasoning": "<brief explanation of why this moment>",
+  "hook_type": "<what makes it engaging>"
+}}"""
+        
+        message = UserMessage(text=prompt)
+        response = await chat.send_message(message)
+        
+        # Parse AI response
+        try:
+            # Extract JSON from response
+            json_match = re.search(r'\{[\s\S]*\}', response)
+            if json_match:
+                analysis = json.loads(json_match.group())
+                # Validate and constrain values
+                start = max(0, min(analysis.get('recommended_start', 0), duration - 30))
+                clip_duration = max(30, min(60, analysis.get('recommended_duration', 45)))
+                
+                return {
+                    "recommended_start": start,
+                    "recommended_duration": clip_duration,
+                    "reasoning": analysis.get('reasoning', 'AI-recommended segment'),
+                    "hook_type": analysis.get('hook_type', 'Engaging moment')
+                }
+            else:
+                raise ValueError("No JSON found in response")
+        except Exception as parse_error:
+            logging.error(f"Error parsing AI response: {parse_error}, raw: {response}")
+            # Fallback to intelligent default
+            return {
+                "recommended_start": max(0, duration // 4),
+                "recommended_duration": 45,
+                "reasoning": "AI analysis fallback: mid-section clip"
+            }
+            
+    except Exception as e:
+        logging.error(f"Error in AI analysis: {str(e)}")
+        return {
+            "recommended_start": max(0, duration // 4),
+            "recommended_duration": 45,
+            "reasoning": "Default timing due to analysis error"
+        }
+
+async def download_and_clip_video(video_id: str, start_time: int, duration: int, use_ai: bool = False):
     try:
         temp_dir = Path("/tmp/contentflow")
         temp_dir.mkdir(exist_ok=True)
