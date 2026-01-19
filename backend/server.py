@@ -293,9 +293,20 @@ async def login(user_data: UserLogin):
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     
+    # Check if email provider (skip password check for OAuth users)
+    if user.get("auth_provider") == "google":
+        raise HTTPException(status_code=400, detail="Please sign in with Google")
+    
     # Verify password
     if not verify_password(user_data.password, user["hashed_password"]):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
+    
+    # Check email verification
+    if not user.get("email_verified", False):
+        raise HTTPException(
+            status_code=403, 
+            detail="Please verify your email before logging in. Check your inbox for the verification link."
+        )
     
     # Create access token
     access_token = create_access_token(data={"sub": user["_id"]})
