@@ -43,7 +43,7 @@ export const VideoPreview = () => {
 
   const fetchVideoDetails = async () => {
     try {
-      const response = await axios.get(`${API}/videos/${videoId}`);
+      const response = await api.get(`/videos/${videoId}`);
       setVideo(response.data);
       setCaption(`Check out this amazing content! 🎬`);
     } catch (error) {
@@ -57,7 +57,7 @@ export const VideoPreview = () => {
   const handleAIAnalysis = async () => {
     setAnalyzingAI(true);
     try {
-      const response = await axios.get(`${API}/clips/ai-analyze/${videoId}`);
+      const response = await api.get(`/clips/ai-analyze/${videoId}`);
       const analysis = response.data.analysis;
       setAiAnalysis(analysis);
       setStartTime(analysis.recommended_start);
@@ -74,7 +74,7 @@ export const VideoPreview = () => {
   const handleGenerateClip = async () => {
     setGenerating(true);
     try {
-      const response = await axios.post(`${API}/clips/generate`, {
+      const response = await api.post('/clips/generate', {
         video_id: videoId,
         start_time: startTime,
         duration: clipDuration,
@@ -98,7 +98,7 @@ export const VideoPreview = () => {
 
     setPosting(true);
     try {
-      await axios.post(`${API}/post`, {
+      await api.post('/post', {
         clip_id: clipId,
         caption: caption,
         platforms: ['youtube', 'instagram'],
