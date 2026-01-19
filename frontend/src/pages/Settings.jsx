@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { Settings as SettingsIcon, Key, Save, Youtube, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 export const Settings = () => {
   const [youtubeKey, setYoutubeKey] = useState('');
@@ -20,7 +17,7 @@ export const Settings = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get(`${API}/settings/api-keys`);
+      const response = await api.get('/settings/api-keys');
       if (response.data.youtube_api_key) {
         setYoutubeKey(response.data.youtube_api_key);
       }
@@ -37,7 +34,7 @@ export const Settings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await axios.post(`${API}/settings/api-keys`, {
+      await api.post('/settings/api-keys', {
         youtube_api_key: youtubeKey,
         instagram_access_token: instagramToken
       });

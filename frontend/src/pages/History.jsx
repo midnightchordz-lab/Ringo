@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { Clock, Youtube, Instagram, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const platformIcons = {
   youtube: Youtube,
@@ -26,7 +23,7 @@ export const History = () => {
 
   const fetchHistory = async () => {
     try {
-      const response = await axios.get(`${API}/history`);
+      const response = await api.get('/history');
       setPosts(response.data.posts);
     } catch (error) {
       console.error('Error fetching history:', error);
