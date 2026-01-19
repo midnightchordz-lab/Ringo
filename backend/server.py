@@ -41,6 +41,35 @@ api_router = APIRouter(prefix="/api")
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 
+# Authentication setup
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-secret-key-change-in-production-09876543210")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+# Pydantic models
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: Dict
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    full_name: str
+    created_at: str
+
 class VideoMetadata(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
