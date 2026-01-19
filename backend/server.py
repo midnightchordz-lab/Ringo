@@ -89,14 +89,14 @@ async def discover_videos(
             try:
                 youtube = build('youtube', 'v3', developerKey=youtube_api_key, cache_discovery=False)
                 
-                search_query = f"{query}" if query else "creative commons"
+                search_query = f"{query}" if query else "tutorial"
                 
-                # Search for videos with Creative Commons license
+                # Search ONLY for videos with Creative Commons license
                 search_request = youtube.search().list(
                     part='id,snippet',
                     q=search_query,
                     type='video',
-                    videoLicense='creativeCommon',
+                    videoLicense='creativeCommon',  # STRICT CC only filter
                     maxResults=50,
                     order='viewCount',
                     videoDuration='medium'  # 4-20 minutes videos
@@ -106,23 +106,37 @@ async def discover_videos(
                 video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
                 
                 if not video_ids:
-                    # If no CC videos found, try without license filter
-                    search_request = youtube.search().list(
-                        part='id,snippet',
-                        q=f"{search_query} creative commons",
-                        type='video',
-                        maxResults=50,
-                        order='viewCount'
-                    )
-                    search_response = search_request.execute()
-                    video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+                    # Try with different search terms for CC content
+                    search_queries = [
+                        f"{search_query} creative commons",
+                        "creative commons music" if not query else f"{search_query}",
+                        "royalty free" if not query else f"{search_query} royalty free"
+                    ]
+                    
+                    for alt_query in search_queries:
+                        search_request = youtube.search().list(
+                            part='id,snippet',
+                            q=alt_query,
+                            type='video',
+                            videoLicense='creativeCommon',
+                            maxResults=50,
+                            order='viewCount'
+                        )
+                        search_response = search_request.execute()
+                        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+                        if video_ids:
+                            break
                 
                 if not video_ids:
-                    return {"videos": [], "total": 0}
+                    return {
+                        "videos": [], 
+                        "total": 0,
+                        "message": "No Creative Commons licensed videos found. Try different search terms like 'creative commons music', 'cc by tutorial', etc."
+                    }
                 
-                # Get detailed statistics for videos
+                # Get detailed statistics - MUST include 'status' to verify CC license
                 videos_request = youtube.videos().list(
-                    part='statistics,contentDetails,snippet',
+                    part='statistics,contentDetails,snippet,status',
                     id=','.join(video_ids)
                 )
                 videos_response = videos_request.execute()
@@ -131,6 +145,12 @@ async def discover_videos(
                 for item in videos_response.get('items', []):
                     snippet = item['snippet']
                     stats = item['statistics']
+                    status = item.get('status', {})
+                    
+                    # STRICT CHECK: Only include if license is explicitly 'creativeCommon'
+                    license_type = status.get('license', 'youtube')
+                    if license_type != 'creativeCommon':
+                        continue
                     
                     views = int(stats.get('viewCount', 0))
                     likes = int(stats.get('likeCount', 0))
@@ -160,10 +180,6 @@ async def discover_videos(
                     
                     viral_score = calculate_viral_score(views, likes, comments, days_ago)
                     
-                    # Check if it's actually CC licensed
-                    license_type = item.get('status', {}).get('license', 'youtube')
-                    is_cc = license_type == 'creativeCommon'
-                    
                     videos.append({
                         'id': item['id'],
                         'title': snippet['title'],
@@ -175,8 +191,8 @@ async def discover_videos(
                         'comments': comments,
                         'viral_score': viral_score,
                         'upload_date': upload_date_formatted,
-                        'license': 'Creative Commons' if is_cc else 'Standard YouTube',
-                        'is_cc_licensed': is_cc,
+                        'license': 'Creative Commons Attribution (CC BY)',
+                        'is_cc_licensed': True,
                         'description': snippet.get('description', '')[:200]
                     })
                 
@@ -194,9 +210,12 @@ async def discover_videos(
                 return {"videos": videos, "total": len(videos)}
                 
             except HttpError as e:
-                logging.error(f"YouTube API error: {str(e)}")
-                # Fallback to yt-dlp if API fails
-                pass
+                error_detail = str(e)
+                logging.error(f"YouTube API error: {error_detail}")
+                if "quotaExceeded" in error_detail:
+                    raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later.")
+                # Don't fallback to yt-dlp for CC-only search
+                raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
         
         # Fallback: Use yt-dlp for search
         ydl_opts = {
