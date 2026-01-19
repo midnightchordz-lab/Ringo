@@ -331,6 +331,75 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         "created_at": current_user["created_at"]
     }
 
+@api_router.get("/auth/verify-email")
+async def verify_email(token: str):
+    """Verify user's email address"""
+    try:
+        user = await db.users.find_one({"verification_token": token})
+        
+        if not user:
+            raise HTTPException(status_code=400, detail="Invalid or expired verification token")
+        
+        if user.get("email_verified"):
+            return {"message": "Email already verified", "success": True}
+        
+        # Update user
+        await db.users.update_one(
+            {"_id": user["_id"]},
+            {
+                "$set": {
+                    "email_verified": True,
+                    "verified_at": datetime.now(timezone.utc).isoformat()
+                },
+                "$unset": {"verification_token": ""}
+            }
+        )
+        
+        # Create access token
+        access_token = create_access_token(data={"sub": user["_id"]})
+        
+        return {
+            "success": True,
+            "message": "Email verified successfully!",
+            "access_token": access_token,
+            "user": {
+                "id": user["_id"],
+                "email": user["email"],
+                "full_name": user["full_name"],
+                "created_at": user["created_at"]
+            }
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Email verification error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Verification failed")
+
+@api_router.post("/auth/resend-verification")
+async def resend_verification(email: EmailStr):
+    """Resend verification email"""
+    user = await db.users.find_one({"email": email})
+    
+    if not user:
+        # Don't reveal if email exists
+        return {"message": "If the email exists, a verification link has been sent"}
+    
+    if user.get("email_verified"):
+        raise HTTPException(status_code=400, detail="Email already verified")
+    
+    # Generate new token
+    new_token = secrets.token_urlsafe(32)
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"verification_token": new_token}}
+    )
+    
+    # Send email
+    asyncio.create_task(send_verification_email(user["email"], new_token, user["full_name"]))
+    
+    return {"message": "Verification email sent! Please check your inbox."}
+
 # Existing models (now with user association)
 
 class VideoMetadata(BaseModel):
