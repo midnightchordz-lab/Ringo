@@ -141,12 +141,12 @@ async def send_verification_email(email: str, token: str, full_name: str):
     """
     
     try:
-        params = {{
+        params = {
             "from": SENDER_EMAIL,
             "to": [email],
             "subject": "Verify your ContentFlow account ✨",
             "html": html_content
-        }}
+        }
         
         # Use synchronous call in thread pool
         response = await asyncio.to_thread(resend.Emails.send, params)
