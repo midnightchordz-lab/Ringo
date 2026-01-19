@@ -107,6 +107,69 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 # Authentication endpoints
+@api_router.post("/auth/google-oauth")
+async def google_oauth_callback(session_id: str = Form(...)):
+    """Process Google OAuth via Emergent Auth"""
+    try:
+        # Call Emergent Auth API to get user data
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id},
+                timeout=10.0
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Invalid session ID")
+            
+            oauth_data = response.json()
+        
+        # Check if user exists
+        user = await db.users.find_one({"email": oauth_data["email"]})
+        
+        if not user:
+            # Create new user
+            user_id = f"user_{uuid.uuid4().hex[:12]}"
+            user = {
+                "user_id": user_id,
+                "email": oauth_data["email"],
+                "full_name": oauth_data["name"],
+                "picture": oauth_data.get("picture", ""),
+                "auth_provider": "google",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "is_active": True
+            }
+            await db.users.insert_one(user)
+        else:
+            user_id = user.get("user_id") or user.get("_id")
+        
+        # Store Emergent session token
+        session_token = oauth_data["session_token"]
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        
+        await db.user_sessions.insert_one({
+            "user_id": user_id,
+            "session_token": session_token,
+            "expires_at": expires_at,
+            "created_at": datetime.now(timezone.utc)
+        })
+        
+        # Return user data with token
+        return {
+            "access_token": session_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": oauth_data["email"],
+                "full_name": oauth_data["name"],
+                "picture": oauth_data.get("picture", "")
+            }
+        }
+    
+    except Exception as e:
+        logging.error(f"OAuth error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/auth/register", response_model=Token)
 async def register(user_data: UserRegister):
     # Check if user already exists
