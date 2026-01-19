@@ -250,30 +250,30 @@ export const Dashboard = () => {
         </h2>
         {stats?.recent_posts && stats.recent_posts.length > 0 ? (
           <div className="glass-card overflow-hidden">
-            <div className=\"overflow-x-auto\">
-              <table className=\"w-full\">
-                <thead className=\"bg-gradient-to-r from-violet-100 to-purple-100\">
-                  <tr className=\"border-b-2 border-violet-200\">
-                    <th className=\"text-left p-4 text-violet-700 font-bold text-sm\">Platform</th>
-                    <th className=\"text-left p-4 text-violet-700 font-bold text-sm\">Caption</th>
-                    <th className=\"text-left p-4 text-violet-700 font-bold text-sm\">Posted</th>
-                    <th className=\"text-left p-4 text-violet-700 font-bold text-sm\">Status</th>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-to-r from-violet-100 to-purple-100">
+                  <tr className="border-b-2 border-violet-200">
+                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Platform</th>
+                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Caption</th>
+                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Posted</th>
+                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {stats.recent_posts.map((post) => (
-                    <tr key={post.post_id} className=\"border-b border-violet-100 hover:bg-violet-50/50 transition-colors\">
-                      <td className=\"p-4\">
-                        <span className=\"inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold gradient-accent text-white shadow-sm\">
+                    <tr key={post.post_id} className="border-b border-violet-100 hover:bg-violet-50/50 transition-colors">
+                      <td className="p-4">
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold gradient-accent text-white shadow-sm">
                           {post.platform}
                         </span>
                       </td>
-                      <td className=\"p-4 text-slate-700 font-medium max-w-md truncate\">{post.caption}</td>
-                      <td className=\"p-4 text-slate-600 text-sm font-medium\">
+                      <td className="p-4 text-slate-700 font-medium max-w-md truncate">{post.caption}</td>
+                      <td className="p-4 text-slate-600 text-sm font-medium">
                         {new Date(post.posted_at).toLocaleDateString()}
                       </td>
-                      <td className=\"p-4\">
-                        <span className=\"inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-sm\">
+                      <td className="p-4">
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-sm">
                           ✓ {post.status}
                         </span>
                       </td>
