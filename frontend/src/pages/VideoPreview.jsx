@@ -147,15 +147,9 @@ export const VideoPreview = () => {
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
-                  {video.is_cc_licensed ? (
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-green-500/30 text-green-300 border border-green-400/50">
-                      ✓ CC BY Licensed
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-yellow-500/30 text-yellow-300 border border-yellow-400/50">
-                      Standard YouTube License
-                    </span>
-                  )}
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-green-500/30 text-green-300 border border-green-400/50">
+                    ✓ CC BY Licensed
+                  </span>
                 </div>
                 <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Oswald, sans-serif' }}>
                   {video.title}
