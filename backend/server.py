@@ -430,12 +430,25 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         temp_dir = Path("/tmp/contentflow")
         temp_dir.mkdir(exist_ok=True)
         
+        # Enhanced yt-dlp options to bypass bot detection
+        ydl_opts = {
+            'quiet': False,
+            'no_warnings': False,
+            'skip_download': True,
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'web'],
+                    'player_skip': ['webpage', 'configs']
+                }
+            }
+        }
+        
         # Get video info first
-        ydl_opts = {'quiet': True, 'no_warnings': True, 'skip_download': True}
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
             video_title = info.get('title', 'video')
             video_duration = info.get('duration', 0)
+            video_url = info.get('url')  # Direct video URL
         
         # Use AI analysis if requested
         if use_ai:
@@ -449,17 +462,42 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
             duration = ai_analysis['recommended_duration']
             logging.info(f"AI recommended: start={start_time}s, duration={duration}s - {ai_analysis['reasoning']}")
         
-        # Download video
+        # Download with enhanced options
         output_template = str(temp_dir / f"{video_id}.%(ext)s")
         download_opts = {
-            'format': 'best[height<=1080]',
+            'format': 'best[height<=1080][ext=mp4]/best[height<=1080]',
             'outtmpl': output_template,
-            'quiet': True,
+            'quiet': False,
+            'no_warnings': False,
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'web'],
+                    'player_skip': ['webpage', 'configs']
+                }
+            },
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-us,en;q=0.5',
+                'Sec-Fetch-Mode': 'navigate',
+            }
         }
         
+        logging.info(f"Downloading video {video_id}...")
         with yt_dlp.YoutubeDL(download_opts) as ydl:
-            ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
+            ydl.download([f"https://www.youtube.com/watch?v={video_id}"])
             downloaded_file = ydl.prepare_filename(info)
+        
+        if not Path(downloaded_file).exists():
+            # Try to find the downloaded file
+            possible_files = list(temp_dir.glob(f"{video_id}.*"))
+            if possible_files:
+                downloaded_file = str(possible_files[0])
+            else:
+                raise Exception("Downloaded file not found")
+        
+        logging.info(f"Downloaded to: {downloaded_file}")
         
         clip_id = str(uuid.uuid4())
         output_clip = temp_dir / f"clip_{clip_id}.mp4"
@@ -482,7 +520,9 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
             str(output_clip)
         ]
         
-        subprocess.run(ffmpeg_cmd, check=True, capture_output=True)
+        logging.info(f"Creating clip with ffmpeg...")
+        result = subprocess.run(ffmpeg_cmd, check=True, capture_output=True, text=True)
+        logging.info(f"Clip created: {output_clip}")
         
         # Generate thumbnail at 2 seconds into the clip
         thumb_cmd = [
@@ -496,10 +536,12 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         ]
         
         subprocess.run(thumb_cmd, check=True, capture_output=True)
+        logging.info(f"Thumbnail created: {output_thumbnail}")
         
         # Clean up source file
         if Path(downloaded_file).exists():
             Path(downloaded_file).unlink()
+            logging.info("Cleaned up source file")
         
         clip_data = {
             "clip_id": clip_id,
@@ -515,12 +557,21 @@ async def download_and_clip_video(video_id: str, start_time: int, duration: int,
         }
         
         await db.processed_clips.insert_one(clip_data)
+        logging.info(f"Clip data saved to database: {clip_id}")
         
         return clip_id
     
     except Exception as e:
-        logging.error(f"Error creating clip: {str(e)}")
-        raise
+        error_msg = str(e)
+        logging.error(f"Error creating clip: {error_msg}")
+        
+        # Provide helpful error message
+        if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+            raise Exception("YouTube bot detection triggered. This is a temporary issue with YouTube's API. Please try again in a few minutes, or try a different video.")
+        elif "403" in error_msg or "Forbidden" in error_msg:
+            raise Exception("YouTube blocked the download. Try selecting a different video or wait a few minutes before trying again.")
+        else:
+            raise
 
 @api_router.get("/clips/ai-analyze/{video_id}")
 async def get_ai_clip_recommendations(video_id: str):
