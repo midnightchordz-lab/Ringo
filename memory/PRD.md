@@ -12,13 +12,14 @@ Build a full-stack application that:
 8. Professional, vibrant UI for corporate/education clients
 9. Button to clear discovered videos from the dashboard
 10. Remove "Made with Emergent" branding
-11. **NEW**: Copyright-free images search from Unsplash & Pexels
+11. Copyright-free images search from Unsplash & Pexels
+12. **NEW**: Content Library for copyright-free educational resources
 
 ## Tech Stack
 - **Frontend**: React, React Router, Axios, Tailwind CSS, Framer Motion, Shadcn/UI
 - **Backend**: FastAPI (Python), MongoDB (via Motor)
 - **Authentication**: JWT (python-jose, passlib), Google OAuth via Emergent Auth
-- **Integrations**: YouTube Data API v3, Resend (email), Emergent LLM Key (AI analysis), yt-dlp, Pexels API
+- **Integrations**: YouTube Data API v3, Resend (email), Emergent LLM Key (AI analysis), yt-dlp, Pexels API, Unsplash API, Project Gutenberg API
 
 ## What's Been Implemented (Completed)
 
@@ -37,8 +38,8 @@ Build a full-stack application that:
 - Video preview page with embedded YouTube player
 - AI-powered clip analysis backend (uses Emergent LLM Key)
 
-### Core Features - Images (NEW)
-- Search copyright-free images from Pexels (Unsplash key configurable)
+### Core Features - Images
+- Search copyright-free images from Pexels and Unsplash
 - Download images directly
 - Copy image URLs to clipboard
 - Save images to favorites collection
@@ -46,19 +47,27 @@ Build a full-stack application that:
 - Source badges (Pexels/Unsplash)
 - Photographer attribution with links
 
+### Core Features - Content Library (NEW)
+- 24 curated copyright-free educational resources
+- 8 content categories: Stories, Poetry, Educational Articles, Textbooks, Audio Books, Research Papers, Historical Documents
+- 5 education levels: Pre-school, Primary, Middle School, High School, University
+- Search and filter by category/level
+- Save resources to favorites
+- Project Gutenberg book search integration
+- Featured resources section
+- Quick access by education level
+
 ### UI/UX
 - Vibrant gradient theme (violet, purple, pink accents)
 - Responsive layout with sidebar navigation
 - Professional card designs with hover effects
 - Loading states and toast notifications
-- "Made with Emergent" branding removed
-- Images tab in sidebar navigation
+- Images tab and Content Library tab in sidebar
 
 ## Current Issues
 
 ### P1 - High Priority
 - **Clip Generation Blocked**: YouTube bot detection blocking yt-dlp downloads (403 Forbidden)
-- **Unsplash API**: Current demo key is invalid, needs valid API key in UNSPLASH_API_KEY env var
 
 ### P2 - Medium Priority  
 - **Email Verification**: Requires valid RESEND_API_KEY for production
@@ -76,7 +85,6 @@ Build a full-stack application that:
 - POST `/api/auth/login` - Login with email/password
 - GET `/api/auth/me` - Get current user info
 - GET `/api/auth/verify-email?token=` - Verify email
-- POST `/api/auth/resend-verification` - Resend verification email
 - POST `/api/auth/google-oauth` - Google OAuth flow
 
 ### Video Discovery
@@ -84,16 +92,17 @@ Build a full-stack application that:
 - GET `/api/videos/{video_id}` - Get video details
 - POST `/api/clear-videos` - Clear all discovered videos
 
-### Images (NEW)
+### Images
 - GET `/api/images/search?query=&per_page=` - Search copyright-free images
 - GET `/api/images/favorites` - Get user's favorite images
 - POST `/api/images/favorites` - Add image to favorites
 - DELETE `/api/images/favorites/{image_id}` - Remove from favorites
 
-### Clips & Posting
-- GET `/api/clips/ai-analyze/{video_id}` - AI analysis for best clip timing
-- POST `/api/clips/generate` - Generate clip (currently blocked by YouTube)
-- POST `/api/post` - Post clip to social media (not implemented)
+### Content Library (NEW)
+- GET `/api/content-library/favorites` - Get favorite resources
+- POST `/api/content-library/favorites` - Add resource to favorites
+- DELETE `/api/content-library/favorites/{resource_id}` - Remove from favorites
+- GET `/api/content-library/gutenberg/search?query=` - Search Project Gutenberg
 
 ### Dashboard
 - GET `/api/stats` - Dashboard statistics
@@ -103,18 +112,23 @@ Build a full-stack application that:
 - `users` - User accounts with auth info
 - `user_sessions` - Emergent OAuth session tokens
 - `discovered_videos` - Cached video data from YouTube
-- `favorite_images` - User's saved images (NEW)
+- `favorite_images` - User's saved images
+- `content_library_favorites` - User's saved content resources (NEW)
 - `clips` - Generated clips metadata
 - `posts` - Social media post history
-- `api_keys` - User API keys for YouTube/Instagram
+
+## Content Library Resources (24 total)
+- **Featured**: Project Gutenberg, Open Library, Khan Academy, MIT OpenCourseWare, LibriVox, Poetry Foundation, CK-12, OpenStax, arXiv, Internet Archive, edX
+- **More**: Storynory, Int'l Children's Digital Library, CORE, DOAJ, Europeana, Library of Congress, Coursera, PBS LearningMedia, Smithsonian, National Geographic Education, Lit2Go, ReadWorks, CommonLit
 
 ## Files of Reference
 - `/app/backend/server.py` - All backend logic
-- `/app/frontend/src/pages/Images.jsx` - Images search page (NEW)
+- `/app/frontend/src/pages/Images.jsx` - Images search page
+- `/app/frontend/src/pages/ContentLibrary.jsx` - Content Library page (NEW)
 - `/app/frontend/src/pages/` - React page components
 - `/app/frontend/src/utils/api.js` - Auth interceptor
-- `/app/frontend/src/components/Layout.jsx` - Sidebar with Images nav item
-- `/app/backend/.env` - Backend secrets
+- `/app/frontend/src/components/Layout.jsx` - Sidebar navigation
+- `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 19, 2026 - Added copyright-free Images feature with Pexels integration
+January 19, 2026 - Added comprehensive Content Library feature with 24 resources, all categories and education levels
