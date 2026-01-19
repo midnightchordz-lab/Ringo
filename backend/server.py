@@ -1213,53 +1213,58 @@ async def search_images(
     try:
         images = []
         
-        # Search Unsplash
+        # Get API keys from environment or use defaults
+        unsplash_key = os.environ.get('UNSPLASH_API_KEY', '')
+        pexels_key = os.environ.get('PEXELS_API_KEY', 'QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq')
+        
         async with httpx.AsyncClient() as client:
-            try:
-                unsplash_response = await client.get(
-                    "https://api.unsplash.com/search/photos",
-                    params={
-                        "query": query,
-                        "page": page,
-                        "per_page": per_page // 2,
-                        "orientation": "landscape"
-                    },
-                    headers={
-                        "Authorization": "Client-ID AAixfeNvsTzLqWVgKJs_EL3mSYMPdCfL_TU_uobmzr4"
-                    },
-                    timeout=10.0
-                )
-                if unsplash_response.status_code == 200:
-                    unsplash_data = unsplash_response.json()
-                    for photo in unsplash_data.get("results", []):
-                        images.append({
-                            "id": f"unsplash_{photo['id']}",
-                            "url": photo["urls"]["regular"],
-                            "thumbnail": photo["urls"]["small"],
-                            "title": photo.get("description") or photo.get("alt_description") or "Untitled",
-                            "photographer": photo["user"]["name"],
-                            "photographer_url": photo["user"]["links"]["html"],
-                            "source": "unsplash",
-                            "download_url": photo["urls"]["full"],
-                            "width": photo["width"],
-                            "height": photo["height"],
-                            "color": photo.get("color", "#000000"),
-                            "likes": photo.get("likes", 0)
-                        })
-            except Exception as e:
-                logging.warning(f"Unsplash API error: {str(e)}")
+            # Search Unsplash (if key available)
+            if unsplash_key:
+                try:
+                    unsplash_response = await client.get(
+                        "https://api.unsplash.com/search/photos",
+                        params={
+                            "query": query,
+                            "page": page,
+                            "per_page": per_page // 2,
+                            "orientation": "landscape"
+                        },
+                        headers={
+                            "Authorization": f"Client-ID {unsplash_key}"
+                        },
+                        timeout=10.0
+                    )
+                    if unsplash_response.status_code == 200:
+                        unsplash_data = unsplash_response.json()
+                        for photo in unsplash_data.get("results", []):
+                            images.append({
+                                "id": f"unsplash_{photo['id']}",
+                                "url": photo["urls"]["regular"],
+                                "thumbnail": photo["urls"]["small"],
+                                "title": photo.get("description") or photo.get("alt_description") or "Untitled",
+                                "photographer": photo["user"]["name"],
+                                "photographer_url": photo["user"]["links"]["html"],
+                                "source": "unsplash",
+                                "download_url": photo["urls"]["full"],
+                                "width": photo["width"],
+                                "height": photo["height"],
+                                "color": photo.get("color", "#000000"),
+                                "likes": photo.get("likes", 0)
+                            })
+                except Exception as e:
+                    logging.warning(f"Unsplash API error: {str(e)}")
             
-            # Search Pexels
+            # Search Pexels (primary source)
             try:
                 pexels_response = await client.get(
                     "https://api.pexels.com/v1/search",
                     params={
                         "query": query,
                         "page": page,
-                        "per_page": per_page // 2
+                        "per_page": per_page  # Get full amount from Pexels
                     },
                     headers={
-                        "Authorization": "QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq"
+                        "Authorization": pexels_key
                     },
                     timeout=10.0
                 )
