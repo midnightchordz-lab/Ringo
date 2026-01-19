@@ -168,19 +168,20 @@ async def get_video_details(video_id: str):
                 
                 viral_score = calculate_viral_score(views, likes, comments, days_ago)
                 
+                # Ensure all values are JSON serializable
                 video = {
-                    'id': video_id,
-                    'title': info.get('title'),
-                    'channel': info.get('uploader'),
-                    'thumbnail': info.get('thumbnail'),
-                    'duration': info.get('duration', 0),
-                    'views': views,
-                    'likes': likes,
-                    'comments': comments,
-                    'viral_score': viral_score,
-                    'upload_date': upload_date,
-                    'license': info.get('license', 'Unknown'),
-                    'description': info.get('description', '')[:500]
+                    'id': str(video_id),
+                    'title': str(info.get('title', '')),
+                    'channel': str(info.get('uploader', '')),
+                    'thumbnail': str(info.get('thumbnail', '')),
+                    'duration': int(info.get('duration', 0) or 0),
+                    'views': int(views),
+                    'likes': int(likes),
+                    'comments': int(comments),
+                    'viral_score': float(viral_score),
+                    'upload_date': str(upload_date),
+                    'license': str(info.get('license', 'Unknown')),
+                    'description': str(info.get('description', ''))[:500]
                 }
         
         return video
