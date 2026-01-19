@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,46 +9,83 @@
     @apply border-border;
   }
   body {
-    @apply bg-slate-50 text-slate-900;
+    @apply bg-gradient-to-br from-violet-50 via-sky-50 to-pink-50;
     font-family: 'Inter', sans-serif;
+    min-height: 100vh;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Sora', sans-serif;
     @apply tracking-tight;
   }
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-white border border-slate-200 rounded-xl shadow-sm;
+    @apply bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl shadow-lg;
   }
   
   .card-hover {
-    @apply hover:shadow-md hover:border-indigo-200 transition-all duration-200;
+    @apply hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300;
+  }
+  
+  .gradient-primary {
+    @apply bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600;
+  }
+  
+  .gradient-secondary {
+    @apply bg-gradient-to-r from-pink-500 via-rose-500 to-red-500;
+  }
+  
+  .gradient-accent {
+    @apply bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500;
   }
   
   .viral-badge {
-    @apply bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold px-3 py-1 rounded-full text-sm;
+    @apply bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold px-3 py-1.5 rounded-full text-sm shadow-lg;
   }
   
   .cc-badge {
-    @apply bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-2 py-1 rounded-md text-xs;
+    @apply bg-gradient-to-r from-emerald-400 to-green-500 text-white border-0 font-bold px-3 py-1 rounded-lg text-xs shadow-md;
+  }
+  
+  .stat-card {
+    @apply glass-card p-6 relative overflow-hidden;
+  }
+  
+  .stat-card::before {
+    content: '';
+    @apply absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/20 to-transparent rounded-full -translate-y-16 translate-x-16;
   }
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100;
+  @apply bg-violet-100/50;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
+  @apply bg-gradient-to-b from-violet-400 to-purple-500 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
+  @apply from-violet-500 to-purple-600;
+}
+
+/* Animated gradient background */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
 }
