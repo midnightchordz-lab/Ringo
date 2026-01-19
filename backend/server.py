@@ -78,7 +78,8 @@ def calculate_viral_score(views: int, likes: int, comments: int, upload_days_ago
 @api_router.get("/discover")
 async def discover_videos(
     query: str = Query(default="", description="Search query"),
-    max_results: int = Query(default=20, le=50)
+    max_results: int = Query(default=50, le=100),
+    min_views: int = Query(default=1000, description="Minimum view count")
 ):
     try:
         youtube_api_key = os.environ.get('YOUTUBE_API_KEY')
