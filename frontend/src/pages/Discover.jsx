@@ -1,11 +1,36 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, Filter, Play, TrendingUp } from 'lucide-react';
+import { Search, Play, TrendingUp, ShieldCheck, Info, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+
+// License Badge Component
+const LicenseBadge = ({ type = 'cc-by' }) => {
+  const licenses = {
+    'cc-by': {
+      name: 'CC BY',
+      description: 'Creative Commons Attribution - Commercial use allowed with attribution',
+      commercial: true,
+      color: 'bg-green-500/30 text-green-300 border-green-400/50'
+    }
+  };
+  
+  const license = licenses[type];
+  
+  return (
+    <div className="flex items-center gap-1.5" title={license.description}>
+      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-bold ${license.color} backdrop-blur-sm border`}>
+        {license.name}
+      </span>
+      {license.commercial && (
+        <ShieldCheck className="w-4 h-4 text-green-400" title="Commercial use allowed" />
+      )}
+    </div>
+  );
+};
 
 const VideoCard = ({ video }) => (
   <Link to={`/video/${video.id}`} data-testid="video-card">
@@ -24,10 +49,8 @@ const VideoCard = ({ video }) => (
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <Play className="w-16 h-16 text-[#BEF264]" fill="#BEF264" />
         </div>
-        <div className="absolute top-3 left-3 flex gap-2">
-          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-green-500/30 text-green-300 border border-green-400/50 backdrop-blur-sm">
-            CC BY
-          </span>
+        <div className="absolute top-3 left-3">
+          <LicenseBadge type="cc-by" />
         </div>
         <div className="absolute top-3 right-3">
           <span className="viral-badge flex items-center space-x-1">
@@ -96,6 +119,39 @@ export const Discover = () => {
         <p className="text-zinc-500">Find viral CC BY licensed YouTube videos</p>
       </div>
 
+      {/* License Info Banner */}
+      <div className="glass-card p-4 mb-6 border-l-4 border-green-500">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-green-500/20 rounded-lg">
+            <ShieldCheck className="w-5 h-5 text-green-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-semibold text-white">All Videos Are Commercial-Safe</span>
+              <CheckCircle2 className="w-4 h-4 text-green-400" />
+            </div>
+            <p className="text-xs text-zinc-400">
+              Videos shown are licensed under <span className="text-green-400 font-semibold">CC BY (Creative Commons Attribution)</span>. 
+              You can use them commercially with proper attribution to the original creator.
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 pt-3 border-t border-zinc-800 flex flex-wrap gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-zinc-400">Commercial Use</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-zinc-400">Modifications Allowed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Info className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-zinc-400">Attribution Required</span>
+          </div>
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="glass-card p-6 mb-8">
         <div className="flex flex-col gap-4">
@@ -160,7 +216,7 @@ export const Discover = () => {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-[#BEF264] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-zinc-500">Discovering viral content...</p>
+            <p className="text-zinc-500">Discovering CC BY videos...</p>
           </div>
         </div>
       )}
@@ -168,16 +224,15 @@ export const Discover = () => {
       {/* Results */}
       {!loading && videos.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <p className="text-zinc-500">
-              Found <span className="text-[#BEF264] font-bold">{videos.length}</span> videos
+              Found <span className="text-[#BEF264] font-bold">{videos.length}</span> CC BY licensed videos
             </p>
-            <div className="flex items-center space-x-2 text-sm text-zinc-600">
-              <Filter className="w-4 h-4" />
-              <span>Sorted by viral score</span>
+            <div className="flex items-center gap-2 text-xs text-green-400">
+              <ShieldCheck className="w-4 h-4" />
+              <span>All commercial-safe</span>
             </div>
           </div>
-          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {videos.map((video) => (
               <VideoCard key={video.id} video={video} />
@@ -190,15 +245,23 @@ export const Discover = () => {
       {!loading && videos.length === 0 && (
         <div className="glass-card p-20 text-center">
           <Search className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
-          <h3 className="text-xl font-bold text-white mb-2">Start Discovering</h3>
-          <p className="text-zinc-500 mb-6">Search for creative commons content or browse trending videos</p>
-          <Button
-            data-testid="browse-button"
-            onClick={handleSearch}
-            className="bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-full px-6 py-2"
-          >
-            Browse Trending
-          </Button>
+          <h3 className="text-xl font-bold text-white mb-2">No CC BY Videos Found</h3>
+          <p className="text-zinc-500 mb-6">Search for a topic to discover Creative Commons licensed content</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {['Nature', 'Music', 'Cooking', 'Technology', 'Education'].map((term) => (
+              <Button
+                key={term}
+                onClick={() => {
+                  setSearchQuery(term.toLowerCase());
+                  setTimeout(() => handleSearch(), 100);
+                }}
+                variant="outline"
+                className="rounded-full border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              >
+                {term}
+              </Button>
+            ))}
+          </div>
         </div>
       )}
     </div>
