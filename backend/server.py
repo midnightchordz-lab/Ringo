@@ -51,6 +51,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
+# Email setup
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
+
+# Frontend URL for email links
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://reel-factory-13.preview.emergentagent.com")
+
 # Pydantic models
 class UserRegister(BaseModel):
     email: EmailStr
