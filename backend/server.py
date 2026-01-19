@@ -1,15 +1,16 @@
-from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Query, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Query, Depends, status
 from fastapi.responses import FileResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional, Dict
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import yt_dlp
 import subprocess
 import tempfile
@@ -22,6 +23,8 @@ from googleapiclient.errors import HttpError
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json
 import re
+from passlib.context import CryptContext
+from jose import JWTError, jwt
 
 
 ROOT_DIR = Path(__file__).parent
