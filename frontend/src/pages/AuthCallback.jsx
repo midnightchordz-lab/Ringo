@@ -44,10 +44,14 @@ export const AuthCallback = () => {
         localStorage.setItem('token', response.data.access_token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
 
-        // Clear URL fragment and redirect to dashboard
+        // Clear URL fragment
         window.history.replaceState(null, '', '/');
         toast.success(`Welcome, ${response.data.user.full_name}! 🎉`);
-        navigate('/', { replace: true, state: { user: response.data.user } });
+        
+        // Small delay to ensure localStorage is synced before navigation
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
 
       } catch (error) {
         console.error('Auth callback error:', error);
