@@ -30,7 +30,10 @@ export const VideoPreview = () => {
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [startTime, setStartTime] = useState(0);
-  const [clipDuration, setClipDuration] = useState(30);
+  const [clipDuration, setClipDuration] = useState(45);
+  const [useAI, setUseAI] = useState(true);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [analyzingAI, setAnalyzingAI] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [caption, setCaption] = useState('');
   const [hashtags, setHashtags] = useState('#viral #trending');
