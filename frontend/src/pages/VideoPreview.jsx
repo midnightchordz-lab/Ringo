@@ -1,15 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, Scissors, TrendingUp, Eye, ThumbsUp, MessageCircle, Calendar } from 'lucide-react';
+import { ArrowLeft, Scissors, TrendingUp, Eye, ThumbsUp, MessageCircle, Calendar, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import ReactPlayer from 'react-player';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+
+const YouTubePlayer = ({ videoId }) => {
+  return (
+    <div className="relative w-full h-full">
+      <iframe
+        src={`https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0`}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="absolute inset-0 w-full h-full"
+      />
+    </div>
+  );
+};
 
 export const VideoPreview = () => {
   const { videoId } = useParams();
