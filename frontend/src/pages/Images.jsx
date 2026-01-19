@@ -1,14 +1,38 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, Download, Link2, Heart, Image as ImageIcon, ExternalLink, X, Check } from 'lucide-react';
+import { Search, Download, Link2, Heart, Image as ImageIcon, ExternalLink, ShieldCheck, CheckCircle2, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
+// License info for image sources
+const IMAGE_LICENSES = {
+  unsplash: {
+    name: 'Unsplash License',
+    shortName: 'Free',
+    color: 'bg-green-500',
+    textColor: 'text-green-300',
+    commercial: true,
+    attribution: false,
+    description: 'Free for commercial use. No attribution required.'
+  },
+  pexels: {
+    name: 'Pexels License',
+    shortName: 'Free',
+    color: 'bg-green-500',
+    textColor: 'text-green-300',
+    commercial: true,
+    attribution: false,
+    description: 'Free for commercial use. No attribution required.'
+  }
+};
+
 const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  
+  const license = IMAGE_LICENSES[image.source] || IMAGE_LICENSES.unsplash;
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -26,7 +50,6 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
       toast.success('Image downloaded!');
     } catch (error) {
       console.error('Download error:', error);
-      // Fallback: open in new tab
       window.open(image.download_url, '_blank');
       toast.info('Opening image in new tab');
     } finally {
@@ -53,14 +76,17 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
         loading="lazy"
       />
       
-      {/* Source Badge */}
-      <div className="absolute top-2 left-2">
+      {/* Source & License Badge */}
+      <div className="absolute top-2 left-2 flex items-center gap-1.5">
         <span className={`px-2 py-1 rounded-md text-xs font-bold backdrop-blur-sm ${
           image.source === 'unsplash' 
-            ? 'bg-black/50 text-white' 
-            : 'bg-teal-500/80 text-white'
+            ? 'bg-black/70 text-white' 
+            : 'bg-teal-600/90 text-white'
         }`}>
           {image.source === 'unsplash' ? 'Unsplash' : 'Pexels'}
+        </span>
+        <span className="px-1.5 py-1 rounded-md text-xs font-bold bg-green-500/90 text-white backdrop-blur-sm flex items-center gap-1">
+          <ShieldCheck className="w-3 h-3" />
         </span>
       </div>
 
@@ -92,9 +118,20 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
             <h3 className="text-white font-semibold text-sm line-clamp-2 mb-1">
               {image.title}
             </h3>
-            <p className="text-white/70 text-xs mb-3">
+            <p className="text-white/70 text-xs mb-2">
               by {image.photographer}
             </p>
+            
+            {/* License Info on Hover */}
+            <div className="flex items-center gap-2 mb-3 text-xs">
+              <span className="px-2 py-0.5 bg-green-500/30 text-green-300 rounded-full flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                Commercial OK
+              </span>
+              <span className="px-2 py-0.5 bg-green-500/30 text-green-300 rounded-full">
+                No Attribution
+              </span>
+            </div>
             
             <div className="flex gap-2">
               <Button
@@ -144,7 +181,7 @@ export const Images = () => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('search'); // 'search' or 'favorites'
+  const [activeTab, setActiveTab] = useState('search');
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
@@ -238,6 +275,39 @@ export const Images = () => {
         <p className="text-zinc-500">Search copyright-free images from Unsplash & Pexels</p>
       </div>
 
+      {/* License Info Banner */}
+      <div className="glass-card p-4 mb-6 border-l-4 border-green-500">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-green-500/20 rounded-lg">
+            <ShieldCheck className="w-5 h-5 text-green-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-semibold text-white">All Images Are Commercial-Safe</span>
+              <CheckCircle2 className="w-4 h-4 text-green-400" />
+            </div>
+            <p className="text-xs text-zinc-400">
+              Images from <span className="text-white font-semibold">Unsplash</span> and <span className="text-teal-400 font-semibold">Pexels</span> are free for commercial and personal use. 
+              No attribution required (but appreciated).
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 pt-3 border-t border-zinc-800 flex flex-wrap gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-zinc-400">Commercial Use</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-zinc-400">Modifications Allowed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-zinc-400">No Attribution Required</span>
+          </div>
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="glass-card p-6 mb-6">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -321,9 +391,15 @@ export const Images = () => {
               <span className="text-[#BEF264] font-bold">{displayImages.length}</span>{' '}
               {activeTab === 'search' ? 'images' : 'favorite images'}
             </p>
-            <div className="flex items-center gap-2 text-xs text-zinc-600">
-              <span className="px-2 py-1 bg-black/30 rounded">Unsplash</span>
-              <span className="px-2 py-1 bg-teal-500/30 rounded text-teal-400">Pexels</span>
+            <div className="flex items-center gap-3 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-1 bg-black/50 rounded text-white">Unsplash</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-1 bg-teal-600/80 rounded text-white">Pexels</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
+              </div>
             </div>
           </div>
           
