@@ -901,12 +901,45 @@ export const ContentLibrary = () => {
       {/* Quick Access Section */}
       {!showFavorites && selectedCategory === 'all' && selectedLevel === 'all' && !searchQuery && (
         <div className="mt-12">
+          {/* Quick Access for Grades 1-10 */}
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-[#BEF264]" />
+            Activity Sheets by Grade (1-10)
+          </h2>
+          <div className="grid grid-cols-5 md:grid-cols-10 gap-3 mb-8">
+            {[1,2,3,4,5,6,7,8,9,10].map((grade) => {
+              const levelId = `grade${grade}`;
+              const count = CURATED_RESOURCES.filter(r => 
+                r.categories.includes('worksheets') && r.levels.includes(levelId)
+              ).length;
+              return (
+                <motion.button
+                  key={grade}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setSelectedCategory('worksheets');
+                    setSelectedLevel(levelId);
+                  }}
+                  className="glass-card p-4 text-center hover:border-[#BEF264]/50 transition-all group"
+                >
+                  <div className="text-2xl font-bold text-white group-hover:text-[#BEF264] transition-colors">
+                    {grade}
+                  </div>
+                  <div className="text-xs text-zinc-500 mt-1">Grade</div>
+                  <div className="text-xs text-[#BEF264] mt-1">{count} sheets</div>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Quick Access by Education Level */}
           <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
             <GraduationCap className="w-5 h-5 text-violet-500" />
-            Quick Access by Education Level
+            Browse by Education Level
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {EDUCATION_LEVELS.filter(l => l.id !== 'all').map((level) => {
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {EDUCATION_LEVELS.filter(l => ['preschool', 'primary', 'middle', 'high', 'university'].includes(l.id)).map((level) => {
               const Icon = level.icon;
               const count = CURATED_RESOURCES.filter(r => r.levels.includes(level.id)).length;
               return (
