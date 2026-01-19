@@ -81,6 +81,96 @@ async def discover_videos(
     max_results: int = Query(default=20, le=50)
 ):
     try:
+        youtube_api_key = os.environ.get('YOUTUBE_API_KEY')
+        
+        if youtube_api_key:
+            # Use YouTube Data API v3 for better results
+            try:
+                youtube = build('youtube', 'v3', developerKey=youtube_api_key, cache_discovery=False)
+                
+                search_query = f"{query} creative commons" if query else "creative commons"
+                
+                # Search for videos with Creative Commons license
+                search_request = youtube.search().list(
+                    part='id,snippet',
+                    q=search_query,
+                    type='video',
+                    videoLicense='creativeCommon',
+                    maxResults=max_results,
+                    order='viewCount'
+                )
+                search_response = search_request.execute()
+                
+                video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+                
+                if not video_ids:
+                    return {"videos": [], "total": 0}
+                
+                # Get detailed statistics for videos
+                videos_request = youtube.videos().list(
+                    part='statistics,contentDetails,snippet',
+                    id=','.join(video_ids)
+                )
+                videos_response = videos_request.execute()
+                
+                videos = []
+                for item in videos_response.get('items', []):
+                    snippet = item['snippet']
+                    stats = item['statistics']
+                    
+                    views = int(stats.get('viewCount', 0))
+                    likes = int(stats.get('likeCount', 0))
+                    comments = int(stats.get('commentCount', 0))
+                    
+                    # Parse duration
+                    duration_str = item['contentDetails']['duration']
+                    duration_seconds = parse_youtube_duration(duration_str)
+                    
+                    # Parse upload date
+                    upload_date = snippet['publishedAt']
+                    try:
+                        upload_datetime = datetime.fromisoformat(upload_date.replace('Z', '+00:00'))
+                        days_ago = (datetime.now(timezone.utc) - upload_datetime).days
+                        upload_date_formatted = upload_datetime.strftime('%Y%m%d')
+                    except:
+                        days_ago = 365
+                        upload_date_formatted = upload_date[:10].replace('-', '')
+                    
+                    if views < 10000:
+                        continue
+                    
+                    viral_score = calculate_viral_score(views, likes, comments, days_ago)
+                    
+                    videos.append({
+                        'id': item['id'],
+                        'title': snippet['title'],
+                        'channel': snippet['channelTitle'],
+                        'thumbnail': snippet['thumbnails']['high']['url'] if 'high' in snippet['thumbnails'] else snippet['thumbnails']['default']['url'],
+                        'duration': duration_seconds,
+                        'views': views,
+                        'likes': likes,
+                        'comments': comments,
+                        'viral_score': viral_score,
+                        'upload_date': upload_date_formatted,
+                        'license': 'Creative Commons',
+                        'is_cc_licensed': True,
+                        'description': snippet.get('description', '')[:200]
+                    })
+                
+                videos.sort(key=lambda x: x['viral_score'], reverse=True)
+                
+                await db.discovered_videos.delete_many({})
+                if videos:
+                    await db.discovered_videos.insert_many(videos)
+                
+                return {"videos": videos, "total": len(videos)}
+                
+            except HttpError as e:
+                logging.error(f"YouTube API error: {str(e)}")
+                # Fallback to yt-dlp if API fails
+                pass
+        
+        # Fallback: Use yt-dlp for search
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
@@ -118,22 +208,20 @@ async def discover_videos(
                     
                     viral_score = calculate_viral_score(views, likes, comments, days_ago)
                     
-                    # Ensure all values are JSON serializable
-                    video_data = {
-                        'id': str(entry.get('id', '')),
-                        'title': str(entry.get('title', '')),
-                        'channel': str(entry.get('uploader', 'Unknown')),
-                        'thumbnail': str(entry.get('thumbnail', '')),
-                        'duration': int(entry.get('duration', 0) or 0),
-                        'views': int(views),
-                        'likes': int(likes),
-                        'comments': int(comments),
-                        'viral_score': float(viral_score),
-                        'upload_date': str(upload_date),
-                        'license': str(license_info or 'Unknown'),
-                        'is_cc_licensed': bool(is_cc)
-                    }
-                    videos.append(video_data)
+                    videos.append({
+                        'id': entry.get('id'),
+                        'title': entry.get('title'),
+                        'channel': entry.get('uploader', 'Unknown'),
+                        'thumbnail': entry.get('thumbnail'),
+                        'duration': entry.get('duration', 0),
+                        'views': views,
+                        'likes': likes,
+                        'comments': comments,
+                        'viral_score': viral_score,
+                        'upload_date': upload_date,
+                        'license': license_info or 'Unknown',
+                        'is_cc_licensed': is_cc
+                    })
             
             videos.sort(key=lambda x: x['viral_score'], reverse=True)
             
@@ -146,6 +234,20 @@ async def discover_videos(
     except Exception as e:
         logging.error(f"Error discovering videos: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+def parse_youtube_duration(duration_str: str) -> int:
+    """Parse ISO 8601 duration format (PT1H2M10S) to seconds"""
+    import re
+    pattern = r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?'
+    match = re.match(pattern, duration_str)
+    if not match:
+        return 0
+    
+    hours = int(match.group(1) or 0)
+    minutes = int(match.group(2) or 0)
+    seconds = int(match.group(3) or 0)
+    
+    return hours * 3600 + minutes * 60 + seconds
 
 @api_router.get("/videos/{video_id}")
 async def get_video_details(video_id: str):
