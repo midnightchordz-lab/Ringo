@@ -44,6 +44,7 @@ function AppRouter() {
         <Route index element={<Dashboard />} />
         <Route path="discover" element={<Discover />} />
         <Route path="images" element={<Images />} />
+        <Route path="library" element={<ContentLibrary />} />
         <Route path="video/:videoId" element={<VideoPreview />} />
         <Route path="history" element={<History />} />
         <Route path="settings" element={<Settings />} />
