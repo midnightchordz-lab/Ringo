@@ -231,7 +231,7 @@ async def discover_videos(
                     except:
                         days_ago = 365
                     
-                    if views < 10000:
+                    if views < min_views:
                         continue
                     
                     viral_score = calculate_viral_score(views, likes, comments, days_ago)
