@@ -151,11 +151,11 @@ export const Dashboard = () => {
         {stats?.total_videos_discovered > 0 && (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
-              data-testid=\"clear-videos-button\"
+              data-testid="clear-videos-button"
               onClick={() => setShowClearModal(true)}
-              className=\"gradient-secondary text-white font-bold rounded-xl px-6 py-3 shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40\"
+              className="gradient-secondary text-white font-bold rounded-xl px-6 py-3 shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40"
             >
-              <Trash2 className=\"w-4 h-4 mr-2\" />
+              <Trash2 className="w-4 h-4 mr-2" />
               Clear Videos
             </Button>
           </motion.div>
@@ -163,7 +163,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8\">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           icon={Video}
           label=\"Videos Found\"
