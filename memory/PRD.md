@@ -12,12 +12,13 @@ Build a full-stack application that:
 8. Professional, vibrant UI for corporate/education clients
 9. Button to clear discovered videos from the dashboard
 10. Remove "Made with Emergent" branding
+11. **NEW**: Copyright-free images search from Unsplash & Pexels
 
 ## Tech Stack
 - **Frontend**: React, React Router, Axios, Tailwind CSS, Framer Motion, Shadcn/UI
 - **Backend**: FastAPI (Python), MongoDB (via Motor)
 - **Authentication**: JWT (python-jose, passlib), Google OAuth via Emergent Auth
-- **Integrations**: YouTube Data API v3, Resend (email), Emergent LLM Key (AI analysis), yt-dlp
+- **Integrations**: YouTube Data API v3, Resend (email), Emergent LLM Key (AI analysis), yt-dlp, Pexels API
 
 ## What's Been Implemented (Completed)
 
@@ -26,8 +27,9 @@ Build a full-stack application that:
 - Google OAuth integration via Emergent Auth
 - Email verification flow using Resend
 - Protected API routes with Bearer token authentication
+- Supports both JWT tokens and Emergent session tokens
 
-### Core Features
+### Core Features - Videos
 - Video discovery with YouTube Data API (CC-BY license filter)
 - Viral score ranking algorithm
 - Dashboard with stats (videos found, clips made, posts live)
@@ -35,38 +37,37 @@ Build a full-stack application that:
 - Video preview page with embedded YouTube player
 - AI-powered clip analysis backend (uses Emergent LLM Key)
 
+### Core Features - Images (NEW)
+- Search copyright-free images from Pexels (Unsplash key configurable)
+- Download images directly
+- Copy image URLs to clipboard
+- Save images to favorites collection
+- View and manage favorites
+- Source badges (Pexels/Unsplash)
+- Photographer attribution with links
+
 ### UI/UX
 - Vibrant gradient theme (violet, purple, pink accents)
 - Responsive layout with sidebar navigation
 - Professional card designs with hover effects
 - Loading states and toast notifications
 - "Made with Emergent" branding removed
+- Images tab in sidebar navigation
 
 ## Current Issues
 
-### P0 - Critical (None currently)
-All core features working after fixes
-
 ### P1 - High Priority
 - **Clip Generation Blocked**: YouTube bot detection blocking yt-dlp downloads (403 Forbidden)
-  - Workaround needed: User cookies or alternative approach
+- **Unsplash API**: Current demo key is invalid, needs valid API key in UNSPLASH_API_KEY env var
 
 ### P2 - Medium Priority  
 - **Email Verification**: Requires valid RESEND_API_KEY for production
-  - Current placeholder: re_123456789
-
-### P3 - Low Priority
-- Dashboard header gradient may have low contrast on some displays
 
 ## Pending Features (Not Yet Implemented)
 
 ### P0 - Required
 - Post clips to YouTube and Instagram (original requirement)
 - Apple OAuth login (user requested)
-
-### P1 - Should Have
-- Video download alternative to bypass YouTube restrictions
-- Real email verification flow with valid Resend API key
 
 ## API Endpoints
 
@@ -83,37 +84,37 @@ All core features working after fixes
 - GET `/api/videos/{video_id}` - Get video details
 - POST `/api/clear-videos` - Clear all discovered videos
 
+### Images (NEW)
+- GET `/api/images/search?query=&per_page=` - Search copyright-free images
+- GET `/api/images/favorites` - Get user's favorite images
+- POST `/api/images/favorites` - Add image to favorites
+- DELETE `/api/images/favorites/{image_id}` - Remove from favorites
+
 ### Clips & Posting
 - GET `/api/clips/ai-analyze/{video_id}` - AI analysis for best clip timing
-- POST `/api/clips/generate` - Generate clip (currently broken)
+- POST `/api/clips/generate` - Generate clip (currently blocked by YouTube)
 - POST `/api/post` - Post clip to social media (not implemented)
 
 ### Dashboard
 - GET `/api/stats` - Dashboard statistics
 - GET `/api/history` - Post history
 
-### Settings
-- GET `/api/settings/api-keys` - Get saved API keys
-- POST `/api/settings/api-keys` - Save API keys
-
 ## Database Collections (MongoDB)
 - `users` - User accounts with auth info
+- `user_sessions` - Emergent OAuth session tokens
 - `discovered_videos` - Cached video data from YouTube
+- `favorite_images` - User's saved images (NEW)
 - `clips` - Generated clips metadata
 - `posts` - Social media post history
 - `api_keys` - User API keys for YouTube/Instagram
 
-## Test Credentials
-- Email: testuser123@test.com
-- Password: Test123456
-- Status: Email verified
-
 ## Files of Reference
 - `/app/backend/server.py` - All backend logic
+- `/app/frontend/src/pages/Images.jsx` - Images search page (NEW)
 - `/app/frontend/src/pages/` - React page components
 - `/app/frontend/src/utils/api.js` - Auth interceptor
-- `/app/frontend/src/index.css` - Global styles
+- `/app/frontend/src/components/Layout.jsx` - Sidebar with Images nav item
 - `/app/backend/.env` - Backend secrets
 
 ## Last Updated
-January 19, 2026 - Fixed video discovery authentication bug, all 17 backend tests passing
+January 19, 2026 - Added copyright-free Images feature with Pexels integration
