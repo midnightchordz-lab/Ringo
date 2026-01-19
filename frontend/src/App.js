@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/sonner';
 import Layout from '@/components/Layout';
 import Dashboard from '@/pages/Dashboard';
 import Discover from '@/pages/Discover';
+import Images from '@/pages/Images';
 import VideoPreview from '@/pages/VideoPreview';
 import History from '@/pages/History';
 import Settings from '@/pages/Settings';
