@@ -191,18 +191,18 @@ export const Dashboard = () => {
       </div>
 
       {/* Top Videos Section */}
-      <div className=\"mb-8\">
-        <div className=\"flex items-center justify-between mb-6\">
-          <h2 className=\"text-3xl font-bold text-slate-900\" style={{ fontFamily: 'Sora, sans-serif' }}>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
             🔥 Top Viral Videos
           </h2>
-          <Link to=\"/discover\">
+          <Link to="/discover">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
-                data-testid=\"discover-more-button\"
-                className=\"gradient-accent text-white font-bold rounded-xl px-8 py-3 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40\"
+                data-testid="discover-more-button"
+                className="gradient-accent text-white font-bold rounded-xl px-8 py-3 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
               >
-                <Search className=\"w-4 h-4 mr-2\" />
+                <Search className="w-4 h-4 mr-2" />
                 Discover More
               </Button>
             </motion.div>
@@ -210,7 +210,7 @@ export const Dashboard = () => {
         </div>
 
         {stats?.top_videos && stats.top_videos.length > 0 ? (
-          <div className=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6\">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {stats.top_videos.map((video, index) => (
               <motion.div
                 key={video.id}
