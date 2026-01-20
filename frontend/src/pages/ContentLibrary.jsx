@@ -423,7 +423,7 @@ export const ContentLibrary = () => {
           {/* Search Input */}
           <div className="flex-1 relative flex gap-2">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
               <Input
                 data-testid="library-search-input"
                 type="text"
@@ -431,14 +431,14 @@ export const ContentLibrary = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-12 bg-zinc-950/50 border-zinc-800 focus:border-violet-500 rounded-lg text-white placeholder:text-zinc-600 h-12"
+                className="pl-12 studio-input"
               />
             </div>
             <Button
               data-testid="library-find-button"
               onClick={handleSearch}
               disabled={isSearching}
-              className="bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-xl px-6 h-12 min-w-[100px]"
+              className="btn-primary min-w-[100px]"
             >
               {isSearching ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -452,7 +452,7 @@ export const ContentLibrary = () => {
           <div className="relative">
             <Button
               onClick={() => setShowLevelDropdown(!showLevelDropdown)}
-              className="h-12 px-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg flex items-center gap-2 min-w-[180px] justify-between"
+              className="h-12 px-4 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl flex items-center gap-2 min-w-[180px] justify-between font-semibold"
               data-testid="level-dropdown"
             >
               <div className="flex items-center gap-2">
@@ -468,7 +468,7 @@ export const ContentLibrary = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-50 top-14 left-0 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden"
+                  className="absolute z-50 top-14 left-0 w-full bg-white border border-neutral-200 rounded-xl shadow-xl overflow-hidden"
                 >
                   {EDUCATION_LEVELS.map((level) => (
                     <button
@@ -477,12 +477,12 @@ export const ContentLibrary = () => {
                         setSelectedLevel(level.id);
                         setShowLevelDropdown(false);
                       }}
-                      className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-zinc-800 transition-colors ${
-                        selectedLevel === level.id ? 'bg-violet-600/20 text-violet-400' : 'text-zinc-300'
+                      className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-neutral-50 transition-colors ${
+                        selectedLevel === level.id ? 'bg-emerald-50 text-emerald-700' : 'text-neutral-700'
                       }`}
                     >
                       <level.icon className="w-4 h-4" />
-                      <span className="text-sm">{level.name}</span>
+                      <span className="text-sm font-medium">{level.name}</span>
                     </button>
                   ))}
                 </motion.div>
@@ -493,10 +493,10 @@ export const ContentLibrary = () => {
           {/* Favorites Toggle */}
           <Button
             onClick={() => setShowFavorites(!showFavorites)}
-            className={`h-12 px-6 rounded-lg flex items-center gap-2 ${
+            className={`h-12 px-6 rounded-xl flex items-center gap-2 font-semibold ${
               showFavorites 
                 ? 'bg-red-500 hover:bg-red-600 text-white' 
-                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+                : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
             }`}
             data-testid="favorites-toggle"
           >
@@ -507,8 +507,8 @@ export const ContentLibrary = () => {
 
         {/* Quick Search Suggestions */}
         {!hasSearched && (
-          <div className="mt-4 pt-4 border-t border-zinc-800">
-            <p className="text-xs text-zinc-500 mb-2">Quick searches:</p>
+          <div className="mt-4 pt-4 border-t border-neutral-200">
+            <p className="text-xs text-neutral-500 mb-2">Quick searches:</p>
             <div className="flex flex-wrap gap-2">
               {SEARCH_SUGGESTIONS.map((suggestion) => (
                 <button
@@ -517,7 +517,7 @@ export const ContentLibrary = () => {
                     setSearchQuery(suggestion);
                     setTimeout(() => handleSearch(), 100);
                   }}
-                  className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-xs rounded-full transition-colors"
+                  className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 text-xs rounded-full transition-colors font-medium"
                 >
                   {suggestion}
                 </button>
