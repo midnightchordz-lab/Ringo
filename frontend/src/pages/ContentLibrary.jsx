@@ -6,7 +6,8 @@ import {
   Baby, School, Building2, University, BookMarked, Mic,
   PenTool, FlaskConical, History, ChevronDown, ClipboardList,
   ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, Info,
-  Loader2, Zap, BookOpenCheck, FileQuestion, Video, Newspaper
+  Loader2, Zap, BookOpenCheck, FileQuestion, Video, Newspaper,
+  Download, Printer, Book
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
