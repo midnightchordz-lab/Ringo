@@ -1,78 +1,80 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { TrendingUp, Video, Upload, BarChart3, Play, Trash2, AlertCircle, Zap, Star, Search } from 'lucide-react';
+import { TrendingUp, Video, Upload, BarChart3, Play, Trash2, AlertCircle, Zap, Star, Search, Sparkles, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-const StatCard = ({ icon: Icon, label, value, trend, gradient }) => (
-  <motion.div
-    whileHover={{ scale: 1.05, y: -8 }}
-    className={`stat-card card-hover ${gradient}`}
-    data-testid={`stat-card-${label.toLowerCase().replace(/\s/g, '-')}`}
-  >
-    <div className="relative z-10">
-      <div className="flex items-start justify-between mb-3">
-        <div className="p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg">
-          <Icon className="w-7 h-7 text-violet-600" strokeWidth={2.5} />
+const StatCard = ({ icon: Icon, label, value, color, trend }) => {
+  const colorClasses = {
+    blue: { bg: 'bg-blue-50', icon: 'bg-blue-100 text-blue-600', border: 'border-blue-100' },
+    coral: { bg: 'bg-red-50', icon: 'bg-red-100 text-red-500', border: 'border-red-100' },
+    purple: { bg: 'bg-purple-50', icon: 'bg-purple-100 text-purple-600', border: 'border-purple-100' },
+    yellow: { bg: 'bg-amber-50', icon: 'bg-amber-100 text-amber-600', border: 'border-amber-100' },
+  };
+  const classes = colorClasses[color] || colorClasses.blue;
+
+  return (
+    <motion.div
+      whileHover={{ y: -4 }}
+      className={`studio-card studio-card-hover p-6 ${classes.bg} border ${classes.border}`}
+      data-testid={`stat-card-${label.toLowerCase().replace(/\s/g, '-')}`}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${classes.icon}`}>
+          <Icon className="w-6 h-6" strokeWidth={2} />
         </div>
-        <Zap className="w-5 h-5 text-amber-400" fill="currentColor" />
+        {trend && (
+          <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
+            {trend}
+          </span>
+        )}
       </div>
-      <p className="text-slate-600 text-sm mb-1 font-semibold uppercase tracking-wider">{label}</p>
-      <h3 className="text-4xl font-black text-slate-900 mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+      <p className="text-neutral-500 text-sm font-medium mb-1">{label}</p>
+      <h3 className="text-3xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
         {value}
       </h3>
-      {trend && (
-        <p className="text-xs text-slate-500 font-medium">
-          {trend}
-        </p>
-      )}
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 const VideoCard = ({ video }) => (
   <Link to={`/video/${video.id}`} data-testid="top-video-card">
     <motion.div
-      whileHover={{ scale: 1.05, y: -8 }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="glass-card card-hover overflow-hidden group"
+      whileHover={{ y: -8 }}
+      className="studio-card studio-card-hover overflow-hidden group"
     >
-      <div className="relative aspect-video bg-gradient-to-br from-violet-200 to-purple-200">
+      <div className="relative aspect-video bg-neutral-100">
         <img
           src={video.thumbnail}
           alt={video.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            whileHover={{ scale: 1 }}
-            className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl"
-          >
-            <Play className="w-8 h-8 text-violet-600 ml-1" fill="currentColor" />
-          </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-xl">
+            <Play className="w-6 h-6 text-blue-600 ml-1" fill="currentColor" />
+          </div>
         </div>
         <div className="absolute top-3 left-3">
-          <span className="cc-badge backdrop-blur-md">
+          <span className="bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-lg">
             CC BY
           </span>
         </div>
         <div className="absolute top-3 right-3">
-          <div className="viral-badge flex items-center space-x-1 backdrop-blur-md">
+          <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-lg flex items-center gap-1">
             <Star className="w-3 h-3" fill="currentColor" />
-            <span>{video.viral_score}</span>
+            {video.viral_score}
           </div>
         </div>
       </div>
-      <div className="p-4 bg-gradient-to-br from-white/90 to-violet-50/50">
-        <h4 className="text-slate-900 font-bold line-clamp-2 mb-2 leading-snug">{video.title}</h4>
-        <p className="text-violet-600 text-sm font-semibold mb-3">{video.channel}</p>
-        <div className="flex items-center justify-between text-xs font-medium">
-          <span className="text-slate-600">{(video.views || 0).toLocaleString()} views</span>
-          <span className="text-slate-500">{Math.floor((video.duration || 0) / 60)}:{String((video.duration || 0) % 60).padStart(2, '0')}</span>
+      <div className="p-4">
+        <h4 className="text-neutral-900 font-semibold line-clamp-2 mb-2 leading-tight">{video.title}</h4>
+        <p className="text-blue-600 text-sm font-medium mb-2">{video.channel}</p>
+        <div className="flex items-center justify-between text-xs text-neutral-500">
+          <span>{(video.views || 0).toLocaleString()} views</span>
+          <span>{Math.floor((video.duration || 0) / 60)}:{String((video.duration || 0) % 60).padStart(2, '0')}</span>
         </div>
       </div>
     </motion.div>
@@ -84,6 +86,7 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showClearModal, setShowClearModal] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     fetchStats();
@@ -117,97 +120,146 @@ export const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-neutral-50">
         <div className="text-center">
-          <div className="w-20 h-20 gradient-primary rounded-3xl animate-spin mb-4 mx-auto flex items-center justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-violet-50 via-sky-50 to-pink-50 rounded-2xl"></div>
-          </div>
-          <p className="text-slate-700 font-semibold text-lg">Loading your dashboard...</p>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-neutral-600 font-medium">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
-      {/* Header */}
-      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <motion.h1 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-5xl sm:text-6xl font-black mb-2" 
-            style={{ fontFamily: 'Sora, sans-serif' }}
-          >
-            <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Dashboard
-            </span>
-          </motion.h1>
-          <p className="text-slate-600 text-lg font-medium">Your content command center ✨</p>
-        </div>
-        {stats?.total_videos_discovered > 0 && (
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              data-testid="clear-videos-button"
-              onClick={() => setShowClearModal(true)}
-              className="gradient-secondary text-white font-bold rounded-xl px-6 py-3 shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Clear Videos
-            </Button>
-          </motion.div>
-        )}
+    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 min-h-screen">
+      {/* Welcome Header */}
+      <div className="mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+        >
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Welcome back, <span className="text-gradient">{user.full_name?.split(' ')[0] || 'Creator'}</span>! 👋
+            </h1>
+            <p className="text-neutral-500 text-lg">Here's what's happening with your content today.</p>
+          </div>
+          <div className="flex gap-3">
+            {stats?.total_videos_discovered > 0 && (
+              <Button
+                data-testid="clear-videos-button"
+                onClick={() => setShowClearModal(true)}
+                className="bg-red-50 text-red-600 hover:bg-red-100 font-semibold rounded-xl px-5 py-2.5 border border-red-200"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear Videos
+              </Button>
+            )}
+            <Link to="/discover">
+              <Button className="btn-primary">
+                <Search className="w-4 h-4 mr-2" />
+                Discover Videos
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
         <StatCard
           icon={Video}
           label="Videos Found"
           value={stats?.total_videos_discovered || 0}
-          gradient="bg-gradient-to-br from-violet-100 to-purple-100"
+          color="blue"
         />
         <StatCard
           icon={TrendingUp}
           label="Clips Made"
           value={stats?.total_clips_generated || 0}
-          gradient="bg-gradient-to-br from-cyan-100 to-blue-100"
+          color="purple"
         />
         <StatCard
           icon={Upload}
           label="Posts Live"
           value={stats?.total_posts_published || 0}
-          gradient="bg-gradient-to-br from-pink-100 to-rose-100"
+          color="coral"
         />
         <StatCard
           icon={BarChart3}
-          label="Viral Score"
+          label="Top Viral Score"
           value={stats?.top_videos?.[0]?.viral_score?.toFixed(1) || '0.0'}
-          gradient="bg-gradient-to-br from-amber-100 to-orange-100"
+          color="yellow"
         />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Link to="/discover" className="block">
+          <motion.div 
+            whileHover={{ y: -4 }}
+            className="studio-card p-6 bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-lg mb-1">Find Videos</h3>
+                <p className="text-blue-100 text-sm">Discover CC licensed content</p>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <Video className="w-6 h-6" />
+              </div>
+            </div>
+          </motion.div>
+        </Link>
+        
+        <Link to="/images" className="block">
+          <motion.div 
+            whileHover={{ y: -4 }}
+            className="studio-card p-6 bg-gradient-to-br from-purple-500 to-pink-600 text-white"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-lg mb-1">Browse Images</h3>
+                <p className="text-purple-100 text-sm">Free stock photos</p>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-6 h-6" />
+              </div>
+            </div>
+          </motion.div>
+        </Link>
+        
+        <Link to="/library" className="block">
+          <motion.div 
+            whileHover={{ y: -4 }}
+            className="studio-card p-6 bg-gradient-to-br from-emerald-500 to-green-600 text-white"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-lg mb-1">Content Library</h3>
+                <p className="text-emerald-100 text-sm">Educational resources</p>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <ArrowRight className="w-6 h-6" />
+              </div>
+            </div>
+          </motion.div>
+        </Link>
       </div>
 
       {/* Top Videos Section */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+          <h2 className="text-2xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
             🔥 Top Viral Videos
           </h2>
-          <Link to="/discover">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                data-testid="discover-more-button"
-                className="gradient-accent text-white font-bold rounded-xl px-8 py-3 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                Discover More
-              </Button>
-            </motion.div>
+          <Link to="/discover" className="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center gap-1">
+            View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {stats?.top_videos && stats.top_videos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
             {stats.top_videos.map((video, index) => (
               <motion.div
                 key={video.id}
@@ -220,21 +272,17 @@ export const Dashboard = () => {
             ))}
           </div>
         ) : (
-          <div className="glass-card p-16 text-center bg-gradient-to-br from-violet-50 to-purple-50">
-            <div className="w-24 h-24 mx-auto mb-6 gradient-primary rounded-3xl flex items-center justify-center shadow-xl">
-              <Video className="w-12 h-12 text-white" strokeWidth={2} />
+          <div className="studio-card p-12 text-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-blue-100 rounded-2xl flex items-center justify-center">
+              <Video className="w-10 h-10 text-blue-600" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">No videos yet!</h3>
-            <p className="text-slate-600 mb-6 text-lg">Start discovering amazing CC content</p>
+            <h3 className="text-xl font-bold text-neutral-900 mb-2">No videos discovered yet</h3>
+            <p className="text-neutral-500 mb-6">Start exploring CC licensed content to build your library</p>
             <Link to="/discover">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  data-testid="start-discovering-button"
-                  className="gradient-primary text-white font-bold rounded-xl px-8 py-4 text-lg shadow-xl shadow-violet-500/30"
-                >
-                  Start Discovering ✨
-                </Button>
-              </motion.div>
+              <Button className="btn-primary">
+                <Search className="w-4 h-4 mr-2" />
+                Start Discovering
+              </Button>
             </Link>
           </div>
         )}
@@ -242,35 +290,35 @@ export const Dashboard = () => {
 
       {/* Recent Activity */}
       <div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: 'Sora, sans-serif' }}>
-          📊 Recent Posts
+        <h2 className="text-2xl font-bold text-neutral-900 mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          📊 Recent Activity
         </h2>
         {stats?.recent_posts && stats.recent_posts.length > 0 ? (
-          <div className="glass-card overflow-hidden">
+          <div className="studio-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-violet-100 to-purple-100">
-                  <tr className="border-b-2 border-violet-200">
-                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Platform</th>
-                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Caption</th>
-                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Posted</th>
-                    <th className="text-left p-4 text-violet-700 font-bold text-sm">Status</th>
+                <thead className="bg-neutral-50 border-b border-neutral-200">
+                  <tr>
+                    <th className="text-left p-4 text-neutral-600 font-semibold text-sm">Platform</th>
+                    <th className="text-left p-4 text-neutral-600 font-semibold text-sm">Caption</th>
+                    <th className="text-left p-4 text-neutral-600 font-semibold text-sm">Posted</th>
+                    <th className="text-left p-4 text-neutral-600 font-semibold text-sm">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {stats.recent_posts.map((post) => (
-                    <tr key={post.post_id} className="border-b border-violet-100 hover:bg-violet-50/50 transition-colors">
+                    <tr key={post.post_id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
                       <td className="p-4">
-                        <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold gradient-accent text-white shadow-sm">
+                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
                           {post.platform}
                         </span>
                       </td>
-                      <td className="p-4 text-slate-700 font-medium max-w-md truncate">{post.caption}</td>
-                      <td className="p-4 text-slate-600 text-sm font-medium">
+                      <td className="p-4 text-neutral-700 max-w-md truncate">{post.caption}</td>
+                      <td className="p-4 text-neutral-500 text-sm">
                         {new Date(post.posted_at).toLocaleDateString()}
                       </td>
                       <td className="p-4">
-                        <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-sm">
+                        <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
                           ✓ {post.status}
                         </span>
                       </td>
@@ -281,38 +329,38 @@ export const Dashboard = () => {
             </div>
           </div>
         ) : (
-          <div className="glass-card p-16 text-center bg-gradient-to-br from-pink-50 to-rose-50">
-            <div className="w-24 h-24 mx-auto mb-6 gradient-secondary rounded-3xl flex items-center justify-center shadow-xl">
-              <Upload className="w-12 h-12 text-white" strokeWidth={2} />
+          <div className="studio-card p-12 text-center bg-neutral-50">
+            <div className="w-20 h-20 mx-auto mb-6 bg-purple-100 rounded-2xl flex items-center justify-center">
+              <Upload className="w-10 h-10 text-purple-600" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">No posts yet!</h3>
-            <p className="text-slate-600 text-lg">Your published content will appear here</p>
+            <h3 className="text-xl font-bold text-neutral-900 mb-2">No activity yet</h3>
+            <p className="text-neutral-500">Your published content will appear here</p>
           </div>
         )}
       </div>
 
       {/* Clear Confirmation Modal */}
       {showClearModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowClearModal(false)}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowClearModal(false)}>
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="glass-card p-8 max-w-md w-full shadow-2xl"
+            className="studio-card p-6 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start space-x-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-pink-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                <AlertCircle className="w-7 h-7 text-white" strokeWidth={2.5} />
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-6 h-6 text-red-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-slate-900 mb-3" style={{ fontFamily: 'Sora, sans-serif' }}>Clear All Videos?</h3>
-                <p className="text-slate-600 mb-6 font-medium">
-                  This will remove all <span className="font-bold text-violet-600">{stats?.total_videos_discovered}</span> discovered videos. This action cannot be undone.
+                <h3 className="text-xl font-bold text-neutral-900 mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>Clear All Videos?</h3>
+                <p className="text-neutral-600 mb-6">
+                  This will remove all <span className="font-bold text-blue-600">{stats?.total_videos_discovered}</span> discovered videos. This action cannot be undone.
                 </p>
-                <div className="flex space-x-3">
+                <div className="flex gap-3">
                   <Button
                     onClick={() => setShowClearModal(false)}
-                    className="flex-1 bg-slate-200 text-slate-700 hover:bg-slate-300 font-bold rounded-xl py-3"
+                    className="flex-1 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 font-semibold rounded-xl"
                     disabled={clearing}
                   >
                     Cancel
@@ -320,7 +368,7 @@ export const Dashboard = () => {
                   <Button
                     onClick={handleClearVideos}
                     disabled={clearing}
-                    className="flex-1 gradient-secondary text-white font-bold rounded-xl py-3 shadow-lg shadow-red-500/30"
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl"
                   >
                     {clearing ? 'Clearing...' : 'Clear Videos'}
                   </Button>
