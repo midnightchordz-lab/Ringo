@@ -361,11 +361,12 @@ async def login(user_data: UserLogin):
 
 @api_router.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
+    user_id = str(current_user.get("_id")) if current_user.get("_id") else current_user.get("user_id", "")
     return {
-        "id": current_user["_id"],
-        "email": current_user["email"],
-        "full_name": current_user["full_name"],
-        "created_at": current_user["created_at"]
+        "id": user_id,
+        "email": current_user.get("email", ""),
+        "full_name": current_user.get("full_name", ""),
+        "created_at": current_user.get("created_at", "")
     }
 
 @api_router.get("/auth/verify-email")
