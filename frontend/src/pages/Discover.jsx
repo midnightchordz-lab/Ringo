@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, Play, TrendingUp, ShieldCheck, Info, CheckCircle2 } from 'lucide-react';
+import { Search, Play, TrendingUp, ShieldCheck, Info, CheckCircle2, Database, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
