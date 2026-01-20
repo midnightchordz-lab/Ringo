@@ -23,6 +23,12 @@ Build a full-stack application that:
 
 ## What's Been Implemented (Completed)
 
+### UI Updates (Jan 20, 2026)
+- Renamed "Discover" to "Videos" in the sidebar navigation
+- Added "Find" button next to search bars on Videos, Images, and Content Library pages
+- Fixed JWT login issue where ObjectId was not JSON serializable
+- Fixed get_current_user to properly handle email-based JWT tokens
+
 ### Authentication System
 - JWT-based registration and login
 - Google OAuth integration via Emergent Auth
