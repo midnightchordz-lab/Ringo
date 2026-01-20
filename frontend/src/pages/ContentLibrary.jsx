@@ -1125,12 +1125,12 @@ export const ContentLibrary = () => {
           <div className="relative">
             <Button
               onClick={() => setShowLevelDropdown(!showLevelDropdown)}
-              className="h-12 px-4 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl flex items-center gap-2 min-w-[180px] justify-between font-semibold"
+              className="h-12 px-4 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl flex items-center gap-2 min-w-[200px] justify-between font-semibold"
               data-testid="level-dropdown"
             >
               <div className="flex items-center gap-2">
                 {selectedLevelInfo && <selectedLevelInfo.icon className="w-4 h-4" />}
-                <span className="text-sm">{selectedLevelInfo?.name || 'All Levels'}</span>
+                <span className="text-sm whitespace-nowrap">{selectedLevelInfo?.name || 'All Levels'}</span>
               </div>
               <ChevronDown className={`w-4 h-4 transition-transform ${showLevelDropdown ? 'rotate-180' : ''}`} />
             </Button>
@@ -1141,7 +1141,7 @@ export const ContentLibrary = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-50 top-14 left-0 w-full bg-white border border-neutral-200 rounded-xl shadow-xl overflow-hidden"
+                  className="absolute z-50 top-14 left-0 min-w-[220px] bg-white border border-neutral-200 rounded-xl shadow-xl overflow-hidden"
                 >
                   {EDUCATION_LEVELS.map((level) => (
                     <button
@@ -1154,8 +1154,8 @@ export const ContentLibrary = () => {
                         selectedLevel === level.id ? 'bg-emerald-50 text-emerald-700' : 'text-neutral-700'
                       }`}
                     >
-                      <level.icon className="w-4 h-4" />
-                      <span className="text-sm font-medium">{level.name}</span>
+                      <level.icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm font-medium whitespace-nowrap">{level.name}</span>
                     </button>
                   ))}
                 </motion.div>
