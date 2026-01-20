@@ -91,12 +91,22 @@ Created modular architecture for maintainability:
   - Categorize results (worksheet, book, article, course, video, resource)
   - Suggest grade levels
   - Generate AI summaries
-- Category filters: All Content, Worksheets, Books, Articles, Courses, Videos, Resources
+- Category filters: All Content, **Free Books**, Worksheets, Books, Articles, Courses, Videos, Resources
 - Education level filters: Pre-school, Elementary, Middle, High, University
 - Save resources to favorites
 - Quick search suggestions for common queries
 - Source badges showing where content came from
 - License information for each result
+
+### Core Features - Free Books Section (NEW Jan 20, 2026)
+- **19 curated free books** from Project Gutenberg (public domain)
+- **Categories**: Stories, Poetry, Grammar, Math, Science
+- **Book cards** display: Title, Author, Category badge, Public Domain badge, Printable badge, Grade levels
+- **Download options**: PDF, EPUB, Read Online
+- **Category filters**: All Books, Stories, Poetry, Grammar, Math, Science
+- **Grade level filtering**: Pre-school through University
+- **Search within books**: Search by title, author, or subject
+- Endpoints: `/api/content-library/free-books`, `/api/content-library/free-books/search`
 
 ### UI/UX
 - Vibrant gradient theme (violet, purple, pink accents)
