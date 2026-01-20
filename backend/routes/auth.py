@@ -1,23 +1,53 @@
 """
-Authentication routes
+Authentication routes - handles user registration, login, and OAuth
 """
+import uuid
 import secrets
 import asyncio
-from datetime import datetime, timezone
+import logging
+from datetime import datetime, timezone, timedelta
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Depends, Form
+from pydantic import EmailStr
+import httpx
 import resend
 
+import sys
+sys.path.insert(0, '/app/backend')
+
 from database import db
-from models import UserRegister, UserLogin, Token, UserResponse
-from utils.auth import verify_password, get_password_hash, create_access_token, get_current_user
-from config import RESEND_API_KEY, SENDER_EMAIL, FRONTEND_URL
+from config import RESEND_API_KEY, SENDER_EMAIL, FRONTEND_URL, SECRET_KEY, ALGORITHM
+from models.schemas import UserRegister, UserLogin, Token, UserResponse
+
+from passlib.context import CryptContext
+from jose import jwt
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Initialize Resend
 if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(days=7)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 async def send_verification_email(email: str, token: str, name: str):
@@ -64,6 +94,72 @@ async def send_verification_email(email: str, token: str, name: str):
         print(f"Failed to send verification email: {e}")
 
 
+@router.post("/google-oauth")
+async def google_oauth_callback(session_id: str = Form(...)):
+    """Process Google OAuth via Emergent Auth"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id},
+                timeout=10.0
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Invalid session ID")
+            
+            oauth_data = response.json()
+        
+        user = await db.users.find_one({"email": oauth_data["email"]})
+        
+        if not user:
+            user_id = f"user_{uuid.uuid4().hex[:12]}"
+            user = {
+                "user_id": user_id,
+                "email": oauth_data["email"],
+                "full_name": oauth_data["name"],
+                "picture": oauth_data.get("picture", ""),
+                "auth_provider": "google",
+                "email_verified": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "is_active": True
+            }
+            await db.users.insert_one(user)
+        else:
+            user_id = user.get("user_id") or str(user.get("_id"))
+        
+        session_token = oauth_data["session_token"]
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        
+        await db.user_sessions.update_one(
+            {"email": oauth_data["email"]},
+            {
+                "$set": {
+                    "user_id": user_id,
+                    "session_token": session_token,
+                    "expires_at": expires_at,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            },
+            upsert=True
+        )
+        
+        return {
+            "access_token": session_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": oauth_data["email"],
+                "full_name": oauth_data["name"],
+                "picture": oauth_data.get("picture", "")
+            }
+        }
+    
+    except Exception as e:
+        logging.error(f"OAuth error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/register")
 async def register(user_data: UserRegister):
     """Register a new user"""
@@ -71,9 +167,11 @@ async def register(user_data: UserRegister):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    user_id = str(uuid.uuid4())
     verification_token = secrets.token_urlsafe(32)
     
     new_user = {
+        "user_id": user_id,
         "email": user_data.email,
         "hashed_password": get_password_hash(user_data.password),
         "full_name": user_data.full_name,
@@ -134,18 +232,6 @@ async def login(credentials: UserLogin):
     }
 
 
-@router.get("/me", response_model=UserResponse)
-async def get_me(current_user: dict = Depends(get_current_user)):
-    """Get current user info"""
-    user_id = str(current_user.get("_id")) if current_user.get("_id") else current_user.get("user_id", "")
-    return {
-        "id": user_id,
-        "email": current_user.get("email", ""),
-        "full_name": current_user.get("full_name", ""),
-        "created_at": current_user.get("created_at", "")
-    }
-
-
 @router.get("/verify-email")
 async def verify_email(token: str):
     """Verify user email with token"""
@@ -169,7 +255,7 @@ async def verify_email(token: str):
 
 
 @router.post("/resend-verification")
-async def resend_verification(email: str):
+async def resend_verification(email: EmailStr):
     """Resend verification email"""
     user = await db.users.find_one({"email": email})
     
@@ -188,7 +274,3 @@ async def resend_verification(email: str):
     asyncio.create_task(send_verification_email(user["email"], new_token, user["full_name"]))
     
     return {"message": "Verification email sent! Please check your inbox."}
-
-
-# Import Depends here to avoid circular import
-from fastapi import Depends
