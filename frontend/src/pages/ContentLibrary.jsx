@@ -712,8 +712,81 @@ export const ContentLibrary = () => {
         </div>
       )}
 
+      {/* Free Books View */}
+      {!isSearching && !loadingBooks && selectedCategory === 'free-books' && !showFavorites && (
+        <div data-testid="free-books-section">
+          {/* Category Filter Pills for Free Books */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {['all', 'stories', 'poetry', 'grammar', 'math', 'science'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => {
+                  const params = { limit: 50 };
+                  if (cat !== 'all') params.category = cat;
+                  if (selectedLevel !== 'all') params.grade = selectedLevel;
+                  api.get('/content-library/free-books', { params })
+                    .then(res => setFreeBooks(res.data.books || []))
+                    .catch(err => console.error(err));
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium capitalize transition-all ${
+                  cat === 'all' 
+                    ? 'bg-amber-500 text-white shadow-md'
+                    : 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                }`}
+                data-testid={`free-books-filter-${cat}`}
+              >
+                {cat === 'all' ? '📚 All Books' : cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Books Count */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-neutral-600">
+              Showing <span className="text-amber-600 font-bold">{freeBooks.length}</span> free downloadable books
+            </p>
+            <div className="flex items-center gap-2 text-xs text-neutral-500">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>All books are public domain - free to download and print</span>
+            </div>
+          </div>
+
+          {/* Books Grid */}
+          {freeBooks.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <AnimatePresence>
+                {freeBooks.map((book) => (
+                  <FreeBookCard
+                    key={book.id}
+                    book={book}
+                    onFavorite={handleFavorite}
+                    isFavorited={isFavorited(book.id)}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="studio-card p-16 text-center">
+              <Book className="w-20 h-20 text-amber-300 mx-auto mb-6" strokeWidth={1.5} />
+              <h3 className="text-xl font-bold text-neutral-800 mb-2">No Books Found</h3>
+              <p className="text-neutral-500 mb-6">Try selecting a different category or grade level</p>
+              <Button
+                onClick={() => {
+                  api.get('/content-library/free-books', { params: { limit: 50 } })
+                    .then(res => setFreeBooks(res.data.books || []))
+                    .catch(err => console.error(err));
+                }}
+                className="bg-amber-500 hover:bg-amber-600 text-white rounded-full px-6"
+              >
+                Show All Books
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Search Results */}
-      {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && (
+      {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && selectedCategory !== 'free-books' && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <p className="text-zinc-500">
