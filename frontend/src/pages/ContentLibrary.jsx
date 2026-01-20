@@ -5,7 +5,8 @@ import {
   ExternalLink, Heart, Library, Sparkles, Globe,
   Baby, School, Building2, University, BookMarked, Mic,
   PenTool, FlaskConical, History, ChevronDown, ClipboardList,
-  ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, Info
+  ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, Info,
+  Loader2, Zap, BookOpenCheck, FileQuestion, Video, Newspaper
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -36,16 +37,16 @@ const LICENSE_TYPES = {
     borderColor: 'border-green-500/50',
     description: 'Commercial use allowed. Attribution required.'
   },
-  'unsplash': {
-    name: 'Unsplash License',
-    shortName: 'Free',
+  'cc-by-sa': {
+    name: 'CC BY-SA',
+    shortName: 'CC SA',
     commercial: true,
     derivatives: true,
-    attribution: false,
+    attribution: true,
     color: 'bg-green-500',
     textColor: 'text-green-400',
     borderColor: 'border-green-500/50',
-    description: 'Free for commercial use. No attribution required.'
+    description: 'Commercial use allowed. Share alike required.'
   },
   'cc-by-nc': {
     name: 'CC BY-NC',
@@ -58,31 +59,8 @@ const LICENSE_TYPES = {
     borderColor: 'border-amber-500/50',
     description: 'Non-commercial use only. Attribution required.'
   },
-  'cc-by-nc-sa': {
-    name: 'CC BY-NC-SA',
-    shortName: 'NC-SA',
-    commercial: false,
-    derivatives: true,
-    attribution: true,
-    shareAlike: true,
-    color: 'bg-amber-500',
-    textColor: 'text-amber-400',
-    borderColor: 'border-amber-500/50',
-    description: 'Non-commercial only. Must share adaptations under same license.'
-  },
-  'cc-by-nd': {
-    name: 'CC BY-ND',
-    shortName: 'ND',
-    commercial: true,
-    derivatives: false,
-    attribution: true,
-    color: 'bg-blue-500',
-    textColor: 'text-blue-400',
-    borderColor: 'border-blue-500/50',
-    description: 'Commercial use allowed. No modifications permitted.'
-  },
   'edu-only': {
-    name: 'Educational Use Only',
+    name: 'Educational Use',
     shortName: 'EDU',
     commercial: false,
     derivatives: false,
@@ -90,10 +68,10 @@ const LICENSE_TYPES = {
     color: 'bg-orange-500',
     textColor: 'text-orange-400',
     borderColor: 'border-orange-500/50',
-    description: 'Free for educational/personal use only. No commercial redistribution.'
+    description: 'Free for educational/personal use only.'
   },
   'varies': {
-    name: 'Varies by Content',
+    name: 'Varies',
     shortName: 'Varies',
     commercial: null,
     derivatives: null,
@@ -105,550 +83,37 @@ const LICENSE_TYPES = {
   }
 };
 
-// Content Categories
+// Content Categories for filtering
 const CATEGORIES = [
   { id: 'all', name: 'All Content', icon: Library, color: 'from-violet-500 to-purple-500' },
-  { id: 'worksheets', name: 'Activity Sheets', icon: ClipboardList, color: 'from-lime-500 to-green-500' },
-  { id: 'stories', name: 'Stories & Fiction', icon: BookOpen, color: 'from-blue-500 to-cyan-500' },
-  { id: 'poetry', name: 'Poetry', icon: PenTool, color: 'from-pink-500 to-rose-500' },
-  { id: 'educational', name: 'Educational Articles', icon: GraduationCap, color: 'from-green-500 to-emerald-500' },
-  { id: 'textbooks', name: 'Textbooks & Courses', icon: BookMarked, color: 'from-orange-500 to-amber-500' },
-  { id: 'audiobooks', name: 'Audio Books', icon: Mic, color: 'from-purple-500 to-indigo-500' },
-  { id: 'research', name: 'Research Papers', icon: FlaskConical, color: 'from-teal-500 to-cyan-500' },
-  { id: 'historical', name: 'Historical Documents', icon: History, color: 'from-amber-500 to-yellow-500' },
+  { id: 'worksheet', name: 'Worksheets', icon: ClipboardList, color: 'from-lime-500 to-green-500' },
+  { id: 'book', name: 'Books', icon: BookOpen, color: 'from-blue-500 to-cyan-500' },
+  { id: 'article', name: 'Articles', icon: Newspaper, color: 'from-pink-500 to-rose-500' },
+  { id: 'course', name: 'Courses', icon: GraduationCap, color: 'from-green-500 to-emerald-500' },
+  { id: 'video', name: 'Videos', icon: Video, color: 'from-red-500 to-orange-500' },
+  { id: 'resource', name: 'Resources', icon: FileText, color: 'from-purple-500 to-indigo-500' },
 ];
 
 // Education Levels
 const EDUCATION_LEVELS = [
   { id: 'all', name: 'All Levels', icon: Library },
-  { id: 'preschool', name: 'Pre-school / Kindergarten', icon: Baby },
-  { id: 'grade1', name: 'Grade 1', icon: School },
-  { id: 'grade2', name: 'Grade 2', icon: School },
-  { id: 'grade3', name: 'Grade 3', icon: School },
-  { id: 'grade4', name: 'Grade 4', icon: School },
-  { id: 'grade5', name: 'Grade 5', icon: School },
-  { id: 'grade6', name: 'Grade 6', icon: Building2 },
-  { id: 'grade7', name: 'Grade 7', icon: Building2 },
-  { id: 'grade8', name: 'Grade 8', icon: Building2 },
-  { id: 'grade9', name: 'Grade 9', icon: GraduationCap },
-  { id: 'grade10', name: 'Grade 10', icon: GraduationCap },
-  { id: 'primary', name: 'Primary School (1-5)', icon: School },
+  { id: 'preschool', name: 'Pre-school', icon: Baby },
+  { id: 'elementary', name: 'Elementary (K-5)', icon: School },
   { id: 'middle', name: 'Middle School (6-8)', icon: Building2 },
   { id: 'high', name: 'High School (9-12)', icon: GraduationCap },
-  { id: 'university', name: 'University / Higher Ed', icon: University },
+  { id: 'university', name: 'University', icon: University },
 ];
 
-// Curated Resources Database with License Information
-const CURATED_RESOURCES = [
-  // ==================== ACTIVITY SHEETS / WORKSHEETS ====================
-  {
-    id: 'k5learning',
-    name: 'K5 Learning',
-    description: 'Free printable worksheets for K-5. Math, reading, spelling, grammar, science, and vocabulary.',
-    url: 'https://www.k5learning.com/free-worksheets',
-    categories: ['worksheets', 'educational'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
-    featured: true,
-    logo: '📝',
-    contentCount: '10,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'mathdrills',
-    name: 'Math-Drills.com',
-    description: 'Free math worksheets covering all topics from basic operations to algebra and geometry.',
-    url: 'https://www.math-drills.com',
-    categories: ['worksheets'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
-    featured: true,
-    logo: '🔢',
-    contentCount: '50,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'worksheetfun',
-    name: 'Worksheet Fun',
-    description: 'Free printable worksheets for preschool through 5th grade. Tracing, coloring, math, and more.',
-    url: 'https://www.worksheetfun.com',
-    categories: ['worksheets'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
-    featured: false,
-    logo: '🎨',
-    contentCount: '2,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'commoncoresheets',
-    name: 'Common Core Sheets',
-    description: 'Free Common Core aligned worksheets for math, ELA, science, and social studies.',
-    url: 'https://www.commoncoresheets.com',
-    categories: ['worksheets', 'educational'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
-    featured: true,
-    logo: '📋',
-    contentCount: '20,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'dadsworksheets',
-    name: "Dad's Worksheets",
-    description: 'Free printable math worksheets including multiplication, division, fractions, and word problems.',
-    url: 'https://www.dadsworksheets.com',
-    categories: ['worksheets'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
-    featured: false,
-    logo: '➕',
-    contentCount: '15,000+ Worksheets',
-    license: 'cc-by'
-  },
-  {
-    id: 'mathworksheets4kids',
-    name: 'Math Worksheets 4 Kids',
-    description: 'Free math worksheets organized by grade and topic. From counting to calculus.',
-    url: 'https://www.mathworksheets4kids.com',
-    categories: ['worksheets'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
-    featured: true,
-    logo: '📐',
-    contentCount: '30,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'worksheetworks',
-    name: 'WorksheetWorks.com',
-    description: 'Generate custom worksheets for math, writing, puzzles, and geography.',
-    url: 'https://www.worksheetworks.com',
-    categories: ['worksheets'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
-    featured: false,
-    logo: '⚙️',
-    contentCount: 'Custom Generator',
-    license: 'edu-only'
-  },
-  {
-    id: 'softschools',
-    name: 'SoftSchools',
-    description: 'Free worksheets, games, and quizzes for math, grammar, science, and social studies.',
-    url: 'https://www.softschools.com/worksheets/',
-    categories: ['worksheets', 'educational'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
-    featured: false,
-    logo: '🎮',
-    contentCount: '5,000+ Resources',
-    license: 'edu-only'
-  },
-  {
-    id: 'superteacher',
-    name: 'Super Teacher Worksheets',
-    description: 'Printable worksheets for reading, math, writing, science, and holidays. Some free content.',
-    url: 'https://www.superteacherworksheets.com/full-free.html',
-    categories: ['worksheets', 'educational'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'primary', 'middle'],
-    featured: true,
-    logo: '🦸',
-    contentCount: '1,000+ Free Sheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'edhelper',
-    name: 'edHelper',
-    description: 'Free worksheets for reading comprehension, math, spelling, and critical thinking.',
-    url: 'https://www.edhelper.com/teacher-free-stuff.htm',
-    categories: ['worksheets', 'educational'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
-    featured: false,
-    logo: '🆘',
-    contentCount: '3,000+ Free Sheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'turtlediary',
-    name: 'Turtle Diary',
-    description: 'Free printable worksheets and games for pre-K through 5th grade in all subjects.',
-    url: 'https://www.turtlediary.com/worksheets.html',
-    categories: ['worksheets'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'primary'],
-    featured: false,
-    logo: '🐢',
-    contentCount: '4,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'mathgoodies',
-    name: 'Math Goodies',
-    description: 'Free interactive math lessons and worksheets for grades 5-12. Algebra, geometry, statistics.',
-    url: 'https://www.mathgoodies.com/worksheets',
-    categories: ['worksheets'],
-    levels: ['grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'middle', 'high'],
-    featured: false,
-    logo: '🍬',
-    contentCount: '1,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'kidslearningstation',
-    name: 'Kids Learning Station',
-    description: 'Free educational printables for toddlers through 2nd grade. ABCs, numbers, shapes.',
-    url: 'https://www.kidslearningstation.com',
-    categories: ['worksheets'],
-    levels: ['preschool', 'grade1', 'grade2', 'primary'],
-    featured: false,
-    logo: '🚂',
-    contentCount: '2,500+ Printables',
-    license: 'edu-only'
-  },
-  {
-    id: 'helpingwithmath',
-    name: 'Helping With Math',
-    description: 'Free math worksheets, lessons, and homework help for K-10.',
-    url: 'https://www.helpingwithmath.com/worksheets/',
-    categories: ['worksheets'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
-    featured: false,
-    logo: '🤝',
-    contentCount: '8,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'superstarworksheets',
-    name: 'Superstar Worksheets',
-    description: 'Free printable worksheets for pre-K through 8th grade in all subjects.',
-    url: 'https://www.superstarworksheets.com',
-    categories: ['worksheets', 'educational'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'primary', 'middle'],
-    featured: true,
-    logo: '⭐',
-    contentCount: '10,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'liveworksheets',
-    name: 'Live Worksheets',
-    description: 'Interactive worksheets that students can complete online. All subjects, all grades.',
-    url: 'https://www.liveworksheets.com',
-    categories: ['worksheets', 'educational'],
-    levels: ['preschool', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
-    featured: true,
-    logo: '💻',
-    contentCount: '1M+ Interactive Sheets',
-    license: 'varies'
-  },
-  {
-    id: 'englishworksheetsland',
-    name: 'English Worksheets Land',
-    description: 'Free ELA worksheets: grammar, reading, writing, vocabulary for all grades.',
-    url: 'https://www.englishworksheetsland.com',
-    categories: ['worksheets'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
-    featured: false,
-    logo: '📖',
-    contentCount: '15,000+ Worksheets',
-    license: 'edu-only'
-  },
-  {
-    id: 'scienceworksheets',
-    name: 'Easy Teacher Worksheets',
-    description: 'Free science, math, and language arts worksheets for all grade levels.',
-    url: 'https://www.easyteacherworksheets.com',
-    categories: ['worksheets', 'educational'],
-    levels: ['grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6', 'grade7', 'grade8', 'grade9', 'grade10', 'primary', 'middle', 'high'],
-    featured: false,
-    logo: '🔬',
-    contentCount: '10,000+ Worksheets',
-    license: 'edu-only'
-  },
-  // ==================== BOOKS & LITERATURE ====================
-  {
-    id: 'gutenberg',
-    name: 'Project Gutenberg',
-    description: 'Over 70,000 free eBooks. Classic literature, fiction, and reference works.',
-    url: 'https://www.gutenberg.org',
-    categories: ['stories', 'poetry', 'historical'],
-    levels: ['middle', 'high', 'university'],
-    featured: true,
-    logo: '📚',
-    contentCount: '70,000+ eBooks',
-    license: 'public-domain'
-  },
-  {
-    id: 'openlibrary',
-    name: 'Open Library',
-    description: 'Borrow and read over 3 million digital books for free. Part of Internet Archive.',
-    url: 'https://openlibrary.org',
-    categories: ['stories', 'textbooks', 'educational', 'research'],
-    levels: ['primary', 'middle', 'high', 'university'],
-    featured: true,
-    logo: '📖',
-    contentCount: '3M+ Books',
-    license: 'varies'
-  },
-  {
-    id: 'librivox',
-    name: 'LibriVox',
-    description: 'Free public domain audiobooks read by volunteers from around the world.',
-    url: 'https://librivox.org',
-    categories: ['audiobooks', 'stories', 'poetry'],
-    levels: ['middle', 'high', 'university'],
-    featured: true,
-    logo: '🎧',
-    contentCount: '18,000+ Audiobooks',
-    license: 'public-domain'
-  },
-  {
-    id: 'poetry',
-    name: 'Poetry Foundation',
-    description: 'Thousands of poems by classic and contemporary poets.',
-    url: 'https://www.poetryfoundation.org',
-    categories: ['poetry'],
-    levels: ['primary', 'middle', 'high', 'university'],
-    featured: true,
-    logo: '✨',
-    contentCount: '50,000+ Poems',
-    license: 'varies'
-  },
-  {
-    id: 'storynory',
-    name: 'Storynory',
-    description: 'Free audio stories for kids. Fairy tales, myths, educational stories.',
-    url: 'https://www.storynory.com',
-    categories: ['stories', 'audiobooks'],
-    levels: ['preschool', 'primary'],
-    featured: false,
-    logo: '🧚',
-    contentCount: '700+ Stories',
-    license: 'cc-by-nc'
-  },
-  {
-    id: 'icdl',
-    name: "Int'l Children's Digital Library",
-    description: 'Free books for children in 100+ languages from around the world.',
-    url: 'http://en.childrenslibrary.org',
-    categories: ['stories'],
-    levels: ['preschool', 'primary'],
-    featured: false,
-    logo: '🌍',
-    contentCount: '4,600+ Books',
-    license: 'varies'
-  },
-  // ==================== EDUCATIONAL COURSES ====================
-  {
-    id: 'khan',
-    name: 'Khan Academy',
-    description: 'Free courses in math, science, computing, history, art, economics, and more.',
-    url: 'https://www.khanacademy.org',
-    categories: ['educational', 'textbooks'],
-    levels: ['preschool', 'primary', 'middle', 'high', 'university'],
-    featured: true,
-    logo: '🎓',
-    contentCount: '10,000+ Videos',
-    license: 'cc-by-nc-sa'
-  },
-  {
-    id: 'mit',
-    name: 'MIT OpenCourseWare',
-    description: 'Free lecture notes, exams, and videos from MIT. University-level courses.',
-    url: 'https://ocw.mit.edu',
-    categories: ['textbooks', 'educational', 'research'],
-    levels: ['university'],
-    featured: true,
-    logo: '🏛️',
-    contentCount: '2,500+ Courses',
-    license: 'cc-by-nc-sa'
-  },
-  {
-    id: 'ck12',
-    name: 'CK-12 Foundation',
-    description: 'Free customizable K-12 textbooks, flashcards, and real-world simulations.',
-    url: 'https://www.ck12.org',
-    categories: ['textbooks', 'educational'],
-    levels: ['primary', 'middle', 'high'],
-    featured: true,
-    logo: '📘',
-    contentCount: '5,000+ Resources',
-    license: 'cc-by-nc'
-  },
-  {
-    id: 'openstax',
-    name: 'OpenStax',
-    description: 'Free peer-reviewed textbooks by Rice University. College-level content.',
-    url: 'https://openstax.org',
-    categories: ['textbooks', 'educational'],
-    levels: ['high', 'university'],
-    featured: true,
-    logo: '📕',
-    contentCount: '50+ Textbooks',
-    license: 'cc-by'
-  },
-  {
-    id: 'coursera',
-    name: 'Coursera (Free Courses)',
-    description: 'Audit thousands of courses from top universities for free.',
-    url: 'https://www.coursera.org/courses?query=free',
-    categories: ['textbooks', 'educational'],
-    levels: ['high', 'university'],
-    featured: false,
-    logo: '🎯',
-    contentCount: '5,000+ Courses',
-    license: 'varies'
-  },
-  {
-    id: 'edx',
-    name: 'edX',
-    description: 'Free courses from Harvard, MIT, Berkeley, and more institutions.',
-    url: 'https://www.edx.org',
-    categories: ['textbooks', 'educational'],
-    levels: ['high', 'university'],
-    featured: true,
-    logo: '🎓',
-    contentCount: '3,000+ Courses',
-    license: 'varies'
-  },
-  {
-    id: 'pbs',
-    name: 'PBS LearningMedia',
-    description: 'Free PreK-12 educational resources including videos and lesson plans.',
-    url: 'https://www.pbslearningmedia.org',
-    categories: ['educational'],
-    levels: ['preschool', 'primary', 'middle', 'high'],
-    featured: false,
-    logo: '📺',
-    contentCount: '100,000+ Resources',
-    license: 'edu-only'
-  },
-  {
-    id: 'smithsonian',
-    name: 'Smithsonian Learning Lab',
-    description: 'Millions of digital resources from Smithsonian museums.',
-    url: 'https://learninglab.si.edu',
-    categories: ['educational', 'historical'],
-    levels: ['primary', 'middle', 'high'],
-    featured: false,
-    logo: '🏛️',
-    contentCount: '4M+ Resources',
-    license: 'edu-only'
-  },
-  {
-    id: 'natgeo',
-    name: 'National Geographic Education',
-    description: 'Free geography, science, and exploration educational resources.',
-    url: 'https://education.nationalgeographic.org',
-    categories: ['educational'],
-    levels: ['primary', 'middle', 'high'],
-    featured: false,
-    logo: '🌎',
-    contentCount: '1,000+ Resources',
-    license: 'edu-only'
-  },
-  {
-    id: 'lit2go',
-    name: 'Lit2Go',
-    description: 'Free online collection of stories and poems in audiobook format.',
-    url: 'https://etc.usf.edu/lit2go/',
-    categories: ['stories', 'poetry', 'audiobooks'],
-    levels: ['primary', 'middle', 'high'],
-    featured: false,
-    logo: '📖',
-    contentCount: '200+ Books',
-    license: 'public-domain'
-  },
-  {
-    id: 'readworks',
-    name: 'ReadWorks',
-    description: 'Free reading passages and curriculum for K-12 students.',
-    url: 'https://www.readworks.org',
-    categories: ['stories', 'educational'],
-    levels: ['primary', 'middle', 'high'],
-    featured: false,
-    logo: '📝',
-    contentCount: '3,000+ Passages',
-    license: 'edu-only'
-  },
-  {
-    id: 'commonlit',
-    name: 'CommonLit',
-    description: 'Free reading passages and literacy resources for grades 3-12.',
-    url: 'https://www.commonlit.org',
-    categories: ['stories', 'poetry', 'educational'],
-    levels: ['primary', 'middle', 'high'],
-    featured: false,
-    logo: '📚',
-    contentCount: '2,000+ Texts',
-    license: 'edu-only'
-  },
-  // ==================== RESEARCH PAPERS ====================
-  {
-    id: 'core',
-    name: 'CORE',
-    description: 'Aggregator of open access research papers. Millions of full-text articles.',
-    url: 'https://core.ac.uk',
-    categories: ['research'],
-    levels: ['university'],
-    featured: false,
-    logo: '🔬',
-    contentCount: '200M+ Papers',
-    license: 'varies'
-  },
-  {
-    id: 'arxiv',
-    name: 'arXiv',
-    description: 'Open access archive for scholarly articles in physics, math, CS, and more.',
-    url: 'https://arxiv.org',
-    categories: ['research'],
-    levels: ['university'],
-    featured: true,
-    logo: '📄',
-    contentCount: '2M+ Papers',
-    license: 'varies'
-  },
-  {
-    id: 'doaj',
-    name: 'DOAJ',
-    description: 'Directory of Open Access Journals. Quality-controlled scientific journals.',
-    url: 'https://doaj.org',
-    categories: ['research'],
-    levels: ['university'],
-    featured: false,
-    logo: '📰',
-    contentCount: '9M+ Articles',
-    license: 'varies'
-  },
-  // ==================== HISTORICAL ====================
-  {
-    id: 'archive',
-    name: 'Internet Archive',
-    description: 'Digital library with books, movies, music, and historical web pages.',
-    url: 'https://archive.org',
-    categories: ['stories', 'historical', 'audiobooks', 'educational'],
-    levels: ['middle', 'high', 'university'],
-    featured: true,
-    logo: '🏛️',
-    contentCount: '35M+ Books',
-    license: 'varies'
-  },
-  {
-    id: 'europeana',
-    name: 'Europeana',
-    description: 'Digital access to European cultural heritage. Art, books, music, videos.',
-    url: 'https://www.europeana.eu',
-    categories: ['historical', 'educational'],
-    levels: ['middle', 'high', 'university'],
-    featured: false,
-    logo: '🇪🇺',
-    contentCount: '50M+ Items',
-    license: 'varies'
-  },
-  {
-    id: 'wdl',
-    name: 'Library of Congress',
-    description: 'Primary source materials from cultures around the world.',
-    url: 'https://www.loc.gov/collections/',
-    categories: ['historical', 'educational'],
-    levels: ['middle', 'high', 'university'],
-    featured: false,
-    logo: '🗽',
-    contentCount: '170M+ Items',
-    license: 'public-domain'
-  },
+// Quick search suggestions
+const SEARCH_SUGGESTIONS = [
+  'STEM worksheets',
+  'Math practice',
+  'Reading comprehension',
+  'Science experiments',
+  'History lessons',
+  'Grammar exercises',
+  'Coding tutorials',
+  'Art activities'
 ];
 
 // License Badge Component
@@ -670,24 +135,38 @@ const LicenseBadge = ({ license, showFull = false }) => {
   );
 };
 
-// Warning Banner Component
-const NonCommercialWarning = ({ license }) => {
-  const licenseInfo = LICENSE_TYPES[license];
-  if (!licenseInfo || licenseInfo.commercial !== false) return null;
-  
-  return (
-    <div className="mt-3 p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-2">
-      <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-      <div className="text-xs text-amber-300">
-        <span className="font-bold">Non-Commercial Only:</span> {licenseInfo.description}
-      </div>
-    </div>
-  );
+// Get icon for result type
+const getTypeIcon = (type) => {
+  switch (type) {
+    case 'worksheet': return ClipboardList;
+    case 'book': return BookOpen;
+    case 'article': return Newspaper;
+    case 'course': return GraduationCap;
+    case 'video': return Video;
+    case 'archive': return History;
+    default: return FileText;
+  }
 };
 
-const ResourceCard = ({ resource, onFavorite, isFavorited }) => {
-  const licenseInfo = LICENSE_TYPES[resource.license] || LICENSE_TYPES['varies'];
-  const isCommercialSafe = licenseInfo.commercial === true;
+// Get source color
+const getSourceColor = (source) => {
+  const colors = {
+    'OpenLibrary': 'bg-blue-500',
+    'Internet Archive': 'bg-amber-600',
+    'Wikipedia': 'bg-zinc-600',
+    'K5 Learning': 'bg-green-500',
+    'Math-Drills': 'bg-purple-500',
+    'Common Core Sheets': 'bg-cyan-500',
+    'Live Worksheets': 'bg-pink-500',
+    'Superstar Worksheets': 'bg-orange-500',
+  };
+  return colors[source] || 'bg-violet-500';
+};
+
+// Dynamic Search Result Card
+const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
+  const TypeIcon = getTypeIcon(result.type || result.category);
+  const licenseInfo = LICENSE_TYPES[result.license] || LICENSE_TYPES['varies'];
   
   return (
     <motion.div
@@ -696,30 +175,51 @@ const ResourceCard = ({ resource, onFavorite, isFavorited }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       className={`glass-card p-5 hover:border-violet-500/50 transition-all group ${
-        !isCommercialSafe && licenseInfo.commercial === false ? `border-l-4 ${licenseInfo.borderColor}` : ''
+        licenseInfo.commercial === false ? `border-l-4 ${licenseInfo.borderColor}` : ''
       }`}
-      data-testid="resource-card"
+      data-testid="search-result-card"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <span className="text-3xl">{resource.logo}</span>
-          <div>
-            <h3 className="font-bold text-white group-hover:text-violet-400 transition-colors">
-              {resource.name}
+          {result.thumbnail ? (
+            <img 
+              src={result.thumbnail} 
+              alt={result.title}
+              className="w-12 h-12 rounded-lg object-cover bg-zinc-800"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center ${result.thumbnail ? 'hidden' : ''}`}>
+            <TypeIcon className="w-6 h-6 text-violet-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-white group-hover:text-violet-400 transition-colors line-clamp-1">
+              {result.title}
             </h3>
-            <span className="text-xs text-[#BEF264] font-semibold">
-              {resource.contentCount}
-            </span>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${getSourceColor(result.source)}`}>
+                {result.source}
+              </span>
+              {result.relevance_score && (
+                <span className="text-xs text-[#BEF264] font-semibold flex items-center gap-1">
+                  <Zap className="w-3 h-3" />
+                  {result.relevance_score}/10
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <button
-          onClick={() => onFavorite(resource)}
+          onClick={() => onFavorite(result)}
           className={`p-2 rounded-full transition-all ${
             isFavorited 
               ? 'bg-red-500/20 text-red-500' 
               : 'bg-zinc-800 text-zinc-500 hover:bg-red-500/20 hover:text-red-500'
           }`}
-          data-testid="favorite-resource-button"
+          data-testid="favorite-result-button"
         >
           <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
         </button>
@@ -727,48 +227,51 @@ const ResourceCard = ({ resource, onFavorite, isFavorited }) => {
       
       {/* License Badge */}
       <div className="mb-3">
-        <LicenseBadge license={resource.license} />
+        <LicenseBadge license={result.license} />
       </div>
       
+      {/* Description */}
       <p className="text-zinc-400 text-sm mb-3 line-clamp-2">
-        {resource.description}
+        {result.ai_summary || result.description || 'No description available'}
       </p>
       
-      {/* Non-Commercial Warning */}
-      <NonCommercialWarning license={resource.license} />
+      {/* Authors */}
+      {result.authors && result.authors.length > 0 && (
+        <p className="text-xs text-zinc-500 mb-2">
+          By: {result.authors.slice(0, 2).join(', ')}
+          {result.year && ` (${result.year})`}
+        </p>
+      )}
       
-      <div className="flex flex-wrap gap-1 mb-4 mt-3">
-        {resource.categories.slice(0, 3).map((cat) => {
-          const category = CATEGORIES.find(c => c.id === cat);
-          return (
-            <span key={cat} className="px-2 py-0.5 bg-zinc-800 text-zinc-400 text-xs rounded-full">
-              {category?.name || cat}
+      {/* Grade Levels */}
+      {result.grade_levels && result.grade_levels.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-3">
+          {result.grade_levels.slice(0, 3).map((level) => (
+            <span key={level} className="px-2 py-0.5 bg-violet-500/20 text-violet-300 text-xs rounded-full">
+              {level}
             </span>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Subjects */}
+      {result.subjects && result.subjects.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-4">
+          {result.subjects.slice(0, 3).map((subject, idx) => (
+            <span key={idx} className="px-2 py-0.5 bg-zinc-800 text-zinc-400 text-xs rounded-full">
+              {typeof subject === 'string' ? subject.slice(0, 30) : subject}
+            </span>
+          ))}
+        </div>
+      )}
       
       <div className="flex items-center justify-between">
-        <div className="flex gap-1">
-          {resource.levels.slice(0, 3).map((level) => {
-            const eduLevel = EDUCATION_LEVELS.find(l => l.id === level);
-            const Icon = eduLevel?.icon || GraduationCap;
-            return (
-              <span key={level} className="p-1.5 bg-zinc-800/50 rounded-lg" title={eduLevel?.name}>
-                <Icon className="w-3 h-3 text-zinc-500" />
-              </span>
-            );
-          })}
-          {resource.levels.length > 3 && (
-            <span className="px-2 py-1 text-xs text-zinc-600">+{resource.levels.length - 3}</span>
-          )}
-        </div>
-        
+        <span className="text-xs text-zinc-600 capitalize">{result.type || result.category}</span>
         <Button
           size="sm"
-          onClick={() => window.open(resource.url, '_blank')}
+          onClick={() => window.open(result.url, '_blank')}
           className="bg-violet-600 hover:bg-violet-500 text-white text-xs rounded-full px-4"
-          data-testid="visit-resource-button"
+          data-testid="visit-result-button"
         >
           <ExternalLink className="w-3 h-3 mr-1" />
           Visit
@@ -779,13 +282,16 @@ const ResourceCard = ({ resource, onFavorite, isFavorited }) => {
 };
 
 export const ContentLibrary = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedLevel, setSelectedLevel] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
-  const [commercialSafeOnly, setCommercialSafeOnly] = useState(false);
+  const [searchSources, setSearchSources] = useState([]);
 
   useEffect(() => {
     fetchFavorites();
@@ -800,25 +306,56 @@ export const ContentLibrary = () => {
     }
   };
 
-  const handleFavorite = async (resource) => {
-    const isFavorited = favorites.some(f => f.resource_id === resource.id);
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      toast.error('Please enter a search term');
+      return;
+    }
+    
+    setIsSearching(true);
+    setHasSearched(true);
     
     try {
-      if (isFavorited) {
-        await api.delete(`/content-library/favorites/${resource.id}`);
-        setFavorites(favorites.filter(f => f.resource_id !== resource.id));
+      const response = await api.get('/content-library/search', {
+        params: {
+          query: searchQuery,
+          category: selectedCategory,
+          limit: 30
+        }
+      });
+      
+      setSearchResults(response.data.results || []);
+      setSearchSources(response.data.sources || []);
+      toast.success(`Found ${response.data.total} resources!`);
+    } catch (error) {
+      console.error('Error searching content:', error);
+      toast.error('Search failed. Please try again.');
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleFavorite = async (resource) => {
+    const resourceId = resource.id;
+    const isFav = favorites.some(f => f.resource_id === resourceId);
+    
+    try {
+      if (isFav) {
+        await api.delete(`/content-library/favorites/${resourceId}`);
+        setFavorites(favorites.filter(f => f.resource_id !== resourceId));
         toast.success('Removed from favorites');
       } else {
         await api.post('/content-library/favorites', {
-          resource_id: resource.id,
-          name: resource.name,
-          description: resource.description,
+          resource_id: resourceId,
+          name: resource.title,
+          description: resource.description || resource.ai_summary,
           url: resource.url,
-          logo: resource.logo,
-          categories: resource.categories,
-          levels: resource.levels
+          logo: resource.thumbnail || '📚',
+          categories: [resource.type || resource.category],
+          levels: resource.grade_levels || ['all']
         });
-        setFavorites([...favorites, { ...resource, resource_id: resource.id }]);
+        setFavorites([...favorites, { ...resource, resource_id: resourceId }]);
         toast.success('Added to favorites!');
       }
     } catch (error) {
@@ -831,35 +368,15 @@ export const ContentLibrary = () => {
     return favorites.some(f => f.resource_id === resourceId);
   };
 
-  // Filter resources
-  let filteredResources = CURATED_RESOURCES.filter(resource => {
-    const matchesCategory = selectedCategory === 'all' || resource.categories.includes(selectedCategory);
-    const matchesLevel = selectedLevel === 'all' || resource.levels.includes(selectedLevel);
-    const matchesSearch = !searchQuery || 
-      resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Commercial safe filter
-    const licenseInfo = LICENSE_TYPES[resource.license] || LICENSE_TYPES['varies'];
-    const matchesCommercial = !commercialSafeOnly || licenseInfo.commercial === true;
-    
-    return matchesCategory && matchesLevel && matchesSearch && matchesCommercial;
-  });
-
-  if (showFavorites) {
-    filteredResources = CURATED_RESOURCES.filter(r => favorites.some(f => f.resource_id === r.id));
+  // Filter results by category
+  let displayResults = searchResults;
+  if (selectedCategory !== 'all') {
+    displayResults = searchResults.filter(r => 
+      (r.type || r.category) === selectedCategory
+    );
   }
 
-  const featuredResources = filteredResources.filter(r => r.featured);
-  const otherResources = filteredResources.filter(r => !r.featured);
-
   const selectedLevelInfo = EDUCATION_LEVELS.find(l => l.id === selectedLevel);
-
-  // Count commercial safe resources
-  const commercialSafeCount = CURATED_RESOURCES.filter(r => {
-    const licenseInfo = LICENSE_TYPES[r.license];
-    return licenseInfo?.commercial === true;
-  }).length;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
@@ -871,64 +388,59 @@ export const ContentLibrary = () => {
             Content Library
           </h1>
         </div>
-        <p className="text-zinc-500">Copyright-free educational resources for all learning levels</p>
+        <p className="text-zinc-500">Search copyright-free educational resources across the web</p>
       </div>
 
-      {/* License Legend */}
-      <div className="glass-card p-4 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Info className="w-4 h-4 text-violet-400" />
-          <span className="text-sm font-semibold text-white">License Guide</span>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-green-500 text-white">PD / CC BY</span>
-            <ShieldCheck className="w-4 h-4 text-green-400" />
-            <span className="text-xs text-zinc-400">Commercial OK</span>
+      {/* AI-Powered Badge */}
+      <div className="glass-card p-4 mb-6 border-l-4 border-violet-500">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-violet-500/20 rounded-lg">
+            <Sparkles className="w-5 h-5 text-violet-400" />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-amber-500 text-white">NC / NC-SA</span>
-            <ShieldAlert className="w-4 h-4 text-amber-400" />
-            <span className="text-xs text-zinc-400">Non-Commercial</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-500 text-white">ND</span>
-            <span className="text-xs text-zinc-400">No Derivatives</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-orange-500 text-white">EDU</span>
-            <span className="text-xs text-zinc-400">Educational Only</span>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-semibold text-white">AI-Powered Search</span>
+              <Zap className="w-4 h-4 text-[#BEF264]" />
+            </div>
+            <p className="text-xs text-zinc-400">
+              Searches <span className="text-violet-400 font-semibold">OpenLibrary</span>, 
+              <span className="text-amber-400 font-semibold"> Internet Archive</span>, 
+              <span className="text-zinc-300 font-semibold"> Wikipedia</span>, and 
+              <span className="text-green-400 font-semibold"> educational worksheet sites</span> 
+              {' '}for free content. AI categorizes and ranks results.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search Bar */}
       <div className="glass-card p-6 mb-6">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Search */}
+          {/* Search Input */}
           <div className="flex-1 relative flex gap-2">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
               <Input
                 data-testid="library-search-input"
                 type="text"
-                placeholder="Search resources..."
+                placeholder="Search for worksheets, books, articles... (e.g., 'STEM worksheets', 'math practice')"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    // Trigger filter by just updating the state (already reactive)
-                  }
-                }}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 className="pl-12 bg-zinc-950/50 border-zinc-800 focus:border-violet-500 rounded-lg text-white placeholder:text-zinc-600 h-12"
               />
             </div>
             <Button
               data-testid="library-find-button"
-              onClick={() => {/* Search is reactive, but button provides UX feedback */}}
-              className="bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-xl px-6 h-12"
+              onClick={handleSearch}
+              disabled={isSearching}
+              className="bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-xl px-6 h-12 min-w-[100px]"
             >
-              Find
+              {isSearching ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                'Find'
+              )}
             </Button>
           </div>
           
@@ -936,12 +448,12 @@ export const ContentLibrary = () => {
           <div className="relative">
             <Button
               onClick={() => setShowLevelDropdown(!showLevelDropdown)}
-              className="h-12 px-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg flex items-center gap-2 min-w-[200px] justify-between"
+              className="h-12 px-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg flex items-center gap-2 min-w-[180px] justify-between"
               data-testid="level-dropdown"
             >
               <div className="flex items-center gap-2">
                 {selectedLevelInfo && <selectedLevelInfo.icon className="w-4 h-4" />}
-                <span>{selectedLevelInfo?.name || 'All Levels'}</span>
+                <span className="text-sm">{selectedLevelInfo?.name || 'All Levels'}</span>
               </div>
               <ChevronDown className={`w-4 h-4 transition-transform ${showLevelDropdown ? 'rotate-180' : ''}`} />
             </Button>
@@ -952,7 +464,7 @@ export const ContentLibrary = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute z-50 top-14 left-0 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden max-h-80 overflow-y-auto"
+                  className="absolute z-50 top-14 left-0 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden"
                 >
                   {EDUCATION_LEVELS.map((level) => (
                     <button
@@ -974,20 +486,6 @@ export const ContentLibrary = () => {
             </AnimatePresence>
           </div>
 
-          {/* Commercial Safe Toggle */}
-          <Button
-            onClick={() => setCommercialSafeOnly(!commercialSafeOnly)}
-            className={`h-12 px-6 rounded-lg flex items-center gap-2 ${
-              commercialSafeOnly 
-                ? 'bg-green-600 hover:bg-green-500 text-white' 
-                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
-            }`}
-            data-testid="commercial-safe-toggle"
-          >
-            <ShieldCheck className="w-4 h-4" />
-            Commercial Safe ({commercialSafeCount})
-          </Button>
-
           {/* Favorites Toggle */}
           <Button
             onClick={() => setShowFavorites(!showFavorites)}
@@ -1002,6 +500,27 @@ export const ContentLibrary = () => {
             Favorites ({favorites.length})
           </Button>
         </div>
+
+        {/* Quick Search Suggestions */}
+        {!hasSearched && (
+          <div className="mt-4 pt-4 border-t border-zinc-800">
+            <p className="text-xs text-zinc-500 mb-2">Quick searches:</p>
+            <div className="flex flex-wrap gap-2">
+              {SEARCH_SUGGESTIONS.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  onClick={() => {
+                    setSearchQuery(suggestion);
+                    setTimeout(() => handleSearch(), 100);
+                  }}
+                  className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-xs rounded-full transition-colors"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Category Pills */}
@@ -1027,34 +546,38 @@ export const ContentLibrary = () => {
         })}
       </div>
 
-      {/* Stats Bar */}
-      <div className="flex items-center justify-between mb-6 px-2">
-        <p className="text-zinc-500">
-          Showing <span className="text-[#BEF264] font-bold">{filteredResources.length}</span> resources
-          {commercialSafeOnly && (
-            <span className="ml-2 text-green-400 text-sm">
-              <ShieldCheck className="w-4 h-4 inline mr-1" />
-              Commercial-safe only
-            </span>
-          )}
-        </p>
-      </div>
+      {/* Loading State */}
+      {isSearching && (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-zinc-500">Searching across multiple sources...</p>
+            <p className="text-xs text-zinc-600 mt-2">OpenLibrary • Internet Archive • Wikipedia • Educational Sites</p>
+          </div>
+        </div>
+      )}
 
-      {/* Featured Resources */}
-      {featuredResources.length > 0 && !showFavorites && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5 text-[#BEF264]" />
-            <h2 className="text-xl font-bold text-white">Featured Resources</h2>
+      {/* Search Results */}
+      {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-zinc-500">
+              Found <span className="text-[#BEF264] font-bold">{displayResults.length}</span> resources
+              {searchSources.length > 0 && (
+                <span className="text-xs text-zinc-600 ml-2">
+                  from {searchSources.join(', ')}
+                </span>
+              )}
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <AnimatePresence>
-              {featuredResources.map((resource) => (
-                <ResourceCard
-                  key={resource.id}
-                  resource={resource}
+              {displayResults.map((result) => (
+                <SearchResultCard
+                  key={result.id}
+                  result={result}
                   onFavorite={handleFavorite}
-                  isFavorited={isFavorited(resource.id)}
+                  isFavorited={isFavorited(result.id)}
                 />
               ))}
             </AnimatePresence>
@@ -1062,122 +585,120 @@ export const ContentLibrary = () => {
         </div>
       )}
 
-      {/* Other Resources */}
-      {otherResources.length > 0 && (
+      {/* Favorites View */}
+      {!isSearching && showFavorites && (
         <div>
-          {!showFavorites && featuredResources.length > 0 && (
-            <div className="flex items-center gap-2 mb-4">
-              <Globe className="w-5 h-5 text-zinc-500" />
-              <h2 className="text-xl font-bold text-white">More Resources</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <Heart className="w-5 h-5 text-red-500" fill="currentColor" />
+            <h2 className="text-xl font-bold text-white">My Favorites</h2>
+          </div>
+          {favorites.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <AnimatePresence>
+                {favorites.map((fav) => (
+                  <SearchResultCard
+                    key={fav.resource_id}
+                    result={{
+                      id: fav.resource_id,
+                      title: fav.name,
+                      description: fav.description,
+                      url: fav.url,
+                      thumbnail: fav.logo && fav.logo.length > 2 ? fav.logo : null,
+                      type: fav.categories?.[0] || 'resource',
+                      license: 'varies',
+                      grade_levels: fav.levels
+                    }}
+                    onFavorite={handleFavorite}
+                    isFavorited={true}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="glass-card p-20 text-center">
+              <Heart className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
+              <h3 className="text-xl font-bold text-white mb-2">No Favorites Yet</h3>
+              <p className="text-zinc-500 mb-6">Search for content and click the heart icon to save them here</p>
+              <Button
+                onClick={() => setShowFavorites(false)}
+                className="bg-violet-600 hover:bg-violet-500 text-white rounded-full px-6"
+              >
+                Start Searching
+              </Button>
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AnimatePresence>
-              {otherResources.map((resource) => (
-                <ResourceCard
-                  key={resource.id}
-                  resource={resource}
-                  onFavorite={handleFavorite}
-                  isFavorited={isFavorited(resource.id)}
-                />
-              ))}
-            </AnimatePresence>
-          </div>
         </div>
       )}
 
-      {/* Empty State */}
-      {filteredResources.length === 0 && (
+      {/* Empty Search State */}
+      {!isSearching && hasSearched && displayResults.length === 0 && !showFavorites && (
         <div className="glass-card p-20 text-center">
-          <Library className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
-          <h3 className="text-xl font-bold text-white mb-2">
-            {showFavorites ? 'No Favorites Yet' : 'No Resources Found'}
-          </h3>
-          <p className="text-zinc-500 mb-6">
-            {showFavorites 
-              ? 'Click the heart icon on resources to save them here'
-              : commercialSafeOnly 
-                ? 'No commercial-safe resources match your filters. Try disabling the filter.'
-                : 'Try adjusting your filters or search term'}
-          </p>
-          {showFavorites && (
-            <Button
-              onClick={() => setShowFavorites(false)}
-              className="bg-violet-600 hover:bg-violet-500 text-white rounded-full px-6"
-            >
-              Browse Resources
-            </Button>
-          )}
-          {commercialSafeOnly && !showFavorites && (
-            <Button
-              onClick={() => setCommercialSafeOnly(false)}
-              className="bg-green-600 hover:bg-green-500 text-white rounded-full px-6"
-            >
-              Show All Resources
-            </Button>
-          )}
+          <FileQuestion className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
+          <h3 className="text-xl font-bold text-white mb-2">No Results Found</h3>
+          <p className="text-zinc-500 mb-6">Try different keywords or browse suggestions below</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {SEARCH_SUGGESTIONS.slice(0, 5).map((suggestion) => (
+              <Button
+                key={suggestion}
+                onClick={() => {
+                  setSearchQuery(suggestion);
+                  setTimeout(() => handleSearch(), 100);
+                }}
+                variant="outline"
+                className="rounded-full border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+              >
+                {suggestion}
+              </Button>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Quick Access Section */}
-      {!showFavorites && selectedCategory === 'all' && selectedLevel === 'all' && !searchQuery && !commercialSafeOnly && (
-        <div className="mt-12">
-          {/* Quick Access for Grades 1-10 */}
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <ClipboardList className="w-5 h-5 text-[#BEF264]" />
-            Activity Sheets by Grade (1-10)
-          </h2>
-          <div className="grid grid-cols-5 md:grid-cols-10 gap-3 mb-8">
-            {[1,2,3,4,5,6,7,8,9,10].map((grade) => {
-              const levelId = `grade${grade}`;
-              const count = CURATED_RESOURCES.filter(r => 
-                r.categories.includes('worksheets') && r.levels.includes(levelId)
-              ).length;
-              return (
-                <motion.button
-                  key={grade}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setSelectedCategory('worksheets');
-                    setSelectedLevel(levelId);
-                  }}
-                  className="glass-card p-4 text-center hover:border-[#BEF264]/50 transition-all group"
-                >
-                  <div className="text-2xl font-bold text-white group-hover:text-[#BEF264] transition-colors">
-                    {grade}
-                  </div>
-                  <div className="text-xs text-zinc-500 mt-1">Grade</div>
-                  <div className="text-xs text-[#BEF264] mt-1">{count} sheets</div>
-                </motion.button>
-              );
-            })}
+      {/* Initial State - Before Search */}
+      {!isSearching && !hasSearched && !showFavorites && (
+        <div className="glass-card p-16 text-center">
+          <BookOpenCheck className="w-24 h-24 text-violet-500/50 mx-auto mb-6" strokeWidth={1.5} />
+          <h3 className="text-2xl font-bold text-white mb-3">Discover Free Educational Content</h3>
+          <p className="text-zinc-500 mb-8 max-w-lg mx-auto">
+            Search millions of copyright-free resources including worksheets, books, articles, 
+            and educational materials from trusted sources worldwide.
+          </p>
+          
+          {/* Featured Sources */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
+            <div className="glass-card p-4 text-center">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <BookOpen className="w-5 h-5 text-blue-400" />
+              </div>
+              <p className="text-xs font-semibold text-white">OpenLibrary</p>
+              <p className="text-xs text-zinc-500">3M+ Books</p>
+            </div>
+            <div className="glass-card p-4 text-center">
+              <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <History className="w-5 h-5 text-amber-400" />
+              </div>
+              <p className="text-xs font-semibold text-white">Internet Archive</p>
+              <p className="text-xs text-zinc-500">35M+ Items</p>
+            </div>
+            <div className="glass-card p-4 text-center">
+              <div className="w-10 h-10 bg-zinc-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <Globe className="w-5 h-5 text-zinc-400" />
+              </div>
+              <p className="text-xs font-semibold text-white">Wikipedia</p>
+              <p className="text-xs text-zinc-500">6M+ Articles</p>
+            </div>
+            <div className="glass-card p-4 text-center">
+              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <ClipboardList className="w-5 h-5 text-green-400" />
+              </div>
+              <p className="text-xs font-semibold text-white">Worksheets</p>
+              <p className="text-xs text-zinc-500">100K+ Sheets</p>
+            </div>
           </div>
 
-          {/* Quick Access by Education Level */}
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-violet-500" />
-            Browse by Education Level
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {EDUCATION_LEVELS.filter(l => ['preschool', 'primary', 'middle', 'high', 'university'].includes(l.id)).map((level) => {
-              const Icon = level.icon;
-              const count = CURATED_RESOURCES.filter(r => r.levels.includes(level.id)).length;
-              return (
-                <motion.button
-                  key={level.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedLevel(level.id)}
-                  className="glass-card p-4 text-center hover:border-violet-500/50 transition-all"
-                >
-                  <Icon className="w-8 h-8 mx-auto mb-2 text-violet-500" />
-                  <h3 className="font-semibold text-white text-sm mb-1">{level.name}</h3>
-                  <p className="text-xs text-zinc-500">{count} resources</p>
-                </motion.button>
-              );
-            })}
-          </div>
+          <p className="text-xs text-zinc-600">
+            Try searching: "STEM worksheets", "math practice grade 5", "science experiments", "reading comprehension"
+          </p>
         </div>
       )}
     </div>
