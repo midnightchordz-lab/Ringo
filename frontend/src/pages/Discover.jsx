@@ -143,6 +143,31 @@ export const Discover = () => {
         <p className="text-zinc-500">Find viral CC BY licensed YouTube videos</p>
       </div>
 
+      {/* Cache/Optimization Status Banner */}
+      {cacheInfo && (cacheInfo.cached || cacheInfo.optimized) && (
+        <div className={`glass-card p-3 mb-4 border-l-4 ${cacheInfo.cached ? 'border-amber-500' : 'border-[#BEF264]'}`}>
+          <div className="flex items-center gap-3">
+            {cacheInfo.cached ? (
+              <>
+                <Database className="w-5 h-5 text-amber-400" />
+                <div className="flex-1">
+                  <span className="text-sm font-semibold text-amber-400">Cached Results</span>
+                  <p className="text-xs text-zinc-500">{cacheInfo.message || 'Showing previously cached videos to save API quota'}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <Zap className="w-5 h-5 text-[#BEF264]" />
+                <div className="flex-1">
+                  <span className="text-sm font-semibold text-[#BEF264]">Optimized API Usage</span>
+                  <p className="text-xs text-zinc-500">Using field filtering, ETags, and user quota tracking to minimize API calls</p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* License Info Banner */}
       <div className="glass-card p-4 mb-6 border-l-4 border-green-500">
         <div className="flex items-start gap-3">
