@@ -6,6 +6,7 @@ import { Mail, Lock, User, Sparkles, ArrowRight, CheckCircle, Image, BookOpen, V
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import api from '../utils/api';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -56,6 +57,17 @@ export const Register = () => {
   const handleGoogleSignIn = () => {
     const redirectUrl = window.location.origin + '/auth/callback';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  };
+
+  const handleMicrosoftSignIn = async () => {
+    try {
+      const response = await api.get('/auth/microsoft/login');
+      const authUrl = response.data.auth_url;
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Microsoft sign in error:', error);
+      toast.error('Failed to initiate Microsoft sign in');
+    }
   };
 
   return (
