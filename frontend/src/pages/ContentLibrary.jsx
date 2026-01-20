@@ -268,16 +268,118 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       )}
       
       <div className="flex items-center justify-between">
-        <span className="text-xs text-zinc-600 capitalize">{result.type || result.category}</span>
+        <span className="text-xs text-neutral-500 capitalize">{result.type || result.category}</span>
         <Button
           size="sm"
           onClick={() => window.open(result.url, '_blank')}
-          className="bg-violet-600 hover:bg-violet-500 text-white text-xs rounded-full px-4"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-full px-4"
           data-testid="visit-result-button"
         >
           <ExternalLink className="w-3 h-3 mr-1" />
           Visit
         </Button>
+      </div>
+    </motion.div>
+  );
+};
+
+// Free Book Card Component
+const FreeBookCard = ({ book, onFavorite, isFavorited }) => {
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="studio-card p-5 hover:shadow-lg transition-all"
+      data-testid="free-book-card"
+    >
+      <div className="flex gap-4">
+        {/* Book Cover */}
+        <div className="w-20 h-28 flex-shrink-0 rounded-lg overflow-hidden bg-neutral-100 shadow-md">
+          {book.cover ? (
+            <img src={book.cover} alt={book.title} className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+              <Book className="w-8 h-8 text-amber-600" />
+            </div>
+          )}
+        </div>
+        
+        {/* Book Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h3 className="font-bold text-neutral-900 line-clamp-2 leading-tight">{book.title}</h3>
+            <button
+              onClick={() => onFavorite(book)}
+              className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
+                isFavorited ? 'bg-red-100 text-red-500' : 'bg-neutral-100 text-neutral-400 hover:bg-red-100 hover:text-red-500'
+              }`}
+            >
+              <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
+            </button>
+          </div>
+          
+          <p className="text-sm text-blue-600 font-medium mb-2">{book.author}</p>
+          
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-medium capitalize">
+              {book.category}
+            </span>
+            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> Public Domain
+            </span>
+            {book.printable && (
+              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium flex items-center gap-1">
+                <Printer className="w-3 h-3" /> Printable
+              </span>
+            )}
+          </div>
+          
+          <p className="text-xs text-neutral-500 line-clamp-2 mb-3">{book.description}</p>
+          
+          {/* Grade Levels */}
+          <div className="flex flex-wrap gap-1 mb-3">
+            {book.grade_level?.map((level) => (
+              <span key={level} className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full capitalize">
+                {level}
+              </span>
+            ))}
+          </div>
+          
+          {/* Download Buttons */}
+          <div className="flex flex-wrap gap-2">
+            {book.formats?.pdf && (
+              <a
+                href={book.formats.pdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors"
+              >
+                <Download className="w-3 h-3" /> PDF
+              </a>
+            )}
+            {book.formats?.epub && (
+              <a
+                href={book.formats.epub}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition-colors"
+              >
+                <Download className="w-3 h-3" /> EPUB
+              </a>
+            )}
+            {book.formats?.html && (
+              <a
+                href={book.formats.html}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors"
+              >
+                <ExternalLink className="w-3 h-3" /> Read Online
+              </a>
+            )}
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -294,10 +396,36 @@ export const ContentLibrary = () => {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [searchSources, setSearchSources] = useState([]);
+  const [freeBooks, setFreeBooks] = useState([]);
+  const [loadingBooks, setLoadingBooks] = useState(false);
 
   useEffect(() => {
     fetchFavorites();
   }, []);
+
+  // Fetch free books when category changes to free-books
+  useEffect(() => {
+    if (selectedCategory === 'free-books') {
+      fetchFreeBooks();
+    }
+  }, [selectedCategory, selectedLevel]);
+
+  const fetchFreeBooks = async () => {
+    setLoadingBooks(true);
+    try {
+      const params = { limit: 50 };
+      if (selectedLevel !== 'all') {
+        params.grade = selectedLevel;
+      }
+      const response = await api.get('/content-library/free-books', { params });
+      setFreeBooks(response.data.books || []);
+    } catch (error) {
+      console.error('Error fetching free books:', error);
+      toast.error('Failed to load free books');
+    } finally {
+      setLoadingBooks(false);
+    }
+  };
 
   const fetchFavorites = async () => {
     try {
@@ -316,6 +444,23 @@ export const ContentLibrary = () => {
     
     setIsSearching(true);
     setHasSearched(true);
+    
+    // If in free-books category, search within free books
+    if (selectedCategory === 'free-books') {
+      try {
+        const response = await api.get('/content-library/free-books/search', {
+          params: { query: searchQuery }
+        });
+        setFreeBooks(response.data.books || []);
+        toast.success(`Found ${response.data.total} books!`);
+      } catch (error) {
+        console.error('Error searching free books:', error);
+        toast.error('Search failed');
+      } finally {
+        setIsSearching(false);
+      }
+      return;
+    }
     
     try {
       const response = await api.get('/content-library/search', {
