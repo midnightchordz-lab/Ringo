@@ -549,8 +549,22 @@ MICROSOFT_TENANT = "common"  # Allows any Microsoft account
 @api_router.get("/auth/microsoft/login")
 async def microsoft_login(request: Request):
     """Redirect to Microsoft OAuth login"""
-    # Get the frontend URL for redirect
-    frontend_url = request.headers.get("origin") or "http://localhost:3000"
+    # Get the frontend URL for redirect - use referer or origin header
+    origin = request.headers.get("origin")
+    referer = request.headers.get("referer")
+    
+    # Determine the correct frontend URL
+    if origin and "localhost" not in origin:
+        frontend_url = origin
+    elif referer:
+        # Extract base URL from referer
+        from urllib.parse import urlparse
+        parsed = urlparse(referer)
+        frontend_url = f"{parsed.scheme}://{parsed.netloc}"
+    else:
+        # Default to preview URL if available, otherwise localhost
+        frontend_url = "https://vidstudio-7.preview.emergentagent.com"
+    
     redirect_uri = f"{frontend_url}/auth/microsoft/callback"
     
     # Build Microsoft OAuth URL
@@ -564,7 +578,7 @@ async def microsoft_login(request: Request):
         f"&state=contentflow_microsoft_auth"
     )
     
-    return {"auth_url": auth_url}
+    return {"auth_url": auth_url, "redirect_uri": redirect_uri}
 
 
 @api_router.post("/auth/microsoft/callback")
