@@ -928,7 +928,6 @@ export const ContentLibrary = () => {
   useEffect(() => {
     fetchFavorites();
   }, []);
-  }, []);
 
   // Fetch free books when category changes to free-books
   useEffect(() => {
