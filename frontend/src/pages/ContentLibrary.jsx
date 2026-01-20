@@ -1476,7 +1476,7 @@ export const ContentLibrary = () => {
       )}
 
       {/* Empty Search State */}
-      {!isSearching && hasSearched && displayResults.length === 0 && !showFavorites && selectedCategory !== 'free-books' && (
+      {!isSearching && hasSearched && displayResults.length === 0 && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && (
         <div className="glass-card p-20 text-center">
           <FileQuestion className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
           <h3 className="text-xl font-bold text-white mb-2">No Results Found</h3>
@@ -1500,7 +1500,7 @@ export const ContentLibrary = () => {
       )}
 
       {/* Initial State - Before Search */}
-      {!isSearching && !loadingBooks && !hasSearched && !showFavorites && selectedCategory !== 'free-books' && (
+      {!isSearching && !loadingBooks && !hasSearched && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && (
         <div className="glass-card p-16 text-center">
           <BookOpenCheck className="w-24 h-24 text-violet-500/50 mx-auto mb-6" strokeWidth={1.5} />
           <h3 className="text-2xl font-bold text-white mb-3">Discover Free Educational Content</h3>
