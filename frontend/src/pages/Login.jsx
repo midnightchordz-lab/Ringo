@@ -6,6 +6,7 @@ import { Mail, Lock, Sparkles, ArrowRight, Play, Zap, Shield, Users } from 'luci
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import api from '../utils/api';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
