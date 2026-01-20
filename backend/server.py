@@ -2791,6 +2791,308 @@ async def search_free_books(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ==================== READING LISTS ====================
+
+class ReadingListCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    description: Optional[str] = Field(default="", max_length=500)
+    grade_level: Optional[str] = None
+    subject: Optional[str] = None
+    is_public: bool = False
+
+class ReadingListUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    description: Optional[str] = Field(default=None, max_length=500)
+    grade_level: Optional[str] = None
+    subject: Optional[str] = None
+    is_public: Optional[bool] = None
+
+class AddBookToList(BaseModel):
+    book_id: str
+    title: str
+    author: str
+    category: str
+    cover: Optional[str] = None
+    formats: Optional[dict] = None
+
+@api_router.post("/reading-lists")
+async def create_reading_list(
+    reading_list: ReadingListCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a new reading list"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        new_list = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "name": reading_list.name,
+            "description": reading_list.description,
+            "grade_level": reading_list.grade_level,
+            "subject": reading_list.subject,
+            "is_public": reading_list.is_public,
+            "books": [],
+            "book_count": 0,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.reading_lists.insert_one(new_list)
+        
+        # Remove MongoDB _id before returning
+        new_list.pop("_id", None)
+        
+        return {"message": "Reading list created", "reading_list": new_list}
+    
+    except Exception as e:
+        logging.error(f"Error creating reading list: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/reading-lists")
+async def get_reading_lists(
+    include_public: bool = Query(default=False),
+    current_user: dict = Depends(get_current_user)
+):
+    """Get user's reading lists and optionally public lists"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        # Build query - user's own lists OR public lists
+        if include_public:
+            query = {"$or": [{"user_id": user_id}, {"is_public": True}]}
+        else:
+            query = {"user_id": user_id}
+        
+        lists = await db.reading_lists.find(query, {"_id": 0}).to_list(100)
+        
+        return {
+            "reading_lists": lists,
+            "total": len(lists)
+        }
+    
+    except Exception as e:
+        logging.error(f"Error fetching reading lists: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/reading-lists/{list_id}")
+async def get_reading_list(
+    list_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get a specific reading list"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        # Can view own lists or public lists
+        reading_list = await db.reading_lists.find_one(
+            {"id": list_id, "$or": [{"user_id": user_id}, {"is_public": True}]},
+            {"_id": 0}
+        )
+        
+        if not reading_list:
+            raise HTTPException(status_code=404, detail="Reading list not found")
+        
+        return {"reading_list": reading_list}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching reading list: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/reading-lists/{list_id}")
+async def update_reading_list(
+    list_id: str,
+    update_data: ReadingListUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update a reading list (only owner can update)"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        # Check ownership
+        existing = await db.reading_lists.find_one({"id": list_id, "user_id": user_id})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Reading list not found or not authorized")
+        
+        # Build update document
+        update_doc = {"updated_at": datetime.now(timezone.utc).isoformat()}
+        if update_data.name is not None:
+            update_doc["name"] = update_data.name
+        if update_data.description is not None:
+            update_doc["description"] = update_data.description
+        if update_data.grade_level is not None:
+            update_doc["grade_level"] = update_data.grade_level
+        if update_data.subject is not None:
+            update_doc["subject"] = update_data.subject
+        if update_data.is_public is not None:
+            update_doc["is_public"] = update_data.is_public
+        
+        await db.reading_lists.update_one(
+            {"id": list_id},
+            {"$set": update_doc}
+        )
+        
+        updated = await db.reading_lists.find_one({"id": list_id}, {"_id": 0})
+        
+        return {"message": "Reading list updated", "reading_list": updated}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating reading list: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/reading-lists/{list_id}")
+async def delete_reading_list(
+    list_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a reading list (only owner can delete)"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        result = await db.reading_lists.delete_one({"id": list_id, "user_id": user_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Reading list not found or not authorized")
+        
+        return {"message": "Reading list deleted"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting reading list: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/reading-lists/{list_id}/books")
+async def add_book_to_list(
+    list_id: str,
+    book: AddBookToList,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add a book to a reading list"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        # Check ownership
+        existing = await db.reading_lists.find_one({"id": list_id, "user_id": user_id})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Reading list not found or not authorized")
+        
+        # Check if book already in list
+        if any(b["book_id"] == book.book_id for b in existing.get("books", [])):
+            raise HTTPException(status_code=400, detail="Book already in this reading list")
+        
+        book_entry = {
+            "book_id": book.book_id,
+            "title": book.title,
+            "author": book.author,
+            "category": book.category,
+            "cover": book.cover,
+            "formats": book.formats,
+            "added_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.reading_lists.update_one(
+            {"id": list_id},
+            {
+                "$push": {"books": book_entry},
+                "$inc": {"book_count": 1},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        return {"message": "Book added to reading list", "book": book_entry}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error adding book to list: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/reading-lists/{list_id}/books/{book_id}")
+async def remove_book_from_list(
+    list_id: str,
+    book_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Remove a book from a reading list"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        # Check ownership
+        existing = await db.reading_lists.find_one({"id": list_id, "user_id": user_id})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Reading list not found or not authorized")
+        
+        result = await db.reading_lists.update_one(
+            {"id": list_id},
+            {
+                "$pull": {"books": {"book_id": book_id}},
+                "$inc": {"book_count": -1},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Book not found in reading list")
+        
+        return {"message": "Book removed from reading list"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error removing book from list: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/reading-lists/{list_id}/copy")
+async def copy_reading_list(
+    list_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Copy a public reading list to user's own lists"""
+    try:
+        user_id = current_user.get("id") or current_user.get("email")
+        
+        # Find the original list (must be public or owned by user)
+        original = await db.reading_lists.find_one(
+            {"id": list_id, "$or": [{"user_id": user_id}, {"is_public": True}]},
+            {"_id": 0}
+        )
+        
+        if not original:
+            raise HTTPException(status_code=404, detail="Reading list not found")
+        
+        # Create a copy
+        new_list = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "name": f"{original['name']} (Copy)",
+            "description": original.get("description", ""),
+            "grade_level": original.get("grade_level"),
+            "subject": original.get("subject"),
+            "is_public": False,  # Copies start as private
+            "books": original.get("books", []),
+            "book_count": original.get("book_count", 0),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "copied_from": list_id
+        }
+        
+        await db.reading_lists.insert_one(new_list)
+        new_list.pop("_id", None)
+        
+        return {"message": "Reading list copied", "reading_list": new_list}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error copying reading list: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 app.include_router(api_router)
 
 app.add_middleware(
