@@ -1288,6 +1288,8 @@ export const ContentLibrary = () => {
                     book={book}
                     onFavorite={handleFavorite}
                     isFavorited={isFavorited(book.id)}
+                    onAddToList={handleAddBookToList}
+                    readingLists={readingLists}
                   />
                 ))}
               </AnimatePresence>
