@@ -211,4 +211,4 @@ Created modular architecture for maintainability:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 19, 2026 - Added comprehensive Content Library feature with 24 resources, all categories and education levels
+January 20, 2026 - Added Free Books section with 19 curated public domain books from Project Gutenberg, fixed search bar text overlap issue
