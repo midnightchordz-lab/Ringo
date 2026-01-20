@@ -27,6 +27,9 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 import resend
 import secrets
+import hashlib
+import gzip
+from io import BytesIO
 
 
 ROOT_DIR = Path(__file__).parent
