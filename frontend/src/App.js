@@ -11,6 +11,7 @@ import Settings from '@/pages/Settings';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AuthCallback from '@/pages/AuthCallback';
+import MicrosoftCallback from '@/pages/MicrosoftCallback';
 import VerifyEmail from '@/pages/VerifyEmail';
 import PendingVerification from '@/pages/PendingVerification';
 import '@/App.css';
