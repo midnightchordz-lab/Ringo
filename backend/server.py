@@ -2270,7 +2270,7 @@ async def search_oer_commons(client: httpx.AsyncClient, query: str, limit: int) 
     return relevant_sources[:limit]
 
 
-async def ai_enhance_results(query: str, results: list) -> list:
+async def ai_enhance_results(query: str, results: list, target_grade: str = "all") -> list:
     """Use AI to enhance, categorize and rank search results"""
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
@@ -2279,14 +2279,25 @@ async def ai_enhance_results(query: str, results: list) -> list:
         if not llm_key:
             return results
         
+        grade_context = ""
+        if target_grade != "all":
+            grade_labels = {
+                "preschool": "preschool (ages 3-5)",
+                "elementary": "elementary school (grades K-5, ages 5-11)",
+                "middle": "middle school (grades 6-8, ages 11-14)",
+                "high": "high school (grades 9-12, ages 14-18)",
+                "university": "university/college level"
+            }
+            grade_context = f"\n\nIMPORTANT: The user is looking for content suitable for {grade_labels.get(target_grade, target_grade)} students. Prioritize results appropriate for this education level and give lower relevance scores to content that doesn't match."
+        
         chat = LlmChat(
             api_key=llm_key,
             session_id=f"content-search-{datetime.now().timestamp()}",
-            system_message="""You are an educational content curator. Given search results, you will:
-1. Add a relevance_score (1-10) based on how well each result matches the query
+            system_message=f"""You are an educational content curator. Given search results, you will:
+1. Add a relevance_score (1-10) based on how well each result matches the query AND the target education level
 2. Categorize each result into: worksheet, book, article, video, course, or resource
 3. Add grade_level suggestions: preschool, elementary, middle, high, university, all
-4. Add a brief AI summary (1 sentence) for each result
+4. Add a brief AI summary (1 sentence) for each result{grade_context}
 Return JSON array with enhanced results. Keep all original fields and add: relevance_score, category, grade_levels, ai_summary"""
         ).with_model("openai", "gpt-4.1-mini")
         
@@ -2304,11 +2315,12 @@ Return JSON array with enhanced results. Keep all original fields and add: relev
         
         user_message = UserMessage(
             text=f"""Query: "{query}"
+Target Education Level: {target_grade if target_grade != "all" else "All levels"}
 
 Search Results to enhance:
 {json.dumps(results_summary, indent=2)}
 
-Return a JSON array with enhanced results. Add relevance_score, category, grade_levels array, and ai_summary to each."""
+Return a JSON array with enhanced results. Add relevance_score, category, grade_levels array, and ai_summary to each. Prioritize results matching the target education level."""
         )
         
         response = await chat.send_message(user_message)
@@ -2343,6 +2355,15 @@ Return a JSON array with enhanced results. Add relevance_score, category, grade_
             
             # Sort by relevance
             results.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
+            
+            # If filtering by grade, move matching results to top
+            if target_grade != "all":
+                def grade_match_score(item):
+                    grades = item.get("grade_levels", ["all"])
+                    if target_grade in grades or "all" in grades:
+                        return item.get("relevance_score", 0) + 10
+                    return item.get("relevance_score", 0)
+                results.sort(key=grade_match_score, reverse=True)
             
         except json.JSONDecodeError:
             logging.warning("Could not parse AI response as JSON")
