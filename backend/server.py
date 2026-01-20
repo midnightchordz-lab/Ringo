@@ -2000,6 +2000,7 @@ async def search_gutenberg(
 async def search_content_library(
     query: str = Query(..., description="Search query for educational content"),
     category: str = Query(default="all", description="Category filter"),
+    grade: str = Query(default="all", description="Education level filter: preschool, elementary, middle, high, university"),
     limit: int = Query(default=20, le=50),
     current_user: dict = Depends(get_current_user)
 ):
@@ -2008,15 +2009,28 @@ async def search_content_library(
     Searches: OpenLibrary, Internet Archive, Wikipedia, and uses AI for enhancement.
     """
     try:
+        # Enhance query with grade level for better results
+        enhanced_query = query
+        grade_keywords = {
+            "preschool": "preschool kindergarten early childhood toddler",
+            "elementary": "elementary school kids children grades 1-5 primary",
+            "middle": "middle school grades 6-8 junior high teens",
+            "high": "high school grades 9-12 secondary advanced",
+            "university": "college university higher education academic"
+        }
+        
+        if grade != "all" and grade in grade_keywords:
+            enhanced_query = f"{query} {grade_keywords[grade]}"
+        
         all_results = []
         
         async with httpx.AsyncClient(timeout=15.0) as client:
             # Run searches in parallel
             tasks = [
-                search_openlibrary(client, query, limit // 4),
-                search_internet_archive(client, query, limit // 4),
-                search_wikipedia(client, query, limit // 4),
-                search_oer_commons(client, query, limit // 4),
+                search_openlibrary(client, enhanced_query, limit // 4),
+                search_internet_archive(client, enhanced_query, limit // 4),
+                search_wikipedia(client, query, limit // 4),  # Wikipedia uses original query
+                search_oer_commons(client, enhanced_query, limit // 4),
             ]
             
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -2030,11 +2044,12 @@ async def search_content_library(
         # Use AI to enhance and categorize results if we have any
         if all_results and len(all_results) > 0:
             try:
-                enhanced_results = await ai_enhance_results(query, all_results[:limit])
+                enhanced_results = await ai_enhance_results(query, all_results[:limit], grade)
                 return {
                     "results": enhanced_results,
                     "total": len(enhanced_results),
                     "query": query,
+                    "grade": grade,
                     "sources": ["OpenLibrary", "Internet Archive", "Wikipedia", "OER Commons"]
                 }
             except Exception as ai_error:
@@ -2044,6 +2059,7 @@ async def search_content_library(
             "results": all_results[:limit],
             "total": len(all_results),
             "query": query,
+            "grade": grade,
             "sources": ["OpenLibrary", "Internet Archive", "Wikipedia", "OER Commons"]
         }
     
