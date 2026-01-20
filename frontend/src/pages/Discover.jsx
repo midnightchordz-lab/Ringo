@@ -199,7 +199,7 @@ export const Discover = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-12 studio-input"
+                className="studio-input-icon w-full"
               />
             </div>
             <Button
