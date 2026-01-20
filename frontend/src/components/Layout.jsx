@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Clock, Settings, Sparkles, TrendingUp, LogOut, Image, Library, Video, ChevronRight } from 'lucide-react';
+import { Home, Clock, Sparkles, TrendingUp, LogOut, Image, Library, Video, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -10,7 +10,6 @@ const navItems = [
   { path: '/images', icon: Image, label: 'Images', color: 'purple' },
   { path: '/library', icon: Library, label: 'Library', color: 'green' },
   { path: '/history', icon: Clock, label: 'History', color: 'yellow' },
-  { path: '/settings', icon: Settings, label: 'Settings', color: 'gray' },
 ];
 
 const colorClasses = {
