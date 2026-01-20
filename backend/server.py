@@ -2384,6 +2384,413 @@ async def search_worksheets(
         logging.error(f"Error searching worksheets: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ==================== FREE DOWNLOADABLE BOOKS ====================
+
+# Curated list of free educational books from Project Gutenberg and other sources
+FREE_EDUCATIONAL_BOOKS = [
+    # Stories & Literature
+    {
+        "id": "gutenberg-11",
+        "title": "Alice's Adventures in Wonderland",
+        "author": "Lewis Carroll",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Classic children's story following Alice through a fantastical world.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/11.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/11.epub",
+            "html": "https://www.gutenberg.org/ebooks/11.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/11/pg11.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1661",
+        "title": "The Adventures of Sherlock Holmes",
+        "author": "Arthur Conan Doyle",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "Classic detective stories featuring the famous Sherlock Holmes.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1661.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1661.epub",
+            "html": "https://www.gutenberg.org/ebooks/1661.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1661/pg1661.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-74",
+        "title": "The Adventures of Tom Sawyer",
+        "author": "Mark Twain",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "A young boy's adventures along the Mississippi River.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/74.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/74.epub",
+            "html": "https://www.gutenberg.org/ebooks/74.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/74/pg74.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1342",
+        "title": "Pride and Prejudice",
+        "author": "Jane Austen",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "A classic novel about love, family, and social expectations in Regency England.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1342.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1342.epub",
+            "html": "https://www.gutenberg.org/ebooks/1342.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1342/pg1342.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-98",
+        "title": "A Tale of Two Cities",
+        "author": "Charles Dickens",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "Historical novel set during the French Revolution.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/98.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/98.epub",
+            "html": "https://www.gutenberg.org/ebooks/98.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/98/pg98.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Poetry
+    {
+        "id": "gutenberg-1065",
+        "title": "The Raven and Other Poems",
+        "author": "Edgar Allan Poe",
+        "category": "poetry",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "Collection of Poe's famous poems including 'The Raven'.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1065.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1065.epub",
+            "html": "https://www.gutenberg.org/ebooks/1065.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1065/pg1065.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1322",
+        "title": "Leaves of Grass",
+        "author": "Walt Whitman",
+        "category": "poetry",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "Groundbreaking collection of American poetry.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1322.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1322.epub",
+            "html": "https://www.gutenberg.org/ebooks/1322.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1322/pg1322.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-12242",
+        "title": "A Child's Garden of Verses",
+        "author": "Robert Louis Stevenson",
+        "category": "poetry",
+        "subject": "literature",
+        "grade_level": ["preschool", "elementary"],
+        "description": "Classic collection of children's poetry.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/12242.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/12242.epub",
+            "html": "https://www.gutenberg.org/ebooks/12242.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/12242/pg12242.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Grammar & Language
+    {
+        "id": "gutenberg-37134",
+        "title": "The Elements of Style",
+        "author": "William Strunk Jr.",
+        "category": "grammar",
+        "subject": "english",
+        "grade_level": ["middle", "high", "university"],
+        "description": "Essential guide to English grammar and writing style.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/37134.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/37134.epub",
+            "html": "https://www.gutenberg.org/ebooks/37134.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/37134/pg37134.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-15877",
+        "title": "English Grammar in Familiar Lectures",
+        "author": "Samuel Kirkham",
+        "category": "grammar",
+        "subject": "english",
+        "grade_level": ["elementary", "middle"],
+        "description": "Comprehensive English grammar textbook with exercises.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/15877.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/15877.epub",
+            "html": "https://www.gutenberg.org/ebooks/15877.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/15877/pg15877.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Math
+    {
+        "id": "gutenberg-33283",
+        "title": "A First Book in Algebra",
+        "author": "Wallace C. Boyden",
+        "category": "math",
+        "subject": "mathematics",
+        "grade_level": ["middle", "high"],
+        "description": "Introduction to algebraic concepts with exercises.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/33283.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/33283.epub",
+            "html": "https://www.gutenberg.org/ebooks/33283.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/33283/pg33283.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-17384",
+        "title": "Practical Arithmetic",
+        "author": "George Payn Quackenbos",
+        "category": "math",
+        "subject": "mathematics",
+        "grade_level": ["elementary", "middle"],
+        "description": "Comprehensive arithmetic textbook with practical problems.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/17384.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/17384.epub",
+            "html": "https://www.gutenberg.org/ebooks/17384.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/17384/pg17384.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-13700",
+        "title": "Plane Geometry",
+        "author": "George Wentworth",
+        "category": "math",
+        "subject": "mathematics",
+        "grade_level": ["high"],
+        "description": "Classic geometry textbook with proofs and exercises.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/13700.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/13700.epub",
+            "html": "https://www.gutenberg.org/ebooks/13700.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/13700/pg13700.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Science
+    {
+        "id": "gutenberg-28054",
+        "title": "The Science of Human Nature",
+        "author": "William Henry Pyle",
+        "category": "science",
+        "subject": "psychology",
+        "grade_level": ["high", "university"],
+        "description": "Introduction to psychology and human behavior.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/28054.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/28054.epub",
+            "html": "https://www.gutenberg.org/ebooks/28054.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/28054/pg28054.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-2009",
+        "title": "The Origin of Species",
+        "author": "Charles Darwin",
+        "category": "science",
+        "subject": "biology",
+        "grade_level": ["high", "university"],
+        "description": "Darwin's groundbreaking work on evolution and natural selection.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/2009.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/2009.epub",
+            "html": "https://www.gutenberg.org/ebooks/2009.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/2009/pg2009.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Fables & Children's Stories
+    {
+        "id": "gutenberg-19994",
+        "title": "Aesop's Fables",
+        "author": "Aesop",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["preschool", "elementary"],
+        "description": "Classic collection of moral fables with animal characters.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/19994.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/19994.epub",
+            "html": "https://www.gutenberg.org/ebooks/19994.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/19994/pg19994.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-2591",
+        "title": "Grimms' Fairy Tales",
+        "author": "Brothers Grimm",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Classic collection of fairy tales including Cinderella, Snow White, and more.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/2591.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/2591.epub",
+            "html": "https://www.gutenberg.org/ebooks/2591.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/2591/pg2591.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-27200",
+        "title": "The Wonderful Wizard of Oz",
+        "author": "L. Frank Baum",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Dorothy's magical adventure in the Land of Oz.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/27200.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/27200.epub",
+            "html": "https://www.gutenberg.org/ebooks/27200.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/27200/pg27200.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-16",
+        "title": "Peter Pan",
+        "author": "J. M. Barrie",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "The story of the boy who never grew up and his adventures in Neverland.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/16.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/16.epub",
+            "html": "https://www.gutenberg.org/ebooks/16.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/16/pg16.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    }
+]
+
+
+@api_router.get("/content-library/free-books")
+async def get_free_books(
+    category: str = Query(default="all", description="Filter by category: stories, poetry, grammar, math, science"),
+    grade: str = Query(default="all", description="Filter by grade level"),
+    limit: int = Query(default=20, le=50),
+    current_user: dict = Depends(get_current_user)
+):
+    """Get curated list of free downloadable educational books"""
+    try:
+        books = FREE_EDUCATIONAL_BOOKS.copy()
+        
+        # Filter by category
+        if category != "all":
+            books = [b for b in books if b["category"] == category]
+        
+        # Filter by grade level
+        if grade != "all":
+            grade_map = {
+                "preschool": "preschool",
+                "elementary": "elementary", 
+                "middle": "middle",
+                "high": "high",
+                "university": "university"
+            }
+            target_grade = grade_map.get(grade, grade)
+            books = [b for b in books if target_grade in b.get("grade_level", [])]
+        
+        return {
+            "books": books[:limit],
+            "total": len(books),
+            "categories": ["stories", "poetry", "grammar", "math", "science"],
+            "grades": ["preschool", "elementary", "middle", "high", "university"]
+        }
+    
+    except Exception as e:
+        logging.error(f"Error getting free books: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/content-library/free-books/search")
+async def search_free_books(
+    query: str = Query(..., description="Search query"),
+    limit: int = Query(default=20, le=50),
+    current_user: dict = Depends(get_current_user)
+):
+    """Search free educational books by title, author, or subject"""
+    try:
+        query_lower = query.lower()
+        
+        matching_books = []
+        for book in FREE_EDUCATIONAL_BOOKS:
+            # Check if query matches title, author, category, or subject
+            if (query_lower in book["title"].lower() or
+                query_lower in book["author"].lower() or
+                query_lower in book["category"].lower() or
+                query_lower in book["subject"].lower() or
+                query_lower in book.get("description", "").lower()):
+                matching_books.append(book)
+        
+        return {
+            "books": matching_books[:limit],
+            "total": len(matching_books),
+            "query": query
+        }
+    
+    except Exception as e:
+        logging.error(f"Error searching free books: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 app.include_router(api_router)
 
 app.add_middleware(
