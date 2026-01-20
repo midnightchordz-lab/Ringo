@@ -1,38 +1,13 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, Download, Link2, Heart, Image as ImageIcon, ExternalLink, ShieldCheck, CheckCircle2, Info } from 'lucide-react';
+import { Search, Download, Link2, Heart, Image as ImageIcon, ExternalLink, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
-// License info for image sources
-const IMAGE_LICENSES = {
-  unsplash: {
-    name: 'Unsplash License',
-    shortName: 'Free',
-    color: 'bg-green-500',
-    textColor: 'text-green-300',
-    commercial: true,
-    attribution: false,
-    description: 'Free for commercial use. No attribution required.'
-  },
-  pexels: {
-    name: 'Pexels License',
-    shortName: 'Free',
-    color: 'bg-green-500',
-    textColor: 'text-green-300',
-    commercial: true,
-    attribution: false,
-    description: 'Free for commercial use. No attribution required.'
-  }
-};
-
 const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  
-  const license = IMAGE_LICENSES[image.source] || IMAGE_LICENSES.unsplash;
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -60,129 +35,88 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="relative rounded-xl overflow-hidden group cursor-pointer"
-      style={{ backgroundColor: image.color || '#1a1a2e' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="studio-card overflow-hidden group"
+      style={{ backgroundColor: image.color || '#f5f5f5' }}
       data-testid="image-card"
     >
-      <img
-        src={image.thumbnail}
-        alt={image.title}
-        className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-      />
-      
-      {/* Source & License Badge */}
-      <div className="absolute top-2 left-2 flex items-center gap-1.5">
-        <span className={`px-2 py-1 rounded-md text-xs font-bold backdrop-blur-sm ${
-          image.source === 'unsplash' 
-            ? 'bg-black/70 text-white' 
-            : 'bg-teal-600/90 text-white'
-        }`}>
-          {image.source === 'unsplash' ? 'Unsplash' : 'Pexels'}
-        </span>
-        <span className="px-1.5 py-1 rounded-md text-xs font-bold bg-green-500/90 text-white backdrop-blur-sm flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3" />
-        </span>
-      </div>
-
-      {/* Favorite Button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onFavorite(image);
-        }}
-        className={`absolute top-2 right-2 p-2 rounded-full backdrop-blur-sm transition-all ${
-          isFavorited 
-            ? 'bg-red-500 text-white' 
-            : 'bg-black/50 text-white hover:bg-red-500'
-        }`}
-        data-testid="favorite-button"
-      >
-        <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
-      </button>
-
-      {/* Hover Overlay */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end p-4"
+      <div className="relative">
+        <img
+          src={image.thumbnail}
+          alt={image.title}
+          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+        />
+        
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-neutral-700 hover:bg-blue-500 hover:text-white transition-colors shadow-lg"
+            title="Download"
           >
-            <h3 className="text-white font-semibold text-sm line-clamp-2 mb-1">
-              {image.title}
-            </h3>
-            <p className="text-white/70 text-xs mb-2">
-              by {image.photographer}
-            </p>
-            
-            {/* License Info on Hover */}
-            <div className="flex items-center gap-2 mb-3 text-xs">
-              <span className="px-2 py-0.5 bg-green-500/30 text-green-300 rounded-full flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" />
-                Commercial OK
-              </span>
-              <span className="px-2 py-0.5 bg-green-500/30 text-green-300 rounded-full">
-                No Attribution
-              </span>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDownload();
-                }}
-                disabled={downloading}
-                className="flex-1 bg-white text-black hover:bg-white/90 text-xs py-1"
-                data-testid="download-button"
-              >
-                <Download className="w-3 h-3 mr-1" />
-                {downloading ? 'Downloading...' : 'Download'}
-              </Button>
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCopyUrl(image.url);
-                }}
-                className="bg-white/20 text-white hover:bg-white/30 text-xs py-1"
-                data-testid="copy-url-button"
-              >
-                <Link2 className="w-3 h-3" />
-              </Button>
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open(image.photographer_url, '_blank');
-                }}
-                className="bg-white/20 text-white hover:bg-white/30 text-xs py-1"
-              >
-                <ExternalLink className="w-3 h-3" />
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <Download className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onCopyUrl(image.url)}
+            className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-neutral-700 hover:bg-blue-500 hover:text-white transition-colors shadow-lg"
+            title="Copy URL"
+          >
+            <Link2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onFavorite(image)}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg ${
+              isFavorited ? 'bg-red-500 text-white' : 'bg-white text-neutral-700 hover:bg-red-500 hover:text-white'
+            }`}
+            title="Favorite"
+          >
+            <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
+          </button>
+        </div>
+        
+        {/* Source Badge */}
+        <div className="absolute top-2 left-2">
+          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg text-white shadow-lg ${
+            image.source === 'unsplash' ? 'bg-neutral-800' : 'bg-teal-600'
+          }`}>
+            {image.source === 'unsplash' ? 'Unsplash' : 'Pexels'}
+          </span>
+        </div>
+        
+        {/* Free Badge */}
+        <div className="absolute top-2 right-2">
+          <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500 text-white shadow-lg flex items-center gap-1">
+            <CheckCircle2 className="w-3 h-3" /> Free
+          </span>
+        </div>
+      </div>
+      
+      <div className="p-4">
+        <p className="text-neutral-900 font-medium text-sm line-clamp-1 mb-2">{image.title || 'Untitled'}</p>
+        <a 
+          href={image.photographer_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-700 text-xs font-medium flex items-center gap-1"
+        >
+          by {image.photographer}
+          <ExternalLink className="w-3 h-3" />
+        </a>
+      </div>
     </motion.div>
   );
 };
 
 export const Images = () => {
   const [images, setImages] = useState([]);
-  const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('search');
-  const [hasSearched, setHasSearched] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
 
   useEffect(() => {
     fetchFavorites();
@@ -204,13 +138,9 @@ export const Images = () => {
     }
     
     setLoading(true);
-    setHasSearched(true);
     try {
       const response = await api.get('/images/search', {
-        params: {
-          query: searchQuery,
-          per_page: 30
-        }
+        params: { query: searchQuery, per_page: 30 }
       });
       setImages(response.data.images || []);
       toast.success(`Found ${response.data.total} images!`);
@@ -223,97 +153,73 @@ export const Images = () => {
   };
 
   const handleFavorite = async (image) => {
-    const isFavorited = favorites.some(f => f.image_id === image.id);
+    const isFav = favorites.some(f => f.id === image.id);
     
     try {
-      if (isFavorited) {
+      if (isFav) {
         await api.delete(`/images/favorites/${image.id}`);
-        setFavorites(favorites.filter(f => f.image_id !== image.id));
+        setFavorites(favorites.filter(f => f.id !== image.id));
         toast.success('Removed from favorites');
       } else {
-        await api.post('/images/favorites', {
-          image_id: image.id,
-          url: image.url,
-          thumbnail: image.thumbnail,
-          title: image.title,
-          photographer: image.photographer,
-          source: image.source,
-          download_url: image.download_url,
-          width: image.width,
-          height: image.height
-        });
-        setFavorites([...favorites, { ...image, image_id: image.id }]);
+        await api.post('/images/favorites', image);
+        setFavorites([...favorites, image]);
         toast.success('Added to favorites!');
       }
     } catch (error) {
       console.error('Error updating favorite:', error);
-      toast.error(error.response?.data?.detail || 'Failed to update favorites');
+      toast.error('Failed to update favorites');
     }
   };
 
   const handleCopyUrl = (url) => {
     navigator.clipboard.writeText(url);
-    toast.success('Image URL copied to clipboard!');
+    toast.success('URL copied to clipboard!');
   };
 
-  const isFavorited = (imageId) => {
-    return favorites.some(f => f.image_id === imageId);
-  };
-
-  const displayImages = activeTab === 'search' ? images : favorites.map(f => ({
-    ...f,
-    id: f.image_id
-  }));
+  const isFavorited = (imageId) => favorites.some(f => f.id === imageId);
+  const displayImages = showFavorites ? favorites : images;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
+    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 min-h-screen">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2" style={{ fontFamily: 'Oswald, sans-serif' }}>
-          Free Images
-        </h1>
-        <p className="text-zinc-500">Search copyright-free images from Unsplash & Pexels</p>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+            <ImageIcon className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Image Search
+            </h1>
+            <p className="text-neutral-500">Find stunning copyright-free images</p>
+          </div>
+        </div>
       </div>
 
-      {/* License Info Banner */}
-      <div className="glass-card p-4 mb-6 border-l-4 border-green-500">
+      {/* License Info */}
+      <div className="studio-card p-4 mb-6 border-l-4 border-emerald-500 bg-emerald-50">
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-green-500/20 rounded-lg">
-            <ShieldCheck className="w-5 h-5 text-green-400" />
+          <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm font-semibold text-white">All Images Are Commercial-Safe</span>
-              <CheckCircle2 className="w-4 h-4 text-green-400" />
+              <span className="text-sm font-semibold text-emerald-800">100% Free to Use</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             </div>
-            <p className="text-xs text-zinc-400">
-              Images from <span className="text-white font-semibold">Unsplash</span> and <span className="text-teal-400 font-semibold">Pexels</span> are free for commercial and personal use. 
-              No attribution required (but appreciated).
+            <p className="text-xs text-emerald-700">
+              All images from <span className="font-bold">Unsplash</span> and <span className="font-bold">Pexels</span> are free for commercial use. No attribution required!
             </p>
-          </div>
-        </div>
-        <div className="mt-3 pt-3 border-t border-zinc-800 flex flex-wrap gap-4 text-xs">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
-            <span className="text-zinc-400">Commercial Use</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
-            <span className="text-zinc-400">Modifications Allowed</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
-            <span className="text-zinc-400">No Attribution Required</span>
           </div>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="glass-card p-6 mb-6">
+      <div className="studio-card p-6 mb-6">
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative flex gap-2">
+          <div className="flex-1 relative flex gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
               <Input
                 data-testid="image-search-input"
                 type="text"
@@ -321,160 +227,101 @@ export const Images = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-12 bg-zinc-950/50 border-zinc-800 focus:border-[#BEF264] focus:ring-1 focus:ring-[#BEF264] rounded-lg text-white placeholder:text-zinc-600 h-12"
+                className="pl-12 studio-input"
               />
             </div>
             <Button
               data-testid="image-find-button"
               onClick={handleSearch}
               disabled={loading}
-              className="bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-xl px-6 h-12"
+              className="btn-primary min-w-[100px]"
             >
-              Find
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                'Find'
+              )}
             </Button>
           </div>
           <Button
-            data-testid="image-search-button"
-            onClick={handleSearch}
-            disabled={loading}
-            className="bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-full px-8 py-3 shadow-[0_0_15px_rgba(190,242,100,0.3)] hover:shadow-[0_0_25px_rgba(190,242,100,0.5)] transition-all h-12 sm:hidden"
+            onClick={() => setShowFavorites(!showFavorites)}
+            className={`rounded-xl px-6 py-3 flex items-center gap-2 font-semibold transition-all ${
+              showFavorites 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
+                : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
+            }`}
+            data-testid="favorites-toggle"
           >
-            {loading ? 'Searching...' : 'Search'}
+            <Heart className="w-4 h-4" fill={showFavorites ? 'currentColor' : 'none'} />
+            Favorites ({favorites.length})
           </Button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        <Button
-          onClick={() => setActiveTab('search')}
-          className={`rounded-full px-6 py-2 font-semibold transition-all ${
-            activeTab === 'search'
-              ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg'
-              : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-          }`}
-          data-testid="tab-search"
-        >
-          <Search className="w-4 h-4 mr-2" />
-          Search Results
-          {images.length > 0 && (
-            <span className="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-xs">
-              {images.length}
-            </span>
-          )}
-        </Button>
-        <Button
-          onClick={() => setActiveTab('favorites')}
-          className={`rounded-full px-6 py-2 font-semibold transition-all ${
-            activeTab === 'favorites'
-              ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg'
-              : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-          }`}
-          data-testid="tab-favorites"
-        >
-          <Heart className="w-4 h-4 mr-2" />
-          My Favorites
-          {favorites.length > 0 && (
-            <span className="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-xs">
-              {favorites.length}
-            </span>
-          )}
-        </Button>
-      </div>
+      {/* Results Count */}
+      {displayImages.length > 0 && (
+        <div className="mb-6">
+          <p className="text-neutral-600">
+            {showFavorites ? (
+              <>Showing <span className="font-bold text-red-500">{favorites.length}</span> favorite images</>
+            ) : (
+              <>Found <span className="font-bold text-blue-600">{images.length}</span> images</>
+            )}
+          </p>
+        </div>
+      )}
 
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-[#BEF264] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-zinc-500">Searching for beautiful images...</p>
+            <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-neutral-600 font-medium">Searching for images...</p>
           </div>
         </div>
       )}
 
-      {/* Results Grid */}
+      {/* Image Grid */}
       {!loading && displayImages.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-zinc-500">
-              {activeTab === 'search' ? 'Found' : 'You have'}{' '}
-              <span className="text-[#BEF264] font-bold">{displayImages.length}</span>{' '}
-              {activeTab === 'search' ? 'images' : 'favorite images'}
-            </p>
-            <div className="flex items-center gap-3 text-xs">
-              <div className="flex items-center gap-1.5">
-                <span className="px-2 py-1 bg-black/50 rounded text-white">Unsplash</span>
-                <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="px-2 py-1 bg-teal-600/80 rounded text-white">Pexels</span>
-                <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
-              </div>
-            </div>
-          </div>
-          
-          <motion.div 
-            layout
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-          >
-            <AnimatePresence>
-              {displayImages.map((image) => (
-                <ImageCard
-                  key={image.id}
-                  image={image}
-                  onFavorite={handleFavorite}
-                  onCopyUrl={handleCopyUrl}
-                  isFavorited={isFavorited(image.id)}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Empty States */}
-      {!loading && activeTab === 'search' && !hasSearched && (
-        <div className="glass-card p-20 text-center">
-          <ImageIcon className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
-          <h3 className="text-xl font-bold text-white mb-2">Discover Free Images</h3>
-          <p className="text-zinc-500 mb-6">Search millions of copyright-free photos from Unsplash and Pexels</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {['Nature', 'Technology', 'Business', 'Food', 'Travel'].map((term) => (
-              <Button
-                key={term}
-                onClick={() => {
-                  setSearchQuery(term.toLowerCase());
-                  setTimeout(() => handleSearch(), 100);
-                }}
-                variant="outline"
-                className="rounded-full border-zinc-700 text-zinc-400 hover:bg-zinc-800"
-              >
-                {term}
-              </Button>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <AnimatePresence>
+            {displayImages.map((image) => (
+              <ImageCard
+                key={image.id}
+                image={image}
+                onFavorite={handleFavorite}
+                onCopyUrl={handleCopyUrl}
+                isFavorited={isFavorited(image.id)}
+              />
             ))}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && displayImages.length === 0 && (
+        <div className="studio-card p-16 text-center">
+          <div className="w-20 h-20 mx-auto mb-6 bg-purple-100 rounded-2xl flex items-center justify-center">
+            {showFavorites ? (
+              <Heart className="w-10 h-10 text-purple-600" />
+            ) : (
+              <ImageIcon className="w-10 h-10 text-purple-600" />
+            )}
           </div>
-        </div>
-      )}
-
-      {!loading && activeTab === 'search' && hasSearched && images.length === 0 && (
-        <div className="glass-card p-20 text-center">
-          <Search className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
-          <h3 className="text-xl font-bold text-white mb-2">No Images Found</h3>
-          <p className="text-zinc-500">Try a different search term</p>
-        </div>
-      )}
-
-      {!loading && activeTab === 'favorites' && favorites.length === 0 && (
-        <div className="glass-card p-20 text-center">
-          <Heart className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
-          <h3 className="text-xl font-bold text-white mb-2">No Favorites Yet</h3>
-          <p className="text-zinc-500 mb-6">Search for images and click the heart icon to save them here</p>
-          <Button
-            onClick={() => setActiveTab('search')}
-            className="bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-full px-6 py-2"
-          >
-            Start Searching
-          </Button>
+          <h3 className="text-xl font-bold text-neutral-900 mb-2">
+            {showFavorites ? 'No favorites yet' : 'Start searching'}
+          </h3>
+          <p className="text-neutral-500 mb-6">
+            {showFavorites 
+              ? 'Search for images and click the heart icon to save them here'
+              : 'Enter a search term to find stunning free images'
+            }
+          </p>
+          {showFavorites && (
+            <Button onClick={() => setShowFavorites(false)} className="btn-primary">
+              Browse Images
+            </Button>
+          )}
         </div>
       )}
     </div>
