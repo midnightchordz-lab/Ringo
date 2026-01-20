@@ -752,66 +752,89 @@ async def discover_videos(
     min_views: int = Query(default=1000, description="Minimum view count"),
     current_user: dict = Depends(get_current_user)
 ):
+    """
+    Discover CC BY licensed YouTube videos with optimized API usage:
+    - Caches results (in-memory + MongoDB)
+    - Uses minimal fields to reduce quota
+    - Supports ETags for conditional requests
+    - Tracks quotaUser per user
+    """
     try:
+        # Get user ID for quota tracking
+        user_id = str(current_user.get("_id", current_user.get("email", "anonymous")))
+        search_query = query.strip() if query else "tutorial"
+        
+        # 1. Check persistent cache first (reduces API calls significantly)
+        cached_videos = await YouTubePersistentCache.get_cached_search(search_query, min_views)
+        if cached_videos:
+            return {
+                "videos": cached_videos[:max_results],
+                "total": len(cached_videos[:max_results]),
+                "cached": True,
+                "cache_type": "persistent",
+                "message": "Showing cached results for faster loading"
+            }
+        
         youtube_api_key = os.environ.get('YOUTUBE_API_KEY')
         
         if youtube_api_key:
             try:
+                # Clean up expired in-memory cache periodically
+                YouTubeAPIOptimizer.clear_expired_cache()
+                
                 youtube = build('youtube', 'v3', developerKey=youtube_api_key, cache_discovery=False)
                 
-                search_query = f"{query}" if query else "tutorial"
-                
-                search_request = youtube.search().list(
-                    part='id,snippet',
-                    q=search_query,
-                    type='video',
-                    videoLicense='creativeCommon',
-                    maxResults=50,
-                    order='viewCount',
-                    videoDuration='medium'
+                # 2. Use optimized search with caching and field filtering
+                search_response = await YouTubeAPIOptimizer.search_videos(
+                    youtube, 
+                    search_query,
+                    max_results=50,
+                    user_id=user_id
                 )
-                search_response = search_request.execute()
                 
                 video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
                 
+                # Try alternative queries if no results
                 if not video_ids:
-                    search_queries = [
+                    alt_queries = [
                         f"{search_query} creative commons",
-                        "creative commons music" if not query else f"{search_query}",
-                        "royalty free" if not query else f"{search_query} royalty free"
+                        "creative commons tutorial" if not query else search_query,
                     ]
-                    
-                    for alt_query in search_queries:
-                        search_request = youtube.search().list(
-                            part='id,snippet',
-                            q=alt_query,
-                            type='video',
-                            videoLicense='creativeCommon',
-                            maxResults=50,
-                            order='viewCount'
+                    for alt_query in alt_queries:
+                        alt_response = await YouTubeAPIOptimizer.search_videos(
+                            youtube, alt_query, max_results=50, user_id=user_id
                         )
-                        search_response = search_request.execute()
-                        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+                        video_ids = [item['id']['videoId'] for item in alt_response.get('items', [])]
                         if video_ids:
                             break
                 
                 if not video_ids:
+                    # Return MongoDB cached videos if no API results
+                    db_videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
+                    if db_videos:
+                        return {
+                            "videos": db_videos,
+                            "total": len(db_videos),
+                            "cached": True,
+                            "message": "No new CC videos found. Showing previously discovered videos."
+                        }
                     return {
                         "videos": [], 
                         "total": 0,
                         "message": "No Creative Commons licensed videos found. Try different search terms."
                     }
                 
-                videos_request = youtube.videos().list(
-                    part='statistics,contentDetails,snippet,status',
-                    id=','.join(video_ids)
+                # 3. Get video details with batching and field optimization
+                videos_response = await YouTubeAPIOptimizer.get_video_details(
+                    youtube, 
+                    video_ids,
+                    user_id=user_id
                 )
-                videos_response = videos_request.execute()
                 
                 videos = []
                 for item in videos_response.get('items', []):
-                    snippet = item['snippet']
-                    stats = item['statistics']
+                    snippet = item.get('snippet', {})
+                    stats = item.get('statistics', {})
                     status = item.get('status', {})
                     
                     license_type = status.get('license', 'youtube')
@@ -825,28 +848,36 @@ async def discover_videos(
                     if views < min_views:
                         continue
                     
-                    duration_str = item['contentDetails']['duration']
+                    duration_str = item.get('contentDetails', {}).get('duration', 'PT0S')
                     duration_seconds = parse_youtube_duration(duration_str)
                     
                     if duration_seconds < 60 or duration_seconds > 3600:
                         continue
                     
-                    upload_date = snippet['publishedAt']
+                    upload_date = snippet.get('publishedAt', '')
                     try:
                         upload_datetime = datetime.fromisoformat(upload_date.replace('Z', '+00:00'))
                         days_ago = (datetime.now(timezone.utc) - upload_datetime).days
                         upload_date_formatted = upload_datetime.strftime('%Y%m%d')
                     except:
                         days_ago = 365
-                        upload_date_formatted = upload_date[:10].replace('-', '')
+                        upload_date_formatted = upload_date[:10].replace('-', '') if upload_date else ''
                     
                     viral_score = calculate_viral_score(views, likes, comments, days_ago)
                     
+                    # Get thumbnail with fallback
+                    thumbnails = snippet.get('thumbnails', {})
+                    thumbnail = (
+                        thumbnails.get('high', {}).get('url') or 
+                        thumbnails.get('medium', {}).get('url') or 
+                        thumbnails.get('default', {}).get('url', '')
+                    )
+                    
                     videos.append({
                         'id': item['id'],
-                        'title': snippet['title'],
-                        'channel': snippet['channelTitle'],
-                        'thumbnail': snippet['thumbnails']['high']['url'] if 'high' in snippet['thumbnails'] else snippet['thumbnails']['default']['url'],
+                        'title': snippet.get('title', 'Untitled'),
+                        'channel': snippet.get('channelTitle', 'Unknown'),
+                        'thumbnail': thumbnail,
                         'duration': duration_seconds,
                         'views': views,
                         'likes': likes,
@@ -861,12 +892,21 @@ async def discover_videos(
                 videos.sort(key=lambda x: x['viral_score'], reverse=True)
                 videos = videos[:max_results]
                 
-                await db.discovered_videos.delete_many({})
+                # 4. Store in MongoDB for persistence
                 if videos:
+                    await db.discovered_videos.delete_many({})
                     await db.discovered_videos.insert_many(videos)
                     videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
+                    
+                    # Also cache in persistent cache
+                    await YouTubePersistentCache.set_cached_search(search_query, min_views, videos)
                 
-                return {"videos": videos, "total": len(videos)}
+                return {
+                    "videos": videos, 
+                    "total": len(videos),
+                    "optimized": True,
+                    "quota_user": hashlib.md5(user_id.encode()).hexdigest()[:8]
+                }
                 
             except HttpError as e:
                 error_detail = str(e)
@@ -882,6 +922,8 @@ async def discover_videos(
                             "cached": True,
                             "message": "Showing cached results. YouTube API quota exceeded - results will refresh tomorrow."
                         }
+                    raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later or use a different API key.")
+                raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
                     raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later or use a different API key.")
                 raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
         
