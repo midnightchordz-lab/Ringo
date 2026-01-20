@@ -993,6 +993,7 @@ export const ContentLibrary = () => {
         params: {
           query: searchQuery,
           category: selectedCategory,
+          grade: selectedLevel !== 'all' ? selectedLevel : undefined,
           limit: 30
         }
       });
