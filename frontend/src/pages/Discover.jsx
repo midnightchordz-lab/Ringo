@@ -156,23 +156,33 @@ export const Discover = () => {
       <div className="glass-card p-6 mb-8">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
-              <Input
-                data-testid="search-input"
-                type="text"
-                placeholder="Search for creative commons content... (e.g., 'cooking tutorial', 'music', 'nature')"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-12 bg-zinc-950/50 border-zinc-800 focus:border-[#BEF264] focus:ring-1 focus:ring-[#BEF264] rounded-lg text-white placeholder:text-zinc-600 h-12"
-              />
+            <div className="flex-1 relative flex gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                <Input
+                  data-testid="search-input"
+                  type="text"
+                  placeholder="Search for creative commons content... (e.g., 'cooking tutorial', 'music', 'nature')"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  className="pl-12 bg-zinc-950/50 border-zinc-800 focus:border-[#BEF264] focus:ring-1 focus:ring-[#BEF264] rounded-lg text-white placeholder:text-zinc-600 h-12"
+                />
+              </div>
+              <Button
+                data-testid="find-button"
+                onClick={handleSearch}
+                disabled={loading}
+                className="bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-xl px-6 h-12"
+              >
+                Find
+              </Button>
             </div>
             <Button
               data-testid="search-button"
               onClick={handleSearch}
               disabled={loading}
-              className="bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-full px-8 py-3 shadow-[0_0_15px_rgba(190,242,100,0.3)] hover:shadow-[0_0_25px_rgba(190,242,100,0.5)] transition-all h-12"
+              className="bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-full px-8 py-3 shadow-[0_0_15px_rgba(190,242,100,0.3)] hover:shadow-[0_0_25px_rgba(190,242,100,0.5)] transition-all h-12 sm:hidden"
             >
               {loading ? 'Searching...' : 'Search'}
             </Button>

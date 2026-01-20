@@ -906,16 +906,30 @@ export const ContentLibrary = () => {
       <div className="glass-card p-6 mb-6">
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
-            <Input
-              data-testid="library-search-input"
-              type="text"
-              placeholder="Search resources..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 bg-zinc-950/50 border-zinc-800 focus:border-violet-500 rounded-lg text-white placeholder:text-zinc-600 h-12"
-            />
+          <div className="flex-1 relative flex gap-2">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+              <Input
+                data-testid="library-search-input"
+                type="text"
+                placeholder="Search resources..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    // Trigger filter by just updating the state (already reactive)
+                  }
+                }}
+                className="pl-12 bg-zinc-950/50 border-zinc-800 focus:border-violet-500 rounded-lg text-white placeholder:text-zinc-600 h-12"
+              />
+            </div>
+            <Button
+              data-testid="library-find-button"
+              onClick={() => {/* Search is reactive, but button provides UX feedback */}}
+              className="bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-xl px-6 h-12"
+            >
+              Find
+            </Button>
           </div>
           
           {/* Education Level Dropdown */}

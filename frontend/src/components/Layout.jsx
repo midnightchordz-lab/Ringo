@@ -1,12 +1,12 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Clock, Settings, Sparkles, TrendingUp, LogOut, Image, Library } from 'lucide-react';
+import { Home, Clock, Settings, Sparkles, TrendingUp, LogOut, Image, Library, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Dashboard' },
-  { path: '/discover', icon: Search, label: 'Discover' },
+  { path: '/discover', icon: Video, label: 'Videos' },
   { path: '/images', icon: Image, label: 'Images' },
   { path: '/library', icon: Library, label: 'Content Library' },
   { path: '/history', icon: Clock, label: 'History' },
