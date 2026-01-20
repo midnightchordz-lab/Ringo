@@ -1,176 +1,143 @@
 {
   "identity": {
-    "name": "ViralFlow Studio",
-    "persona": "The Electric Editor",
-    "tone": "High-Voltage, Precision, Viral-Focused",
-    "aesthetic": "Dark Mode, Neon Accents, Glassmorphism, Data-Dense"
+    "persona": "E1: The Anti-AI Designer",
+    "mission": "Create a 'Creative Studio' aesthetic that feels like a physical workspace for digital artists. Reject generic SaaS templates. Embrace 'Vibrant Play' mixed with 'Swiss Clarity'.",
+    "principles": [
+      "Fusion: Mix productivity tools with art gallery aesthetics.",
+      "Emotion: Every interaction should feel 'snappy' and 'optimistic'.",
+      "Content is King: The video thumbnails are the heroes; the UI is the frame.",
+      "Negative Space: Use whitespace to create focus, not just to fill space."
+    ]
   },
   "typography": {
+    "strategy": "The 'Soft Utility' Archetype",
     "headings": {
-      "font_family": "Oswald, sans-serif",
-      "weights": ["500", "700"],
-      "usage": "Page titles, Viral Scores, Key Metrics",
-      "letter_spacing": "tracking-tight"
+      "font_family": "Outfit, sans-serif",
+      "weights": ["600", "700"],
+      "tracking": "tracking-tight",
+      "usage": "Use for all page titles, section headers, and feature callouts. Don't be afraid of large sizes (text-4xl+)."
     },
     "body": {
-      "font_family": "Manrope, sans-serif",
-      "weights": ["400", "500", "600"],
-      "usage": "General text, tables, descriptions",
-      "letter_spacing": "tracking-normal"
+      "font_family": "DM Sans, sans-serif",
+      "weights": ["400", "500"],
+      "tracking": "tracking-normal",
+      "usage": "Use for all UI text, descriptions, and data tables. High legibility is key."
     },
-    "mono": {
-      "font_family": "JetBrains Mono, monospace",
-      "usage": "Timestamps, IDs, Code snippets"
-    }
+    "installation": "Import via Google Fonts in index.css: @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Outfit:wght@400;600;700;800&display=swap');"
   },
   "colors": {
-    "theme": "dark",
+    "theme": "light",
     "palette": {
-      "background": {
-        "default": "#09090B",
-        "paper": "#18181B",
-        "subtle": "#27272A"
-      },
       "primary": {
-        "main": "#BEF264",
-        "light": "#D9F99D",
-        "dark": "#A3E635",
-        "foreground": "#1A2E05"
+        "name": "Electric Azure",
+        "hex": "#006FEE",
+        "tailwind": "bg-blue-600",
+        "usage": "Primary buttons, active states, key brand moments."
       },
       "secondary": {
-        "main": "#A855F7",
-        "light": "#C084FC",
-        "dark": "#9333EA",
-        "foreground": "#FFFFFF"
+        "name": "Vivid Coral",
+        "hex": "#FF5555",
+        "tailwind": "bg-red-500",
+        "usage": "Accents, 'New' badges, viral score highlights."
       },
       "accent": {
-        "youtube": "#EF4444",
-        "instagram": "#EC4899",
-        "viral_high": "#BEF264",
-        "viral_med": "#FACC15",
-        "viral_low": "#F87171"
+        "name": "Sunshine Yellow",
+        "hex": "#FACC15",
+        "tailwind": "bg-yellow-400",
+        "usage": "Highlights, illustrations, 'premium' features."
+      },
+      "background": {
+        "name": "Studio White",
+        "hex": "#FAFAFA",
+        "tailwind": "bg-neutral-50",
+        "usage": "Main app background. Avoid pure white #FFFFFF for the full page background."
+      },
+      "surface": {
+        "name": "Pure White",
+        "hex": "#FFFFFF",
+        "tailwind": "bg-white",
+        "usage": "Cards, sidebars, modals."
       },
       "text": {
-        "primary": "#FAFAFA",
-        "secondary": "#A1A1AA",
-        "muted": "#52525B"
-      },
-      "border": {
-        "default": "#27272A",
-        "active": "#3F3F46"
+        "primary": "#111827",
+        "secondary": "#6B7280",
+        "muted": "#9CA3AF"
       }
     },
     "gradients": {
-      "viral_glow": "linear-gradient(135deg, #BEF264 0%, #84CC16 100%)",
-      "glass_surface": "linear-gradient(180deg, rgba(24, 24, 27, 0.6) 0%, rgba(24, 24, 27, 0.8) 100%)"
+      "hero": "bg-gradient-to-br from-blue-50 via-indigo-50 to-white",
+      "button": "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700",
+      "text": "bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600"
     }
   },
+  "spacing": {
+    "scale": ["p-1", "p-2", "p-4", "p-6", "p-8", "p-12", "p-16", "p-24", "p-32"],
+    "rules": [
+      "Containers with borders MUST have internal padding (p-6 or p-8).",
+      "Section spacing: py-16 or py-24.",
+      "Grid gaps: gap-6 (dense) to gap-12 (airy)."
+    ]
+  },
   "layout": {
-    "spacing_scale": "px-4, px-6, px-8, px-12, px-16",
-    "container": {
-      "max_width": "max-w-7xl",
-      "padding": "px-4 sm:px-6 lg:px-8"
-    },
     "grid_system": {
-      "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
-      "cards": "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      "marketing": "Mode A: The Tetris Grid (Asymmetrical, Artful). Use col-span-full for heroes, col-span-4 for features.",
+      "dashboard": "Mode B: High Density Grid (Functional). Use col-span-1 for stats, col-span-2/3 for charts."
     },
-    "bento_grid": {
-      "hero": "col-span-full lg:col-span-8 row-span-2",
-      "stat": "col-span-1 sm:col-span-2 lg:col-span-4",
-      "list": "col-span-full lg:col-span-4 row-span-2"
+    "containers": {
+      "max_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+      "card_style": "rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
     }
   },
   "components": {
-    "cards": {
-      "style": "glass",
-      "classes": "bg-zinc-900/50 backdrop-blur-md border border-white/10 rounded-xl shadow-xl hover:border-white/20 transition-all duration-300",
-      "hover_effect": "hover:-translate-y-1 hover:shadow-2xl"
-    },
     "buttons": {
-      "primary": "bg-[#BEF264] text-zinc-900 hover:bg-[#A3E635] font-bold rounded-full px-6 py-2 shadow-[0_0_15px_rgba(190,242,100,0.3)] hover:shadow-[0_0_25px_rgba(190,242,100,0.5)] transition-all",
-      "secondary": "bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700 rounded-full px-6 py-2",
-      "ghost": "text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg px-4 py-2"
+      "primary": "rounded-full px-8 py-6 font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:-translate-y-0.5",
+      "secondary": "rounded-full px-6 py-6 font-medium bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-all",
+      "ghost": "rounded-full px-4 py-2 font-medium text-neutral-600 hover:text-blue-600 hover:bg-blue-50"
+    },
+    "cards": {
+      "base": "bg-white rounded-2xl border border-neutral-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300",
+      "glass": "bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm"
     },
     "inputs": {
-      "style": "minimal",
-      "classes": "bg-zinc-950/50 border-zinc-800 focus:border-[#BEF264] focus:ring-1 focus:ring-[#BEF264] rounded-lg text-white placeholder:text-zinc-600"
-    },
-    "navigation": {
-      "sidebar": "bg-zinc-950 border-r border-zinc-800 w-64 hidden lg:block fixed h-full",
-      "mobile_nav": "lg:hidden fixed bottom-0 w-full bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-800 z-50"
-    }
-  },
-  "visual_enhancers": {
-    "glassmorphism": "backdrop-blur-xl bg-black/40 border border-white/10",
-    "neon_glow": "shadow-[0_0_20px_rgba(190,242,100,0.15)]",
-    "noise_texture": "url('/assets/noise.png') opacity-5",
-    "borders": "border border-white/5"
-  },
-  "motion": {
-    "page_transition": {
-      "initial": { "opacity": 0, "y": 20 },
-      "animate": { "opacity": 1, "y": 0 },
-      "exit": { "opacity": 0, "y": -20 },
-      "transition": { "duration": 0.3, "ease": "easeOut" }
-    },
-    "hover_scale": {
-      "scale": 1.02,
-      "transition": { "duration": 0.2 }
+      "style": "rounded-xl border-neutral-200 bg-neutral-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all h-12 px-4"
     }
   },
   "assets": {
-    "icons": {
-      "library": "lucide-react",
-      "style": "stroke-width={1.5}"
-    },
     "images": {
+      "login_hero": {
+        "url": "https://images.unsplash.com/photo-1682056598904-9aa7ea5e8991?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGNyZWF0aXZlJTIwY29udGVudCUyMGNyZWF0b3IlMjB3b3JraW5nJTIwbGFwdG9wJTIwYnJpZ2h0JTIwc3R1ZGlvfGVufDB8fHx8MTc2ODg4MzYyOHww&ixlib=rb-4.1.0&q=85",
+        "alt": "Happy creator working in a bright studio",
+        "usage": "Login/Register page split-screen image"
+      },
+      "dashboard_avatar": {
+        "url": "https://images.unsplash.com/photo-1564518534518-e79657852a1a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwyfHxoYXBweSUyMGNyZWF0aXZlJTIwY29udGVudCUyMGNyZWF0b3IlMjB3b3JraW5nJTIwbGFwdG9wJTIwYnJpZ2h0JTIwc3R1ZGlvfGVufDB8fHx8MTc2ODg4MzYyOHww&ixlib=rb-4.1.0&q=85",
+        "alt": "User avatar",
+        "usage": "Dashboard user profile"
+      },
+      "abstract_shapes": [
+        "https://images.unsplash.com/photo-1722528490197-fcad1006e762?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMDNkJTIwY29sb3JmdWwlMjBzaGFwZXMlMjBwbGF5ZnVsfGVufDB8fHx8MTc2ODg4MzYzMHww&ixlib=rb-4.1.0&q=85",
+        "https://images.unsplash.com/photo-1767719243883-5d6e8d61c403?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMDNkJTIwY29sb3JmdWwlMjBzaGFwZXMlMjBwbGF5ZnVsfGVufDB8fHx8MTc2ODg4MzYzMHww&ixlib=rb-4.1.0&q=85"
+      ],
       "placeholders": {
         "video_thumbnails": [
-          "https://images.unsplash.com/photo-1632931612792-fbaacfd952f6?crop=entropy&cs=srgb&fm=jpg&q=85",
-          "https://images.unsplash.com/photo-1683201681321-1415b8794e73?crop=entropy&cs=srgb&fm=jpg&q=85",
-          "https://images.unsplash.com/photo-1733681198831-eb4b838c6f77?crop=entropy&cs=srgb&fm=jpg&q=85",
-          "https://images.unsplash.com/photo-1694878982378-4fc7fb9ca415?crop=entropy&cs=srgb&fm=jpg&q=85"
-        ],
-        "avatars": [
-          "https://images.unsplash.com/photo-1754643128657-cbf034a77202?crop=entropy&cs=srgb&fm=jpg&q=85",
-          "https://images.unsplash.com/photo-1754643127643-6b05da592b92?crop=entropy&cs=srgb&fm=jpg&q=85",
-          "https://images.unsplash.com/photo-1754643128759-a2279dc0de4e?crop=entropy&cs=srgb&fm=jpg&q=85"
-        ],
-        "social_icons_3d": [
-          "https://images.unsplash.com/photo-1683721003111-070bcc053d8b?crop=entropy&cs=srgb&fm=jpg&q=85",
-          "https://images.unsplash.com/photo-1694109010480-2f7aa9ceb339?crop=entropy&cs=srgb&fm=jpg&q=85"
+          "https://images.unsplash.com/photo-1764752715208-ca8df663d522?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBsYW5kc2NhcGUlMjB2aWJyYW50fGVufDB8fHx8MTc2ODg4MzYzMnww&ixlib=rb-4.1.0&q=85",
+          "https://images.unsplash.com/photo-1761495715892-4002a132ffb6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxuYXR1cmUlMjBsYW5kc2NhcGUlMjB2aWJyYW50fGVufDB8fHx8MTc2ODg4MzYzMnww&ixlib=rb-4.1.0&q=85",
+          "https://images.unsplash.com/photo-1725798595320-0c5c7d718dc9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwzfHxuYXR1cmUlMjBsYW5kc2NhcGUlMjB2aWJyYW50fGVufDB8fHx8MTc2ODg4MzYzMnww&ixlib=rb-4.1.0&q=85"
         ]
       }
-    }
+    },
+    "icons": "Use Lucide React (default). For feature sections, use colorful background circles behind icons."
   },
-  "instructions_to_main_agent": [
-    "1. INSTALLATION: Run 'npm install lucide-react recharts framer-motion clsx tailwind-merge' immediately.",
-    "2. FONTS: Add '@import url(\"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Oswald:wght@500;700&family=JetBrains+Mono&display=swap\");' to index.css.",
-    "3. THEME: Force dark mode in tailwind.config.js or apply 'dark' class to html/body by default.",
-    "4. LAYOUT: Use the 'Bento Grid' strategy for the Dashboard Home. Don't just stack cards.",
-    "5. VIRAL SCORE: Always display the 'Viral Score' prominently using the primary neon color (#BEF264).",
-    "6. GLASSMORPHISM: Use the provided glass classes for all cards and overlays. Do not use solid opaque backgrounds for cards.",
-    "7. CHARTS: Use Recharts. Customize the Tooltip to be a glass card. Hide grid lines or make them very subtle (#ffffff10).",
-    "8. IMAGES: Use the provided Unsplash URLs for placeholders. Do not leave empty image blocks.",
-    "9. NAVIGATION: Create a sidebar for desktop and a bottom nav for mobile. Use Lucide icons.",
-    "10. DATA-TESTID: Add data-testid to all interactive elements (buttons, inputs, cards)."
-  ],
   "universal_guidelines": [
+    "Avoid 'AI Slop': No generic centered layouts. Use asymmetry.",
     "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
-    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
     "Create depth through layered design elements with z-index hierarchy.",
     "Use glass-morphism effects with backdrop filters (12-24px blur).",
-    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms.",
+    "You MUST NOT apply universal transition. Eg: transition: all.",
     "You MUST NOT center align the app container.",
-    "Always use modern button styles like pill-shaped, or sharp button with interaction animations.",
-    "NEVER use AI assistant Emoji characters for icons.",
-    "Every interaction needs micro-animations - hover states, transitions.",
+    "Every interaction needs micro-animations.",
     "Use 2-3x more spacing than feels comfortable.",
-    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations.",
-    "Prioritize using pre-existing components from src/components/ui when applicable.",
-    "Components MUST use named exports.",
-    "Pages MUST use default exports.",
-    "Use sonner for toasts."
-  ]
+    "All interactive elements MUST include data-testid attribute."
+  ],
+  "instructions_to_main_agent": "1. Update tailwind.config.js with the new color palette and font families. 2. Update index.css to import fonts and set the new base styles. 3. Refactor the Dashboard to use the 'High Density Grid'. 4. Redesign the Login page using the 'Split Screen' layout with the provided hero image. 5. Ensure all cards use the new 'Soft Utility' shadow styles."
 }
