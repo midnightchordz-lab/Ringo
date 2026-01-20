@@ -47,6 +47,18 @@ export const Login = () => {
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
+  const handleMicrosoftSignIn = async () => {
+    try {
+      // Get Microsoft OAuth URL from backend
+      const response = await api.get('/auth/microsoft/login');
+      const authUrl = response.data.auth_url;
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Microsoft sign in error:', error);
+      toast.error('Failed to initiate Microsoft sign in');
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-white">
       {/* Left Side - Branding & Features */}
