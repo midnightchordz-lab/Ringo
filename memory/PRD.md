@@ -93,6 +93,27 @@ Build a full-stack application that:
 - Post clips to YouTube and Instagram (original requirement)
 - Apple OAuth login (user requested)
 
+## YouTube API Optimization (Implemented Jan 20, 2026)
+
+### Features Implemented:
+1. **Cache Data Store** - Dual-layer caching:
+   - In-memory cache (30 min TTL) for fast repeated queries
+   - MongoDB persistent cache (6 hour TTL) survives restarts
+2. **Request Only Necessary Fields** - Uses `fields` parameter to request minimal data
+3. **GZIP Compression** - Enabled for reduced data transfer
+4. **Conditional Requests (ETags)** - Stores and uses ETags to skip unchanged data
+5. **Batch Requests** - Video details fetched in batches of 50
+6. **quotaUser Tracking** - Per-user quota tracking via hashed user ID
+
+### New API Endpoints:
+- GET `/api/youtube/cache-stats` - View cache statistics
+- POST `/api/youtube/clear-cache` - Clear all YouTube caches
+
+### Frontend Indicators:
+- "Cached Results" banner (amber) when showing cached data
+- "Optimized API Usage" banner (green) when using fresh optimized requests
+- Toast notifications for cache/optimization status
+
 ## API Endpoints
 
 ### Authentication
@@ -103,9 +124,11 @@ Build a full-stack application that:
 - POST `/api/auth/google-oauth` - Google OAuth flow
 
 ### Video Discovery
-- GET `/api/discover?query=&max_results=&min_views=` - Search CC-BY videos
+- GET `/api/discover?query=&max_results=&min_views=` - Search CC-BY videos (optimized)
 - GET `/api/videos/{video_id}` - Get video details
 - POST `/api/clear-videos` - Clear all discovered videos
+- GET `/api/youtube/cache-stats` - Cache statistics (NEW)
+- POST `/api/youtube/clear-cache` - Clear caches (NEW)
 
 ### Images
 - GET `/api/images/search?query=&per_page=` - Search copyright-free images
@@ -113,7 +136,9 @@ Build a full-stack application that:
 - POST `/api/images/favorites` - Add image to favorites
 - DELETE `/api/images/favorites/{image_id}` - Remove from favorites
 
-### Content Library (NEW)
+### Content Library
+- GET `/api/content-library/search` - Dynamic search across web sources (NEW)
+- GET `/api/content-library/worksheets/search` - Worksheet-specific search (NEW)
 - GET `/api/content-library/favorites` - Get favorite resources
 - POST `/api/content-library/favorites` - Add resource to favorites
 - DELETE `/api/content-library/favorites/{resource_id}` - Remove from favorites
@@ -127,6 +152,7 @@ Build a full-stack application that:
 - `users` - User accounts with auth info
 - `user_sessions` - Emergent OAuth session tokens
 - `discovered_videos` - Cached video data from YouTube
+- `youtube_api_cache` - Persistent cache for YouTube API responses (NEW)
 - `favorite_images` - User's saved images
 - `content_library_favorites` - User's saved content resources (NEW)
 - `clips` - Generated clips metadata
