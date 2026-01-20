@@ -96,10 +96,22 @@ export const Discover = () => {
         }
       });
       setVideos(response.data.videos);
-      toast.success(`Found ${response.data.total} videos!`);
+      
+      // Show appropriate message based on response
+      if (response.data.cached) {
+        toast.info(response.data.message || 'Showing cached results');
+      } else {
+        toast.success(`Found ${response.data.total} videos!`);
+      }
     } catch (error) {
       console.error('Error discovering videos:', error);
-      toast.error('Failed to discover videos');
+      const errorMessage = error.response?.data?.detail || 'Failed to discover videos';
+      
+      if (error.response?.status === 429) {
+        toast.error('YouTube API quota exceeded. Please try again tomorrow or contact support for a new API key.');
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
