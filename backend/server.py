@@ -177,14 +177,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     # First, try to decode as JWT (for email/password login)
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
+        sub: str = payload.get("sub")
+        if sub is None:
             raise credentials_exception
         
-        # Try to find user by user_id field first, then by _id
-        user = await db.users.find_one({"user_id": user_id})
+        # The sub field contains email for JWT tokens
+        user = await db.users.find_one({"email": sub})
         if user is None:
-            user = await db.users.find_one({"_id": user_id})
+            # Fallback: try to find by user_id field or _id (for older tokens)
+            user = await db.users.find_one({"user_id": sub})
+        if user is None:
+            user = await db.users.find_one({"_id": sub})
         if user is None:
             raise credentials_exception
         return user
