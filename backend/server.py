@@ -608,7 +608,17 @@ async def discover_videos(
                 error_detail = str(e)
                 logging.error(f"YouTube API error: {error_detail}")
                 if "quotaExceeded" in error_detail:
-                    raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later.")
+                    # Try to return cached videos when quota is exceeded
+                    cached_videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
+                    if cached_videos:
+                        logging.info(f"Returning {len(cached_videos)} cached videos due to quota exceeded")
+                        return {
+                            "videos": cached_videos, 
+                            "total": len(cached_videos),
+                            "cached": True,
+                            "message": "Showing cached results. YouTube API quota exceeded - results will refresh tomorrow."
+                        }
+                    raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later or use a different API key.")
                 raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
         
         logging.warning("Using yt-dlp fallback for CC content search")
