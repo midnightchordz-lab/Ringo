@@ -745,6 +745,62 @@ def calculate_viral_score(views: int, likes: int, comments: int, upload_days_ago
     
     return min(round(viral_score, 2), 100.0)
 
+
+@api_router.get("/youtube/cache-stats")
+async def get_youtube_cache_stats(current_user: dict = Depends(get_current_user)):
+    """
+    Get YouTube API cache statistics for monitoring and debugging.
+    Shows both in-memory and persistent cache stats.
+    """
+    # In-memory cache stats
+    memory_cache_entries = len(YouTubeAPIOptimizer._data_cache)
+    memory_etag_entries = len(YouTubeAPIOptimizer._etag_cache)
+    
+    # Persistent cache stats
+    persistent_cache_count = await db[YouTubePersistentCache.CACHE_COLLECTION].count_documents({})
+    persistent_valid_count = await db[YouTubePersistentCache.CACHE_COLLECTION].count_documents({
+        "expires_at": {"$gt": datetime.now(timezone.utc)}
+    })
+    
+    # Discovered videos in main collection
+    discovered_videos_count = await db.discovered_videos.count_documents({})
+    
+    return {
+        "memory_cache": {
+            "data_entries": memory_cache_entries,
+            "etag_entries": memory_etag_entries,
+            "ttl_minutes": YouTubeAPIOptimizer.CACHE_TTL_MINUTES
+        },
+        "persistent_cache": {
+            "total_entries": persistent_cache_count,
+            "valid_entries": persistent_valid_count,
+            "ttl_hours": YouTubePersistentCache.CACHE_TTL_HOURS
+        },
+        "discovered_videos": discovered_videos_count,
+        "optimization_features": {
+            "field_filtering": True,
+            "etag_conditional_requests": True,
+            "quota_user_tracking": True,
+            "batch_requests": True,
+            "gzip_compression": True
+        }
+    }
+
+
+@api_router.post("/youtube/clear-cache")
+async def clear_youtube_cache(current_user: dict = Depends(get_current_user)):
+    """Clear all YouTube API caches (admin function)"""
+    # Clear in-memory cache
+    YouTubeAPIOptimizer._data_cache.clear()
+    YouTubeAPIOptimizer._etag_cache.clear()
+    YouTubeAPIOptimizer._cache_timestamps.clear()
+    
+    # Clear persistent cache
+    await db[YouTubePersistentCache.CACHE_COLLECTION].delete_many({})
+    
+    return {"message": "All YouTube caches cleared successfully"}
+
+
 @api_router.get("/discover")
 async def discover_videos(
     query: str = Query(default="", description="Search query"),
