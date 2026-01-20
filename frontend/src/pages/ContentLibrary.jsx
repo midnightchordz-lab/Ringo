@@ -975,7 +975,10 @@ export const ContentLibrary = () => {
     if (selectedCategory === 'free-books') {
       try {
         const response = await api.get('/content-library/free-books/search', {
-          params: { query: searchQuery }
+          params: { 
+            query: searchQuery,
+            grade: selectedLevel !== 'all' ? selectedLevel : undefined
+          }
         });
         setFreeBooks(response.data.books || []);
         toast.success(`Found ${response.data.total} books!`);
