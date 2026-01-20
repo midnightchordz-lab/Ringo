@@ -53,22 +53,31 @@ Build a full-stack application that:
 - Source badges (Pexels/Unsplash)
 - Photographer attribution with links
 
-### Core Features - Content Library (NEW)
-- 24 curated copyright-free educational resources
-- 8 content categories: Stories, Poetry, Educational Articles, Textbooks, Audio Books, Research Papers, Historical Documents
-- 5 education levels: Pre-school, Primary, Middle School, High School, University
-- Search and filter by category/level
+### Core Features - Content Library (ENHANCED Jan 20, 2026)
+- **Dynamic AI-Powered Search** - searches across multiple sources in real-time:
+  - OpenLibrary (3M+ books)
+  - Internet Archive (35M+ items)
+  - Wikipedia (6M+ articles)
+  - Educational worksheet sites (K5 Learning, Math-Drills, Common Core Sheets, etc.)
+- **AI Enhancement** - uses GPT-4.1-mini via Emergent LLM Key to:
+  - Score relevance (1-10)
+  - Categorize results (worksheet, book, article, course, video, resource)
+  - Suggest grade levels
+  - Generate AI summaries
+- Category filters: All Content, Worksheets, Books, Articles, Courses, Videos, Resources
+- Education level filters: Pre-school, Elementary, Middle, High, University
 - Save resources to favorites
-- Project Gutenberg book search integration
-- Featured resources section
-- Quick access by education level
+- Quick search suggestions for common queries
+- Source badges showing where content came from
+- License information for each result
 
 ### UI/UX
 - Vibrant gradient theme (violet, purple, pink accents)
 - Responsive layout with sidebar navigation
 - Professional card designs with hover effects
 - Loading states and toast notifications
-- Images tab and Content Library tab in sidebar
+- "Videos" tab (renamed from "Discover"), Images tab, and Content Library tab in sidebar
+- "Find" button added to all search bars
 
 ## Current Issues
 
