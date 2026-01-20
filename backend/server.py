@@ -924,8 +924,6 @@ async def discover_videos(
                         }
                     raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later or use a different API key.")
                 raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
-                    raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later or use a different API key.")
-                raise HTTPException(status_code=500, detail=f"YouTube API error: {error_detail}")
         
         logging.warning("Using yt-dlp fallback for CC content search")
         ydl_opts = {
