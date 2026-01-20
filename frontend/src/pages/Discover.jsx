@@ -82,6 +82,7 @@ export const Discover = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [minViews, setMinViews] = useState(1000);
   const [maxResults, setMaxResults] = useState(50);
+  const [cacheInfo, setCacheInfo] = useState(null);
 
   const handleSearch = async () => {
     if (!searchQuery.trim() && videos.length > 0) return;
@@ -97,9 +98,20 @@ export const Discover = () => {
       });
       setVideos(response.data.videos);
       
+      // Store cache info for display
+      setCacheInfo({
+        cached: response.data.cached || false,
+        cacheType: response.data.cache_type,
+        optimized: response.data.optimized,
+        quotaUser: response.data.quota_user,
+        message: response.data.message
+      });
+      
       // Show appropriate message based on response
       if (response.data.cached) {
         toast.info(response.data.message || 'Showing cached results');
+      } else if (response.data.optimized) {
+        toast.success(`Found ${response.data.total} videos (optimized API usage)`);
       } else {
         toast.success(`Found ${response.data.total} videos!`);
       }
