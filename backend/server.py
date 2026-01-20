@@ -539,6 +539,131 @@ async def google_oauth_callback(session_id: str = Form(...)):
         logging.error(f"OAuth error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ==================== MICROSOFT OAUTH ====================
+
+MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID")
+MICROSOFT_CLIENT_SECRET = os.environ.get("MICROSOFT_CLIENT_SECRET")
+MICROSOFT_TENANT = "common"  # Allows any Microsoft account
+
+@api_router.get("/auth/microsoft/login")
+async def microsoft_login(request: Request):
+    """Redirect to Microsoft OAuth login"""
+    # Get the frontend URL for redirect
+    frontend_url = request.headers.get("origin") or "http://localhost:3000"
+    redirect_uri = f"{frontend_url}/auth/microsoft/callback"
+    
+    # Build Microsoft OAuth URL
+    auth_url = (
+        f"https://login.microsoftonline.com/{MICROSOFT_TENANT}/oauth2/v2.0/authorize"
+        f"?client_id={MICROSOFT_CLIENT_ID}"
+        f"&response_type=code"
+        f"&redirect_uri={redirect_uri}"
+        f"&response_mode=query"
+        f"&scope=openid%20profile%20email%20User.Read"
+        f"&state=contentflow_microsoft_auth"
+    )
+    
+    return {"auth_url": auth_url}
+
+
+@api_router.post("/auth/microsoft/callback")
+async def microsoft_callback(code: str = Form(...), redirect_uri: str = Form(...)):
+    """Process Microsoft OAuth callback"""
+    try:
+        # Exchange code for tokens
+        token_url = f"https://login.microsoftonline.com/{MICROSOFT_TENANT}/oauth2/v2.0/token"
+        
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                token_url,
+                data={
+                    "client_id": MICROSOFT_CLIENT_ID,
+                    "client_secret": MICROSOFT_CLIENT_SECRET,
+                    "code": code,
+                    "redirect_uri": redirect_uri,
+                    "grant_type": "authorization_code",
+                    "scope": "openid profile email User.Read"
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                timeout=15.0
+            )
+            
+            if token_response.status_code != 200:
+                error_detail = token_response.json()
+                logging.error(f"Microsoft token error: {error_detail}")
+                raise HTTPException(status_code=400, detail="Failed to get access token from Microsoft")
+            
+            tokens = token_response.json()
+            access_token = tokens.get("access_token")
+            
+            # Get user info from Microsoft Graph
+            user_response = await client.get(
+                "https://graph.microsoft.com/v1.0/me",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=10.0
+            )
+            
+            if user_response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Failed to get user info from Microsoft")
+            
+            user_info = user_response.json()
+        
+        # Extract user data
+        email = user_info.get("mail") or user_info.get("userPrincipalName")
+        full_name = user_info.get("displayName", "")
+        microsoft_id = user_info.get("id")
+        
+        if not email:
+            raise HTTPException(status_code=400, detail="Could not get email from Microsoft account")
+        
+        # Check if user exists
+        user = await db.users.find_one({"email": email})
+        
+        if not user:
+            # Create new user
+            user_id = str(uuid.uuid4())
+            user = {
+                "_id": user_id,
+                "email": email,
+                "full_name": full_name,
+                "microsoft_id": microsoft_id,
+                "auth_provider": "microsoft",
+                "email_verified": True,  # Microsoft emails are pre-verified
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "is_active": True
+            }
+            await db.users.insert_one(user)
+        else:
+            user_id = str(user.get("_id")) or user.get("user_id")
+            # Update Microsoft ID if not set
+            if not user.get("microsoft_id"):
+                await db.users.update_one(
+                    {"email": email},
+                    {"$set": {"microsoft_id": microsoft_id}}
+                )
+        
+        # Create JWT token
+        jwt_token = create_access_token(data={"sub": email})
+        
+        return {
+            "access_token": jwt_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": email,
+                "full_name": full_name,
+                "auth_provider": "microsoft"
+            }
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Microsoft OAuth error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Authentication failed: {str(e)}")
+
+
 @api_router.post("/auth/register", response_model=Token)
 async def register(user_data: UserRegister):
     # Check if user already exists
