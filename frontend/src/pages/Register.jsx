@@ -119,7 +119,7 @@ export const Register = () => {
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 z-10" />
                   <Input
                     data-testid="fullname-input"
                     type="text"
@@ -127,7 +127,7 @@ export const Register = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="John Doe"
                     required
-                    className="pl-12 studio-input"
+                    className="studio-input-icon"
                   />
                 </div>
               </div>
@@ -137,7 +137,7 @@ export const Register = () => {
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 z-10" />
                   <Input
                     data-testid="email-input"
                     type="email"
@@ -145,7 +145,7 @@ export const Register = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
-                    className="pl-12 studio-input"
+                    className="studio-input-icon"
                   />
                 </div>
               </div>
@@ -155,7 +155,7 @@ export const Register = () => {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 z-10" />
                   <Input
                     data-testid="password-input"
                     type="password"
@@ -164,7 +164,7 @@ export const Register = () => {
                     placeholder="Min. 6 characters"
                     required
                     minLength={6}
-                    className="pl-12 studio-input"
+                    className="studio-input-icon"
                   />
                 </div>
               </div>
