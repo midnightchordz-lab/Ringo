@@ -39,6 +39,7 @@ function AppRouter() {
       <Route path="/register" element={<Register />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/pending-verification" element={<PendingVerification />} />
+      <Route path="/auth/microsoft/callback" element={<MicrosoftCallback />} />
       
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
