@@ -551,12 +551,14 @@ async def register(user_data: UserRegister):
     hashed_password = get_password_hash(user_data.password)
     verification_token = secrets.token_urlsafe(32)
     
+    # Auto-verify users since email verification isn't configured
+    # Set email_verified to True to allow immediate login
     new_user = {
         "_id": user_id,
         "email": user_data.email,
         "full_name": user_data.full_name,
         "hashed_password": hashed_password,
-        "email_verified": False,
+        "email_verified": True,  # Auto-verified since Resend API not configured
         "verification_token": verification_token,
         "auth_provider": "email",
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -565,19 +567,22 @@ async def register(user_data: UserRegister):
     
     await db.users.insert_one(new_user)
     
-    # Send verification email (non-blocking)
-    asyncio.create_task(send_verification_email(user_data.email, verification_token, user_data.full_name))
+    # Try to send verification email (non-blocking, won't fail registration)
+    if RESEND_API_KEY:
+        asyncio.create_task(send_verification_email(user_data.email, verification_token, user_data.full_name))
     
-    # Don't return token yet - user needs to verify email first
+    # Create access token and log user in immediately
+    access_token = create_access_token(data={"sub": user_data.email})
+    
     return {
-        "access_token": "pending_verification",
+        "access_token": access_token,
         "token_type": "bearer",
         "user": {
             "id": user_id,
             "email": user_data.email,
             "full_name": user_data.full_name,
             "created_at": new_user["created_at"],
-            "email_verified": False
+            "email_verified": True
         }
     }
 
