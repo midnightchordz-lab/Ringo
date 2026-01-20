@@ -286,7 +286,9 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
 };
 
 // Free Book Card Component
-const FreeBookCard = ({ book, onFavorite, isFavorited }) => {
+const FreeBookCard = ({ book, onFavorite, isFavorited, onAddToList, readingLists = [] }) => {
+  const [showListMenu, setShowListMenu] = useState(false);
+  
   return (
     <motion.div
       layout
@@ -311,14 +313,62 @@ const FreeBookCard = ({ book, onFavorite, isFavorited }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="font-bold text-neutral-900 line-clamp-2 leading-tight">{book.title}</h3>
-            <button
-              onClick={() => onFavorite(book)}
-              className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
-                isFavorited ? 'bg-red-100 text-red-500' : 'bg-neutral-100 text-neutral-400 hover:bg-red-100 hover:text-red-500'
-              }`}
-            >
-              <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
-            </button>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {/* Add to Reading List Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowListMenu(!showListMenu)}
+                  className="p-1.5 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-all"
+                  title="Add to Reading List"
+                  data-testid="add-to-list-btn"
+                >
+                  <FolderPlus className="w-4 h-4" />
+                </button>
+                {showListMenu && (
+                  <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-xl border border-neutral-200 z-50 py-2">
+                    <p className="px-3 py-1 text-xs text-neutral-500 font-medium">Add to list:</p>
+                    {readingLists.length > 0 ? (
+                      readingLists.map(list => (
+                        <button
+                          key={list.id}
+                          onClick={() => {
+                            onAddToList(list.id, book);
+                            setShowListMenu(false);
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-indigo-50 flex items-center gap-2"
+                        >
+                          <List className="w-3 h-3 text-indigo-500" />
+                          <span className="truncate">{list.name}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="px-3 py-2 text-xs text-neutral-400">No reading lists yet</p>
+                    )}
+                    <div className="border-t border-neutral-100 mt-1 pt-1">
+                      <button
+                        onClick={() => {
+                          setShowListMenu(false);
+                          onAddToList('create-new', book);
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2 font-medium"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Create New List
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Favorite Button */}
+              <button
+                onClick={() => onFavorite(book)}
+                className={`p-1.5 rounded-full transition-all ${
+                  isFavorited ? 'bg-red-100 text-red-500' : 'bg-neutral-100 text-neutral-400 hover:bg-red-100 hover:text-red-500'
+                }`}
+              >
+                <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
+              </button>
+            </div>
           </div>
           
           <p className="text-sm text-blue-600 font-medium mb-2">{book.author}</p>
@@ -384,6 +434,351 @@ const FreeBookCard = ({ book, onFavorite, isFavorited }) => {
         </div>
       </div>
     </motion.div>
+  );
+};
+
+// Reading List Card Component
+const ReadingListCard = ({ list, onView, onEdit, onDelete, onCopy, isOwner }) => {
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="studio-card p-5 hover:shadow-lg transition-all cursor-pointer"
+      onClick={() => onView(list)}
+      data-testid="reading-list-card"
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center shadow-md">
+            <List className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="font-bold text-neutral-900">{list.name}</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-neutral-500">{list.book_count || 0} books</span>
+              {list.is_public ? (
+                <span className="flex items-center gap-1 text-xs text-emerald-600">
+                  <Unlock className="w-3 h-3" /> Public
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-xs text-neutral-400">
+                  <Lock className="w-3 h-3" /> Private
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {isOwner ? (
+            <>
+              <button
+                onClick={() => onEdit(list)}
+                className="p-1.5 rounded-full bg-neutral-100 text-neutral-500 hover:bg-blue-100 hover:text-blue-600 transition-all"
+                title="Edit"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(list)}
+                className="p-1.5 rounded-full bg-neutral-100 text-neutral-500 hover:bg-red-100 hover:text-red-600 transition-all"
+                title="Delete"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => onCopy(list)}
+              className="p-1.5 rounded-full bg-neutral-100 text-neutral-500 hover:bg-indigo-100 hover:text-indigo-600 transition-all"
+              title="Copy to My Lists"
+            >
+              <Copy className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {list.description && (
+        <p className="text-sm text-neutral-500 mb-3 line-clamp-2">{list.description}</p>
+      )}
+      
+      <div className="flex flex-wrap gap-2">
+        {list.grade_level && (
+          <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full capitalize">
+            {list.grade_level}
+          </span>
+        )}
+        {list.subject && (
+          <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full capitalize">
+            {list.subject}
+          </span>
+        )}
+      </div>
+      
+      {/* Preview of books */}
+      {list.books && list.books.length > 0 && (
+        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-neutral-100">
+          <div className="flex -space-x-2">
+            {list.books.slice(0, 4).map((book, idx) => (
+              <div
+                key={book.book_id || idx}
+                className="w-8 h-10 rounded bg-gradient-to-br from-amber-100 to-orange-100 border-2 border-white flex items-center justify-center"
+                title={book.title}
+              >
+                <Book className="w-4 h-4 text-amber-600" />
+              </div>
+            ))}
+            {list.books.length > 4 && (
+              <div className="w-8 h-10 rounded bg-neutral-100 border-2 border-white flex items-center justify-center text-xs font-bold text-neutral-500">
+                +{list.books.length - 4}
+              </div>
+            )}
+          </div>
+          <span className="text-xs text-neutral-400">Click to view all books</span>
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
+// Create/Edit Reading List Modal
+const ReadingListModal = ({ isOpen, onClose, onSave, editList = null }) => {
+  const [name, setName] = useState(editList?.name || '');
+  const [description, setDescription] = useState(editList?.description || '');
+  const [gradeLevel, setGradeLevel] = useState(editList?.grade_level || '');
+  const [subject, setSubject] = useState(editList?.subject || '');
+  const [isPublic, setIsPublic] = useState(editList?.is_public || false);
+  const [saving, setSaving] = useState(false);
+  
+  useEffect(() => {
+    if (editList) {
+      setName(editList.name || '');
+      setDescription(editList.description || '');
+      setGradeLevel(editList.grade_level || '');
+      setSubject(editList.subject || '');
+      setIsPublic(editList.is_public || false);
+    } else {
+      setName('');
+      setDescription('');
+      setGradeLevel('');
+      setSubject('');
+      setIsPublic(false);
+    }
+  }, [editList, isOpen]);
+  
+  const handleSubmit = async () => {
+    if (!name.trim()) {
+      toast.error('Please enter a name for the reading list');
+      return;
+    }
+    setSaving(true);
+    await onSave({
+      name: name.trim(),
+      description: description.trim(),
+      grade_level: gradeLevel || null,
+      subject: subject || null,
+      is_public: isPublic
+    });
+    setSaving(false);
+  };
+  
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-neutral-900">
+            {editList ? 'Edit Reading List' : 'Create Reading List'}
+          </h2>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-neutral-100">
+            <X className="w-5 h-5 text-neutral-500" />
+          </button>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Name *</label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., Grade 3 Science Books"
+              className="w-full"
+              data-testid="list-name-input"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="What is this reading list for?"
+              className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+              rows={3}
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">Grade Level</label>
+              <select
+                value={gradeLevel}
+                onChange={(e) => setGradeLevel(e.target.value)}
+                className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Any Grade</option>
+                <option value="preschool">Pre-school</option>
+                <option value="elementary">Elementary</option>
+                <option value="middle">Middle School</option>
+                <option value="high">High School</option>
+                <option value="university">University</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">Subject</label>
+              <select
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Any Subject</option>
+                <option value="stories">Stories</option>
+                <option value="poetry">Poetry</option>
+                <option value="grammar">Grammar</option>
+                <option value="math">Math</option>
+                <option value="science">Science</option>
+                <option value="history">History</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
+            <button
+              onClick={() => setIsPublic(!isPublic)}
+              className={`relative w-12 h-6 rounded-full transition-colors ${isPublic ? 'bg-indigo-500' : 'bg-neutral-300'}`}
+            >
+              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${isPublic ? 'left-7' : 'left-1'}`} />
+            </button>
+            <div>
+              <p className="text-sm font-medium text-neutral-700 flex items-center gap-2">
+                {isPublic ? <Unlock className="w-4 h-4 text-emerald-500" /> : <Lock className="w-4 h-4 text-neutral-400" />}
+                {isPublic ? 'Public List' : 'Private List'}
+              </p>
+              <p className="text-xs text-neutral-500">
+                {isPublic ? 'Other teachers can discover and copy this list' : 'Only you can see this list'}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex gap-3 mt-6">
+          <Button onClick={onClose} variant="outline" className="flex-1">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={saving || !name.trim()}
+            className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white"
+            data-testid="save-list-btn"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+            {editList ? 'Save Changes' : 'Create List'}
+          </Button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+// View Reading List Detail Modal
+const ReadingListDetailModal = ({ isOpen, onClose, list, onRemoveBook }) => {
+  if (!isOpen || !list) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-neutral-100">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center">
+                <List className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-neutral-900">{list.name}</h2>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm text-neutral-500">{list.book_count || 0} books</span>
+                  {list.is_public && <span className="text-xs text-emerald-600 flex items-center gap-1"><Unlock className="w-3 h-3" /> Public</span>}
+                </div>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-neutral-100">
+              <X className="w-5 h-5 text-neutral-500" />
+            </button>
+          </div>
+          {list.description && <p className="text-sm text-neutral-500 mt-3">{list.description}</p>}
+          <div className="flex gap-2 mt-3">
+            {list.grade_level && <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full capitalize">{list.grade_level}</span>}
+            {list.subject && <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full capitalize">{list.subject}</span>}
+          </div>
+        </div>
+        
+        {/* Books List */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {list.books && list.books.length > 0 ? (
+            <div className="space-y-3">
+              {list.books.map((book) => (
+                <div key={book.book_id} className="flex items-center gap-4 p-3 bg-neutral-50 rounded-xl">
+                  <div className="w-12 h-16 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center flex-shrink-0">
+                    <Book className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-neutral-900 truncate">{book.title}</h4>
+                    <p className="text-sm text-blue-600">{book.author}</p>
+                    <span className="text-xs text-neutral-400 capitalize">{book.category}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {book.formats?.pdf && (
+                      <a href={book.formats.pdf} target="_blank" rel="noopener noreferrer" className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
+                        <Download className="w-4 h-4" />
+                      </a>
+                    )}
+                    {onRemoveBook && (
+                      <button
+                        onClick={() => onRemoveBook(list.id, book.book_id)}
+                        className="p-2 bg-neutral-100 text-neutral-500 rounded-lg hover:bg-red-100 hover:text-red-600 transition-colors"
+                        title="Remove from list"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Book className="w-16 h-16 text-neutral-200 mx-auto mb-4" />
+              <p className="text-neutral-500">No books in this list yet</p>
+              <p className="text-sm text-neutral-400 mt-1">Add books from the Free Books section</p>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
