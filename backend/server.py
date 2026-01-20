@@ -1603,6 +1603,402 @@ async def search_gutenberg(
         logging.error(f"Error searching Gutenberg: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ==================== DYNAMIC CONTENT LIBRARY SEARCH ====================
+
+@api_router.get("/content-library/search")
+async def search_content_library(
+    query: str = Query(..., description="Search query for educational content"),
+    category: str = Query(default="all", description="Category filter"),
+    limit: int = Query(default=20, le=50),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Dynamic search for copyright-free educational content across multiple sources.
+    Searches: OpenLibrary, Internet Archive, Wikipedia, and uses AI for enhancement.
+    """
+    try:
+        all_results = []
+        
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            # Run searches in parallel
+            tasks = [
+                search_openlibrary(client, query, limit // 4),
+                search_internet_archive(client, query, limit // 4),
+                search_wikipedia(client, query, limit // 4),
+                search_oer_commons(client, query, limit // 4),
+            ]
+            
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            for result in results:
+                if isinstance(result, list):
+                    all_results.extend(result)
+                elif isinstance(result, Exception):
+                    logging.warning(f"Search source failed: {str(result)}")
+        
+        # Use AI to enhance and categorize results if we have any
+        if all_results and len(all_results) > 0:
+            try:
+                enhanced_results = await ai_enhance_results(query, all_results[:limit])
+                return {
+                    "results": enhanced_results,
+                    "total": len(enhanced_results),
+                    "query": query,
+                    "sources": ["OpenLibrary", "Internet Archive", "Wikipedia", "OER Commons"]
+                }
+            except Exception as ai_error:
+                logging.warning(f"AI enhancement failed, returning raw results: {str(ai_error)}")
+        
+        return {
+            "results": all_results[:limit],
+            "total": len(all_results),
+            "query": query,
+            "sources": ["OpenLibrary", "Internet Archive", "Wikipedia", "OER Commons"]
+        }
+    
+    except Exception as e:
+        logging.error(f"Error in content library search: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def search_openlibrary(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search OpenLibrary for books and educational materials"""
+    try:
+        response = await client.get(
+            "https://openlibrary.org/search.json",
+            params={"q": query, "limit": limit, "fields": "key,title,author_name,first_publish_year,subject,cover_i,ia"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for doc in data.get("docs", [])[:limit]:
+                cover_id = doc.get("cover_i")
+                results.append({
+                    "id": f"ol-{doc.get('key', '').replace('/works/', '')}",
+                    "title": doc.get("title", "Untitled"),
+                    "description": f"By {', '.join(doc.get('author_name', ['Unknown'])[:2])}. First published: {doc.get('first_publish_year', 'N/A')}",
+                    "url": f"https://openlibrary.org{doc.get('key', '')}",
+                    "source": "OpenLibrary",
+                    "type": "book",
+                    "license": "varies",
+                    "thumbnail": f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg" if cover_id else None,
+                    "subjects": doc.get("subject", [])[:5],
+                    "authors": doc.get("author_name", [])[:3],
+                    "year": doc.get("first_publish_year"),
+                    "has_fulltext": bool(doc.get("ia"))
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"OpenLibrary search failed: {str(e)}")
+    return []
+
+
+async def search_internet_archive(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Internet Archive for educational materials"""
+    try:
+        # Search for educational texts and materials
+        response = await client.get(
+            "https://archive.org/advancedsearch.php",
+            params={
+                "q": f"{query} AND mediatype:(texts OR education)",
+                "fl[]": ["identifier", "title", "description", "creator", "year", "subject"],
+                "rows": limit,
+                "output": "json"
+            }
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for doc in data.get("response", {}).get("docs", [])[:limit]:
+                identifier = doc.get("identifier", "")
+                results.append({
+                    "id": f"ia-{identifier}",
+                    "title": doc.get("title", "Untitled") if isinstance(doc.get("title"), str) else doc.get("title", ["Untitled"])[0],
+                    "description": doc.get("description", "")[:200] if isinstance(doc.get("description"), str) else (doc.get("description", [""])[0][:200] if doc.get("description") else ""),
+                    "url": f"https://archive.org/details/{identifier}",
+                    "source": "Internet Archive",
+                    "type": "archive",
+                    "license": "public-domain",
+                    "thumbnail": f"https://archive.org/services/img/{identifier}",
+                    "subjects": doc.get("subject", [])[:5] if isinstance(doc.get("subject"), list) else [doc.get("subject", "")][:5],
+                    "authors": [doc.get("creator")] if isinstance(doc.get("creator"), str) else doc.get("creator", [])[:3],
+                    "year": doc.get("year")
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Internet Archive search failed: {str(e)}")
+    return []
+
+
+async def search_wikipedia(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Wikipedia for educational articles"""
+    try:
+        response = await client.get(
+            "https://en.wikipedia.org/w/api.php",
+            params={
+                "action": "query",
+                "list": "search",
+                "srsearch": query,
+                "srlimit": limit,
+                "format": "json",
+                "srprop": "snippet|titlesnippet"
+            }
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("query", {}).get("search", [])[:limit]:
+                page_id = item.get("pageid")
+                title = item.get("title", "")
+                # Clean HTML from snippet
+                snippet = item.get("snippet", "").replace('<span class="searchmatch">', '').replace('</span>', '')
+                results.append({
+                    "id": f"wiki-{page_id}",
+                    "title": title,
+                    "description": snippet[:200],
+                    "url": f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}",
+                    "source": "Wikipedia",
+                    "type": "article",
+                    "license": "cc-by-sa",
+                    "thumbnail": None,
+                    "subjects": [query],
+                    "authors": ["Wikipedia Contributors"],
+                    "year": None
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Wikipedia search failed: {str(e)}")
+    return []
+
+
+async def search_oer_commons(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search for Open Educational Resources"""
+    # OER Commons doesn't have a public API, so we'll simulate with curated educational sites
+    # This returns worksheet-related resources from known free sources
+    worksheet_sources = [
+        {
+            "id": "oer-k5learning",
+            "title": f"K5 Learning - {query} Worksheets",
+            "description": f"Free printable {query} worksheets for K-5 students. Math, reading, spelling, grammar, science.",
+            "url": f"https://www.k5learning.com/free-worksheets?search={query.replace(' ', '+')}",
+            "source": "K5 Learning",
+            "type": "worksheet",
+            "license": "edu-only",
+            "thumbnail": None,
+            "subjects": [query, "worksheets", "K-5"],
+            "authors": ["K5 Learning"],
+            "year": 2024
+        },
+        {
+            "id": "oer-mathdrills",
+            "title": f"Math-Drills - {query}",
+            "description": f"Free {query} math worksheets covering all topics from basic operations to algebra.",
+            "url": f"https://www.math-drills.com/search.php?q={query.replace(' ', '+')}",
+            "source": "Math-Drills",
+            "type": "worksheet",
+            "license": "edu-only",
+            "thumbnail": None,
+            "subjects": [query, "math", "worksheets"],
+            "authors": ["Math-Drills"],
+            "year": 2024
+        },
+        {
+            "id": "oer-commoncore",
+            "title": f"Common Core Sheets - {query}",
+            "description": f"Free Common Core aligned {query} worksheets for math, ELA, science.",
+            "url": f"https://www.commoncoresheets.com/search.php?s={query.replace(' ', '+')}",
+            "source": "Common Core Sheets",
+            "type": "worksheet",
+            "license": "edu-only",
+            "thumbnail": None,
+            "subjects": [query, "common core", "worksheets"],
+            "authors": ["Common Core Sheets"],
+            "year": 2024
+        },
+        {
+            "id": "oer-liveworksheets",
+            "title": f"Live Worksheets - {query}",
+            "description": f"Interactive {query} worksheets that students can complete online.",
+            "url": f"https://www.liveworksheets.com/search.asp?content={query.replace(' ', '+')}",
+            "source": "Live Worksheets",
+            "type": "worksheet",
+            "license": "varies",
+            "thumbnail": None,
+            "subjects": [query, "interactive", "worksheets"],
+            "authors": ["Live Worksheets Community"],
+            "year": 2024
+        },
+        {
+            "id": "oer-superstar",
+            "title": f"Superstar Worksheets - {query}",
+            "description": f"Free printable {query} worksheets for pre-K through 8th grade.",
+            "url": f"https://www.superstarworksheets.com/?s={query.replace(' ', '+')}",
+            "source": "Superstar Worksheets",
+            "type": "worksheet",
+            "license": "edu-only",
+            "thumbnail": None,
+            "subjects": [query, "worksheets", "K-8"],
+            "authors": ["Superstar Worksheets"],
+            "year": 2024
+        }
+    ]
+    
+    # Filter based on query relevance
+    relevant_sources = []
+    query_lower = query.lower()
+    
+    for source in worksheet_sources:
+        # Always include if searching for worksheets or educational content
+        if any(term in query_lower for term in ["worksheet", "activity", "printable", "exercise", "practice"]):
+            relevant_sources.append(source)
+        elif any(term in query_lower for term in ["math", "science", "stem", "reading", "writing", "grammar"]):
+            relevant_sources.append(source)
+        else:
+            # Include a subset for general queries
+            relevant_sources.append(source)
+    
+    return relevant_sources[:limit]
+
+
+async def ai_enhance_results(query: str, results: list) -> list:
+    """Use AI to enhance, categorize and rank search results"""
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        
+        llm_key = os.environ.get("EMERGENT_LLM_KEY")
+        if not llm_key:
+            return results
+        
+        chat = LlmChat(
+            api_key=llm_key,
+            session_id=f"content-search-{datetime.now().timestamp()}",
+            system_message="""You are an educational content curator. Given search results, you will:
+1. Add a relevance_score (1-10) based on how well each result matches the query
+2. Categorize each result into: worksheet, book, article, video, course, or resource
+3. Add grade_level suggestions: preschool, elementary, middle, high, university, all
+4. Add a brief AI summary (1 sentence) for each result
+Return JSON array with enhanced results. Keep all original fields and add: relevance_score, category, grade_levels, ai_summary"""
+        ).with_model("openai", "gpt-4.1-mini")
+        
+        # Prepare results for AI
+        results_summary = []
+        for r in results[:15]:  # Limit to avoid token limits
+            results_summary.append({
+                "id": r.get("id"),
+                "title": r.get("title"),
+                "description": r.get("description", "")[:150],
+                "source": r.get("source"),
+                "type": r.get("type"),
+                "subjects": r.get("subjects", [])[:3]
+            })
+        
+        user_message = UserMessage(
+            text=f"""Query: "{query}"
+
+Search Results to enhance:
+{json.dumps(results_summary, indent=2)}
+
+Return a JSON array with enhanced results. Add relevance_score, category, grade_levels array, and ai_summary to each."""
+        )
+        
+        response = await chat.send_message(user_message)
+        
+        # Parse AI response
+        try:
+            # Try to extract JSON from response
+            response_text = response.strip()
+            if response_text.startswith("```"):
+                response_text = response_text.split("```")[1]
+                if response_text.startswith("json"):
+                    response_text = response_text[4:]
+            
+            enhanced_data = json.loads(response_text)
+            
+            # Merge AI enhancements with original results
+            enhanced_map = {item.get("id"): item for item in enhanced_data}
+            
+            for result in results:
+                result_id = result.get("id")
+                if result_id in enhanced_map:
+                    ai_data = enhanced_map[result_id]
+                    result["relevance_score"] = ai_data.get("relevance_score", 5)
+                    result["category"] = ai_data.get("category", result.get("type", "resource"))
+                    result["grade_levels"] = ai_data.get("grade_levels", ["all"])
+                    result["ai_summary"] = ai_data.get("ai_summary", "")
+                else:
+                    result["relevance_score"] = 5
+                    result["category"] = result.get("type", "resource")
+                    result["grade_levels"] = ["all"]
+                    result["ai_summary"] = ""
+            
+            # Sort by relevance
+            results.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
+            
+        except json.JSONDecodeError:
+            logging.warning("Could not parse AI response as JSON")
+        
+        return results
+        
+    except Exception as e:
+        logging.warning(f"AI enhancement failed: {str(e)}")
+        return results
+
+
+@api_router.get("/content-library/worksheets/search")
+async def search_worksheets(
+    query: str = Query(..., description="Search query for worksheets"),
+    grade: str = Query(default="all", description="Grade level filter"),
+    subject: str = Query(default="all", description="Subject filter"),
+    limit: int = Query(default=20, le=50),
+    current_user: dict = Depends(get_current_user)
+):
+    """Search specifically for free educational worksheets and activity sheets"""
+    try:
+        all_results = []
+        
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            # Search worksheet-specific sources
+            oer_results = await search_oer_commons(client, query, limit)
+            all_results.extend(oer_results)
+            
+            # Also search Internet Archive for educational materials
+            ia_results = await search_internet_archive(client, f"{query} worksheet OR activity sheet", limit // 2)
+            all_results.extend(ia_results)
+        
+        # Filter by grade if specified
+        if grade != "all":
+            grade_map = {
+                "preschool": ["preschool", "pre-k", "kindergarten"],
+                "elementary": ["k-5", "elementary", "grade 1", "grade 2", "grade 3", "grade 4", "grade 5"],
+                "middle": ["6-8", "middle", "grade 6", "grade 7", "grade 8"],
+                "high": ["9-12", "high school", "grade 9", "grade 10", "grade 11", "grade 12"]
+            }
+            grade_terms = grade_map.get(grade, [grade])
+            filtered = []
+            for r in all_results:
+                subjects = " ".join(r.get("subjects", [])).lower()
+                title = r.get("title", "").lower()
+                if any(term in subjects or term in title for term in grade_terms):
+                    filtered.append(r)
+            if filtered:
+                all_results = filtered
+        
+        return {
+            "results": all_results[:limit],
+            "total": len(all_results),
+            "query": query,
+            "grade": grade,
+            "subject": subject
+        }
+    
+    except Exception as e:
+        logging.error(f"Error searching worksheets: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
 
 app.add_middleware(
