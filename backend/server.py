@@ -686,8 +686,23 @@ async def discover_videos(
             
             return {"videos": videos, "total": len(videos)}
     
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error discovering videos: {str(e)}")
+        # Try to return cached videos on any error
+        try:
+            cached_videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
+            if cached_videos:
+                logging.info(f"Returning {len(cached_videos)} cached videos due to error")
+                return {
+                    "videos": cached_videos, 
+                    "total": len(cached_videos),
+                    "cached": True,
+                    "message": "Showing cached results due to temporary issue."
+                }
+        except:
+            pass
         raise HTTPException(status_code=500, detail=str(e))
 
 def parse_youtube_duration(duration_str: str) -> int:
