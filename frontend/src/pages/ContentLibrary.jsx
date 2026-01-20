@@ -1314,8 +1314,96 @@ export const ContentLibrary = () => {
         </div>
       )}
 
+      {/* Reading Lists View */}
+      {!isSearching && !loadingLists && selectedCategory === 'reading-lists' && !showFavorites && (
+        <div data-testid="reading-lists-section">
+          {/* Header with Create Button */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-neutral-800 flex items-center gap-2">
+                <List className="w-6 h-6 text-indigo-500" />
+                My Reading Lists
+              </h2>
+              <p className="text-sm text-neutral-500 mt-1">Create curated book collections for your classes</p>
+            </div>
+            <Button
+              onClick={() => {
+                setEditingList(null);
+                setShowListModal(true);
+              }}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl flex items-center gap-2"
+              data-testid="create-list-btn"
+            >
+              <Plus className="w-4 h-4" />
+              Create List
+            </Button>
+          </div>
+          
+          {/* Toggle for Public Lists */}
+          <div className="studio-card p-4 mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Users className="w-5 h-5 text-indigo-500" />
+              <div>
+                <p className="font-medium text-neutral-800">Discover Public Lists</p>
+                <p className="text-xs text-neutral-500">See reading lists shared by other teachers</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIncludePublicLists(!includePublicLists)}
+              className={`relative w-12 h-6 rounded-full transition-colors ${includePublicLists ? 'bg-indigo-500' : 'bg-neutral-300'}`}
+            >
+              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${includePublicLists ? 'left-7' : 'left-1'}`} />
+            </button>
+          </div>
+          
+          {/* Lists Grid */}
+          {readingLists.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <AnimatePresence>
+                {readingLists.map((list) => (
+                  <ReadingListCard
+                    key={list.id}
+                    list={list}
+                    onView={(l) => {
+                      setSelectedList(l);
+                      setShowListDetail(true);
+                    }}
+                    onEdit={(l) => {
+                      setEditingList(l);
+                      setShowListModal(true);
+                    }}
+                    onDelete={handleDeleteList}
+                    onCopy={handleCopyList}
+                    isOwner={true} // TODO: Check actual ownership
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="studio-card p-16 text-center">
+              <List className="w-20 h-20 text-indigo-200 mx-auto mb-6" strokeWidth={1.5} />
+              <h3 className="text-xl font-bold text-neutral-800 mb-2">No Reading Lists Yet</h3>
+              <p className="text-neutral-500 mb-6 max-w-md mx-auto">
+                Create your first reading list to organize books for your students. 
+                Perfect for lesson planning and class assignments!
+              </p>
+              <Button
+                onClick={() => {
+                  setEditingList(null);
+                  setShowListModal(true);
+                }}
+                className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-full px-6"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First List
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Search Results */}
-      {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && selectedCategory !== 'free-books' && (
+      {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <p className="text-zinc-500">
