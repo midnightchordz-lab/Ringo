@@ -795,9 +795,139 @@ export const ContentLibrary = () => {
   const [searchSources, setSearchSources] = useState([]);
   const [freeBooks, setFreeBooks] = useState([]);
   const [loadingBooks, setLoadingBooks] = useState(false);
+  
+  // Reading Lists State
+  const [readingLists, setReadingLists] = useState([]);
+  const [loadingLists, setLoadingLists] = useState(false);
+  const [showListModal, setShowListModal] = useState(false);
+  const [editingList, setEditingList] = useState(null);
+  const [selectedList, setSelectedList] = useState(null);
+  const [showListDetail, setShowListDetail] = useState(false);
+  const [includePublicLists, setIncludePublicLists] = useState(false);
+  const [pendingBook, setPendingBook] = useState(null);
 
   useEffect(() => {
     fetchFavorites();
+    fetchReadingLists();
+  }, []);
+  
+  // Fetch reading lists
+  const fetchReadingLists = async () => {
+    setLoadingLists(true);
+    try {
+      const response = await api.get('/reading-lists', { params: { include_public: includePublicLists } });
+      setReadingLists(response.data.reading_lists || []);
+    } catch (error) {
+      console.error('Error fetching reading lists:', error);
+    } finally {
+      setLoadingLists(false);
+    }
+  };
+  
+  // Refetch when include_public changes
+  useEffect(() => {
+    if (selectedCategory === 'reading-lists') {
+      fetchReadingLists();
+    }
+  }, [includePublicLists, selectedCategory]);
+
+  // Create or update reading list
+  const handleSaveList = async (listData) => {
+    try {
+      if (editingList) {
+        await api.put(`/reading-lists/${editingList.id}`, listData);
+        toast.success('Reading list updated!');
+      } else {
+        const response = await api.post('/reading-lists', listData);
+        // If there's a pending book, add it to the new list
+        if (pendingBook && response.data.reading_list) {
+          await handleAddBookToList(response.data.reading_list.id, pendingBook);
+        }
+        toast.success('Reading list created!');
+      }
+      setShowListModal(false);
+      setEditingList(null);
+      setPendingBook(null);
+      fetchReadingLists();
+    } catch (error) {
+      console.error('Error saving reading list:', error);
+      toast.error('Failed to save reading list');
+    }
+  };
+  
+  // Delete reading list
+  const handleDeleteList = async (list) => {
+    if (!confirm(`Delete "${list.name}"? This cannot be undone.`)) return;
+    try {
+      await api.delete(`/reading-lists/${list.id}`);
+      toast.success('Reading list deleted');
+      fetchReadingLists();
+    } catch (error) {
+      console.error('Error deleting reading list:', error);
+      toast.error('Failed to delete reading list');
+    }
+  };
+  
+  // Copy a public reading list
+  const handleCopyList = async (list) => {
+    try {
+      await api.post(`/reading-lists/${list.id}/copy`);
+      toast.success('Reading list copied to your lists!');
+      fetchReadingLists();
+    } catch (error) {
+      console.error('Error copying reading list:', error);
+      toast.error('Failed to copy reading list');
+    }
+  };
+  
+  // Add book to reading list
+  const handleAddBookToList = async (listId, book) => {
+    if (listId === 'create-new') {
+      setPendingBook(book);
+      setEditingList(null);
+      setShowListModal(true);
+      return;
+    }
+    
+    try {
+      await api.post(`/reading-lists/${listId}/books`, {
+        book_id: book.id,
+        title: book.title,
+        author: book.author,
+        category: book.category,
+        cover: book.cover,
+        formats: book.formats
+      });
+      toast.success(`Added "${book.title}" to reading list!`);
+      fetchReadingLists();
+    } catch (error) {
+      if (error.response?.status === 400) {
+        toast.error('Book already in this reading list');
+      } else {
+        console.error('Error adding book to list:', error);
+        toast.error('Failed to add book to list');
+      }
+    }
+  };
+  
+  // Remove book from reading list
+  const handleRemoveBookFromList = async (listId, bookId) => {
+    try {
+      await api.delete(`/reading-lists/${listId}/books/${bookId}`);
+      toast.success('Book removed from list');
+      // Refresh the selected list
+      const response = await api.get(`/reading-lists/${listId}`);
+      setSelectedList(response.data.reading_list);
+      fetchReadingLists();
+    } catch (error) {
+      console.error('Error removing book from list:', error);
+      toast.error('Failed to remove book');
+    }
+  };
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
   }, []);
 
   // Fetch free books when category changes to free-books
