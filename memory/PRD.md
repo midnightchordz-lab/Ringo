@@ -98,6 +98,16 @@ Created modular architecture for maintainability:
 - Source badges showing where content came from
 - License information for each result
 
+### Core Features - Reading Lists (NEW Jan 20, 2026)
+- **Create curated book collections** for specific grades or subjects
+- **Reading List management**: Create, edit, delete lists
+- **Add books** from Free Books section to any reading list
+- **Public/Private toggle**: Share lists with other teachers or keep private
+- **Copy public lists**: Teachers can copy shared reading lists to their own collection
+- **List metadata**: Name, description, grade level, subject
+- **View list details**: See all books in a list with download options
+- Endpoints: `/api/reading-lists`, `/api/reading-lists/{id}`, `/api/reading-lists/{id}/books`, `/api/reading-lists/{id}/copy`
+
 ### Core Features - Free Books Section (NEW Jan 20, 2026)
 - **19 curated free books** from Project Gutenberg (public domain)
 - **Categories**: Stories, Poetry, Grammar, Math, Science
