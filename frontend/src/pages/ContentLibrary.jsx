@@ -698,12 +698,16 @@ export const ContentLibrary = () => {
       </div>
 
       {/* Loading State */}
-      {isSearching && (
+      {(isSearching || loadingBooks) && (
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-zinc-500">Searching across multiple sources...</p>
-            <p className="text-xs text-zinc-600 mt-2">OpenLibrary • Internet Archive • Wikipedia • Educational Sites</p>
+            <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-neutral-600">
+              {selectedCategory === 'free-books' ? 'Loading free books...' : 'Searching across multiple sources...'}
+            </p>
+            <p className="text-xs text-neutral-500 mt-2">
+              {selectedCategory === 'free-books' ? 'Project Gutenberg • Internet Archive' : 'OpenLibrary • Internet Archive • Wikipedia • Educational Sites'}
+            </p>
           </div>
         </div>
       )}
