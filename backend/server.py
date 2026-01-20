@@ -339,17 +339,20 @@ async def login(user_data: UserLogin):
             detail="Please verify your email before logging in. Check your inbox for the verification link."
         )
     
-    # Create access token
-    access_token = create_access_token(data={"sub": user.get("_id") or user.get("user_id")})
+    # Create access token - use email as sub since _id is ObjectId
+    access_token = create_access_token(data={"sub": user["email"]})
+    
+    # Convert ObjectId to string for response
+    user_id = str(user.get("_id")) if user.get("_id") else user.get("user_id", "")
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "user": {
-            "id": user.get("_id") or user.get("user_id"),
+            "id": user_id,
             "email": user["email"],
-            "full_name": user["full_name"],
-            "created_at": user["created_at"]
+            "full_name": user.get("full_name", ""),
+            "created_at": user.get("created_at", "")
         }
     }
 
