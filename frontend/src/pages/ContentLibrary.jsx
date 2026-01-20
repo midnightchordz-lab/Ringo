@@ -1546,6 +1546,29 @@ export const ContentLibrary = () => {
           </p>
         </div>
       )}
+      
+      {/* Reading List Modal */}
+      <ReadingListModal
+        isOpen={showListModal}
+        onClose={() => {
+          setShowListModal(false);
+          setEditingList(null);
+          setPendingBook(null);
+        }}
+        onSave={handleSaveList}
+        editList={editingList}
+      />
+      
+      {/* Reading List Detail Modal */}
+      <ReadingListDetailModal
+        isOpen={showListDetail}
+        onClose={() => {
+          setShowListDetail(false);
+          setSelectedList(null);
+        }}
+        list={selectedList}
+        onRemoveBook={handleRemoveBookFromList}
+      />
     </div>
   );
 };
