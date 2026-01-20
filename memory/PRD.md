@@ -183,6 +183,16 @@ Created modular architecture for maintainability:
 - POST `/api/images/favorites` - Add image to favorites
 - DELETE `/api/images/favorites/{image_id}` - Remove from favorites
 
+### Reading Lists
+- POST `/api/reading-lists` - Create new reading list (NEW)
+- GET `/api/reading-lists` - Get user's reading lists (NEW)
+- GET `/api/reading-lists/{id}` - Get specific reading list (NEW)
+- PUT `/api/reading-lists/{id}` - Update reading list (NEW)
+- DELETE `/api/reading-lists/{id}` - Delete reading list (NEW)
+- POST `/api/reading-lists/{id}/books` - Add book to list (NEW)
+- DELETE `/api/reading-lists/{id}/books/{book_id}` - Remove book from list (NEW)
+- POST `/api/reading-lists/{id}/copy` - Copy public list to own lists (NEW)
+
 ### Content Library
 - GET `/api/content-library/search` - Dynamic search across web sources (NEW)
 - GET `/api/content-library/worksheets/search` - Worksheet-specific search (NEW)
