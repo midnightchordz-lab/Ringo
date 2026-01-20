@@ -2768,6 +2768,7 @@ async def get_free_books(
 @api_router.get("/content-library/free-books/search")
 async def search_free_books(
     query: str = Query(..., description="Search query"),
+    grade: str = Query(default="all", description="Filter by grade level"),
     limit: int = Query(default=20, le=50),
     current_user: dict = Depends(get_current_user)
 ):
@@ -2784,6 +2785,18 @@ async def search_free_books(
                 query_lower in book["subject"].lower() or
                 query_lower in book.get("description", "").lower()):
                 matching_books.append(book)
+        
+        # Filter by grade level
+        if grade != "all":
+            grade_map = {
+                "preschool": "preschool",
+                "elementary": "elementary", 
+                "middle": "middle",
+                "high": "high",
+                "university": "university"
+            }
+            target_grade = grade_map.get(grade, grade)
+            matching_books = [b for b in matching_books if target_grade in b.get("grade_level", [])]
         
         return {
             "books": matching_books[:limit],
