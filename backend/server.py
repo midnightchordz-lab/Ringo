@@ -58,7 +58,7 @@ if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
 # Frontend URL for email links
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://clipcreator-19.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://videoremix.preview.emergentagent.com")
 
 # Pydantic models
 class UserRegister(BaseModel):

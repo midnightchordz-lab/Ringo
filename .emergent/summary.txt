@@ -6,191 +6,410 @@
 5.  Posts the generated reels to the user's YouTube and Instagram accounts.
 6.  The application should have a user registration and login system (JWT, Google, and Apple ID).
 7.  Email verification is required for new user registrations.
-8.  The UI should be professional, vibrant, and attractive for corporate/education clients.
+8.  The UI should be professional, vibrant, and attractive.
 9.  A button to clear the discovered videos from the dashboard is required.
 10. The Made with Emergent branding must be removed.
+
+**PRODUCT REQUIREMENTS added this session:**
+1.  Add a new tab to search for copyright-free images from Unsplash and Pexels, with search, favorites, and download functionality.
+2.  Add a Content Library tab for copyright-free educational resources (stories, poetry, articles, etc.) with categorization and filtering.
+3.  Enhance the Content Library with a section for Free Downloadable Activity Sheets for grades 1-10.
+4.  Audit the entire project for Creative Commons license compliance and display clear license information (badges, warnings, filters) on the Videos, Images, and Content Library pages.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application with a React frontend and a FastAPI backend has been developed. The application features a vibrant, multi-color gradient theme. It includes a complete user authentication system with JWT-based registration/login, Google OAuth, and an email verification flow using Resend. The core feature of searching for Creative Commons (CC-BY) videos from YouTube is implemented but is currently broken. An AI-powered clip generation feature (using the Emergent LLM Key) has been added to the backend, but the underlying video download mechanism is blocked by YouTube's bot detection, rendering it non-functional.
+A full-stack application with a React frontend and FastAPI backend. It includes a full authentication system (JWT & Google OAuth), email verification, and a vibrant UI. The core video discovery feature has been fixed. Three major new features have been added: a copyright-free image search engine (Pexels/Unsplash), a comprehensive Content Library for educational resources, and a full license compliance audit UI across all content-related pages. The clip generation feature remains blocked by YouTube, but a workaround has been implemented that allows users to preview clips using the embedded player.
 
 **Last working item**:
--   **Last item agent was working**: The agent was investigating a user-reported error: failed to discover videos on you tube error. The agent had just started debugging this issue by attempting to check the backend logs. This is a critical failure as it breaks the primary functionality of the app.
--   **Status**: IN PROGRESS
--   **Agent Testing Done**: N
--   **Which testing method agent to use?**: backend testing agent
+-   **Last item agent was working**: Fixing the video clip generation feature, which is blocked by YouTube's bot detection (). After failing to bypass the block with  and usage: pytubefix [-h] [-V] [--itag ITAG] [-r RESOLUTION] [-l] [--oauth] [-v]
+                 [--logfile LOGFILE] [--build-playback-report]
+                 [-c CAPTION_CODE] [-lc] [-t TARGET] [-a [AUDIO]]
+                 [-f [FFMPEG]]
+                 [url]
+
+positional arguments:
+  url                   The YouTube /watch or /playlist url
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --itag ITAG           The itag for the desired stream
+  -r RESOLUTION, --resolution RESOLUTION
+                        The resolution for the desired stream
+  -l, --list            The list option causes pytubefix cli to return a list
+                        of streams available to download
+  --oauth               use oauth token
+  -v, --verbose         Set logger output to verbose output.
+  --logfile LOGFILE     logging debug and error messages into a log file
+  --build-playback-report
+                        Save the html and js to disk
+  -c CAPTION_CODE, --caption-code CAPTION_CODE
+                        Download srt captions for given language code. Prints
+                        available language codes if no argument given
+  -lc, --list-captions  List available caption codes for a video
+  -t TARGET, --target TARGET
+                        The output directory for the downloaded stream.
+                        Default is current working directory
+  -a [AUDIO], --audio [AUDIO]
+                        Download the audio for a given URL at the highest
+                        bitrate available. Defaults to mp4 format if none is
+                        specified
+  -f [FFMPEG], --ffmpeg [FFMPEG]
+                        Downloads the audio and video stream for resolution
+                        provided. If no resolution is provided, downloads the
+                        best resolution. Runs the command line program ffmpeg
+                        to combine the audio and video, the agent implemented a workaround. The backend endpoint now returns an error, and the frontend shows a Preview Clip button (using YouTube's embed player with timestamps) instead of Generate Clip, along with an explanation for the user.
+-   **Status**: USER VERIFICATION PENDING
+-   **Agent Testing Done**: Y
+-   **Which testing method agent to use?**: manual testing by screenshot tool
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1**: **(P0)** The video discovery feature is broken, preventing users from searching for any YouTube videos. The user reported this as failed to discover videos on you tube error.
--   **Issue 2**: **(P1)** The video download functionality for clip generation is failing due to YouTube's bot detection ( and  errors from ).
--   **Issue 3**: **(P2)** The email verification system was reported as not working by the user. The agent attempted a fix, but it has not been verified.
--   **Issue 4**: **(P3)** A  was occurring for users logging in via Google OAuth. The agent implemented a fix, but it has not been verified.
+-   Issue 1: **(P0)** YouTube video download for clip generation is blocked.
+-   Issue 2: **(P0)** User reported being automatically logged out.
+-   Issue 3: **(P1)** Email verification system was reported as not working.
+-   Issue 4: **(P2)**  for Google OAuth users.
 
 **Issues Detail**:
--   **Issue 1**: Failed video discovery
-    -   **Attempted fixes**: None. The agent was just beginning to investigate when the session ended.
-    -   **Next debug checklist**:
-        1.  Examine the backend logs () for errors related to the  endpoint.
-        2.  Use  to test the  endpoint directly and analyze the response/error.
-        3.  Review the  function in  to check for recent changes that might have introduced the bug.
-        4.  Verify that the YouTube API key is still valid and has not exceeded its quota.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is the app's core functionality. Fixing it will restore the ability for users to find videos, which is the first step in the workflow.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: N
+-   **Issue 1**: YouTube download for clip generation is blocked
+    -   **Attempted fixes**: The agent confirmed that both  and usage: pytubefix [-h] [-V] [--itag ITAG] [-r RESOLUTION] [-l] [--oauth] [-v]
+                 [--logfile LOGFILE] [--build-playback-report]
+                 [-c CAPTION_CODE] [-lc] [-t TARGET] [-a [AUDIO]]
+                 [-f [FFMPEG]]
+                 [url]
+
+positional arguments:
+  url                   The YouTube /watch or /playlist url
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --itag ITAG           The itag for the desired stream
+  -r RESOLUTION, --resolution RESOLUTION
+                        The resolution for the desired stream
+  -l, --list            The list option causes pytubefix cli to return a list
+                        of streams available to download
+  --oauth               use oauth token
+  -v, --verbose         Set logger output to verbose output.
+  --logfile LOGFILE     logging debug and error messages into a log file
+  --build-playback-report
+                        Save the html and js to disk
+  -c CAPTION_CODE, --caption-code CAPTION_CODE
+                        Download srt captions for given language code. Prints
+                        available language codes if no argument given
+  -lc, --list-captions  List available caption codes for a video
+  -t TARGET, --target TARGET
+                        The output directory for the downloaded stream.
+                        Default is current working directory
+  -a [AUDIO], --audio [AUDIO]
+                        Download the audio for a given URL at the highest
+                        bitrate available. Defaults to mp4 format if none is
+                        specified
+  -f [FFMPEG], --ffmpeg [FFMPEG]
+                        Downloads the audio and video stream for resolution
+                        provided. If no resolution is provided, downloads the
+                        best resolution. Runs the command line program ffmpeg
+                        to combine the audio and video are blocked by YouTube's bot detection, resulting in  errors. A workaround was implemented on the frontend () to disable direct generation and instead offer a Preview Clip functionality using the YouTube embedded player with timestamps. A warning message explaining the limitation was also added.
+    -   **Next debug checklist**: The implemented workaround needs to be validated by the user. If they do not accept it, the next step is to research third-party download services or alternative solutions.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a core feature of the application. The workaround restores partial functionality.
+    -   **Status**: USER VERIFICATION PENDING
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Frontend
+    -   **Blocked on other issue**: None
+
+-   **Issue 2**: Automatic logout after login
+    -   **Attempted fixes**: The agent identified and fixed several potential race conditions.
+        1.  Updated the backend  function to correctly handle both JWTs (email login) and session tokens (Google OAuth).
+        2.  Added a small  delay in  and  before navigation to ensure  is updated.
+        3.  Made the  interceptor in  more robust to prevent logging out on any  error.
+    -   **Next debug checklist**: The user needs to test the login flow (both email and Google) and confirm if the automatic logout issue is resolved.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a critical bug that makes the application unusable.
+    -   **Status**: USER VERIFICATION PENDING
+    -   **Is recurring issue?**: Y
     -   **Should Test frontend/backend/both after fix?**: Both
     -   **Blocked on other issue**: None
 
--   **Issue 2**: YouTube download for clip generation is blocked
-    -   **Attempted fixes**:
-        1.  Updated  to the latest version.
-        2.  Modified the download logic in  to use the YouTube Data API to get direct stream URLs, attempting to bypass 's main download method. This did not work.
-    -   **Next debug checklist**:
-        1.  Research  documentation for advanced options to handle bot detection, such as using cookies ( or ).
-        2.  Investigate alternative Python libraries for downloading YouTube videos that may be more resilient to blocking.
-        3.  Implement a user-guided flow where the user can provide their own browser cookies to authenticate .
-    -   **Why fix this issue and what will be achieved with the fix?**: This will enable the AI-powered clip generation feature, a key value proposition of the app.
-    -   **Status**: BLOCKED
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Backend
-    -   **Blocked on other issue**: None
-
 -   **Issue 3**: Email verification system not working
-    -   **Attempted fixes**: The agent modified the call to the  library in the  function in .
-    -   **Next debug checklist**:
-        1.  Perform a registration with a new test email.
-        2.  Check the backend logs for any errors from the  API call.
-        3.  Verify if the verification email is received.
-        4.  Test the  endpoint with the token from the email.
-    -   **Why fix this issue and what will be achieved with the fix?**: Ensures new users can complete the registration flow and access the application, a critical part of the user lifecycle.
+    -   **Attempted fixes**: The testing agent discovered and fixed a bug related to double braces in the email sending logic. All automated tests for registration and verification passed successfully.
+    -   **Next debug checklist**: The user needs to perform a new registration to confirm they receive the verification email and can complete the flow.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is critical for new user onboarding.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: N
     -   **Should Test frontend/backend/both after fix?**: Both
     -   **Blocked on other issue**: None
 
 -   **Issue 4**: Google OAuth  bug
-    -   **Attempted fixes**: The agent modified the  endpoint in  to handle cases where a user exists but was created via Google OAuth (and thus has no password).
-    -   **Next debug checklist**:
-        1.  Attempt to log in using an existing Google OAuth account.
-        2.  Check backend logs for any .
-    -   **Why fix this issue and what will be achieved with the fix?**: Fixes the Google login flow, ensuring a seamless experience for users who prefer social login.
+    -   **Attempted fixes**: This was resolved as part of the broader Google OAuth fix. The  function no longer relies on a  for Google-authenticated users. The fix passed automated testing.
+    -   **Next debug checklist**: User needs to confirm they can log in via Google.
+    -   **Why fix this issue and what will be achieved with the fix?**: Ensures social login works correctly.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: N
     -   **Should Test frontend/backend/both after fix?**: Backend
     -   **Blocked on other issue**: None
 
 **In progress Task List**:
-None. The current focus is on resolving the critical bugs.
+None.
 
-**Upcoming and Future Tasks**:
+**Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   **(P1)** Implement Apple OAuth for user sign-in. This was requested by the user but has not been started.
+    -   **(P1)** Implement Apple OAuth for user sign-in.
 -   **Future Tasks**:
-    -   **(P0)** Implement the functionality to post the generated clips to YouTube and Instagram. This was part of the original problem statement but has not been implemented. This will require using the  for YouTube and Instagram APIs.
+    -   **(P0)** Implement functionality to post generated clips to YouTube and Instagram (currently blocked by the clip generation issue).
+    -   **(P2)** Refactor the monolithic  into smaller, more manageable modules (e.g., routers, services).
 
 **Completed work in this session**
--   **User Authentication System**:
-    -   Implemented JWT-based user registration and login (, , ).
-    -   Integrated Google OAuth using Emergent Auth (, ).
-    -   Added a complete email verification flow using Resend (, ).
--   **UI/Theme Overhaul**:
-    -   Redesigned the entire application UI to a vibrant, professional theme with gradient backgrounds and improved layouts (, , page components).
-    -   Removed all Made with Emergent branding ().
--   **Feature Implementation**:
-    -   Added a Clear Videos button and corresponding backend endpoint (, ).
-    -   Implemented the backend logic for AI-powered clip analysis using the Emergent LLM key and  ().
-    -   Refined the video search to exclusively look for Creative Commons content and verified its authenticity.
+-   **BUG FIX**: Resolved the failed to discover videos error by correcting all frontend pages to use the authenticated  instance.
+-   **BUG FIX**: Fixed all Google OAuth login issues by rewriting the backend  function to handle both JWT and Emergent Auth session tokens.
+-   **BUG FIX**: Addressed the automatic logout issue by fixing race conditions in the frontend authentication flow.
+-   **BUG FIX**: The testing agent automatically fixed a critical bug in the email verification flow.
+-   **NEW FEATURE**: Implemented a Copyright-Free Images page () with search (Unsplash & Pexels), favorites, and download functionality.
+-   **NEW FEATURE**: Implemented a Content Library page () with a large, curated list of educational resources, complete with category and grade-level filtering.
+-   **NEW FEATURE**: Expanded the Content Library to include a dedicated Activity Sheets section with 18 new resources for grades 1-10.
+-   **NEW FEATURE**: Implemented a comprehensive license compliance UI across the Discover, Images, and Content Library pages, including informative banners, badges on each item, and a Commercial Safe filter.
+-   **WORKAROUND**: Implemented a user-facing workaround for the blocked clip generation feature, enabling clip previews within the YouTube player.
+-   **TESTING**: Successfully ran the , which passed 17 tests and verified major functionality.
 
-**Earlier issues found/mentioned but not fixed**:
--   **Issue 1**: YouTube's bot detection blocking .
-    -   **Debug checklist**: See Issue 2 in the All Pending/In progress Issue list section.
-    -   **Why to solve this issue and what will be achieved with this?**: This is essential for the clip generation feature to work.
-    -   **Should Test frontend/backend/both after fix**: Backend
-    -   **Is recurring issue?**: Y
+**Earlier issues found/mentioned but not fixed**
+-   The core issue of YouTube blocking server-side downloads (/usage: pytubefix [-h] [-V] [--itag ITAG] [-r RESOLUTION] [-l] [--oauth] [-v]
+                 [--logfile LOGFILE] [--build-playback-report]
+                 [-c CAPTION_CODE] [-lc] [-t TARGET] [-a [AUDIO]]
+                 [-f [FFMPEG]]
+                 [url]
 
-**Known issue recurrence from previous fork**:
-None.
+positional arguments:
+  url                   The YouTube /watch or /playlist url
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --itag ITAG           The itag for the desired stream
+  -r RESOLUTION, --resolution RESOLUTION
+                        The resolution for the desired stream
+  -l, --list            The list option causes pytubefix cli to return a list
+                        of streams available to download
+  --oauth               use oauth token
+  -v, --verbose         Set logger output to verbose output.
+  --logfile LOGFILE     logging debug and error messages into a log file
+  --build-playback-report
+                        Save the html and js to disk
+  -c CAPTION_CODE, --caption-code CAPTION_CODE
+                        Download srt captions for given language code. Prints
+                        available language codes if no argument given
+  -lc, --list-captions  List available caption codes for a video
+  -t TARGET, --target TARGET
+                        The output directory for the downloaded stream.
+                        Default is current working directory
+  -a [AUDIO], --audio [AUDIO]
+                        Download the audio for a given URL at the highest
+                        bitrate available. Defaults to mp4 format if none is
+                        specified
+  -f [FFMPEG], --ffmpeg [FFMPEG]
+                        Downloads the audio and video stream for resolution
+                        provided. If no resolution is provided, downloads the
+                        best resolution. Runs the command line program ffmpeg
+                        to combine the audio and video) remains unresolved. A workaround is in place, but a full solution has not been found.
+
+**Known issue recurrence from previous fork**
+-   None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, MongoDB (via ), JWT (, ), , ,  for AI analysis.
--   **Frontend**: React, React Router, Axios, Tailwind CSS, Framer Motion.
--   **Authentication**: JWT-based local authentication, Google OAuth via Emergent Auth.
--   **Integrations**: YouTube Data API v3, Resend (for email), Emergent LLM Key.
+-   **Backend**: FastAPI, MongoDB (), JWT, , , usage: pytubefix [-h] [-V] [--itag ITAG] [-r RESOLUTION] [-l] [--oauth] [-v]
+                 [--logfile LOGFILE] [--build-playback-report]
+                 [-c CAPTION_CODE] [-lc] [-t TARGET] [-a [AUDIO]]
+                 [-f [FFMPEG]]
+                 [url]
+
+positional arguments:
+  url                   The YouTube /watch or /playlist url
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --itag ITAG           The itag for the desired stream
+  -r RESOLUTION, --resolution RESOLUTION
+                        The resolution for the desired stream
+  -l, --list            The list option causes pytubefix cli to return a list
+                        of streams available to download
+  --oauth               use oauth token
+  -v, --verbose         Set logger output to verbose output.
+  --logfile LOGFILE     logging debug and error messages into a log file
+  --build-playback-report
+                        Save the html and js to disk
+  -c CAPTION_CODE, --caption-code CAPTION_CODE
+                        Download srt captions for given language code. Prints
+                        available language codes if no argument given
+  -lc, --list-captions  List available caption codes for a video
+  -t TARGET, --target TARGET
+                        The output directory for the downloaded stream.
+                        Default is current working directory
+  -a [AUDIO], --audio [AUDIO]
+                        Download the audio for a given URL at the highest
+                        bitrate available. Defaults to mp4 format if none is
+                        specified
+  -f [FFMPEG], --ffmpeg [FFMPEG]
+                        Downloads the audio and video stream for resolution
+                        provided. If no resolution is provided, downloads the
+                        best resolution. Runs the command line program ffmpeg
+                        to combine the audio and video (attempted), .
+-   **Frontend**: React, React Router, Axios, Tailwind CSS, Framer Motion, Sonner (for toasts).
+-   **Authentication**: JWT local auth, Emergent-managed Google OAuth.
+-   **Integrations**: YouTube Data API v3, Resend, Emergent LLM Key, Pexels API, Unsplash API.
 
 **key DB schema**
--   **users** (in ): 
--   **videos** (in ): Caches video data fetched from YouTube. Schema includes videoId, title, thumbnails, license info, viral score, etc.
+-   **users**: 
+-   **videos**: Caches YouTube video data.
+-   **image_favorites**: 
+-   **content_favorites**: 
+-   **user_sessions**: Stores active sessions for Google OAuth users.
 
 **changes in tech stack**
-None.
+-   usage: pytubefix [-h] [-V] [--itag ITAG] [-r RESOLUTION] [-l] [--oauth] [-v]
+                 [--logfile LOGFILE] [--build-playback-report]
+                 [-c CAPTION_CODE] [-lc] [-t TARGET] [-a [AUDIO]]
+                 [-f [FFMPEG]]
+                 [url]
+
+positional arguments:
+  url                   The YouTube /watch or /playlist url
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --itag ITAG           The itag for the desired stream
+  -r RESOLUTION, --resolution RESOLUTION
+                        The resolution for the desired stream
+  -l, --list            The list option causes pytubefix cli to return a list
+                        of streams available to download
+  --oauth               use oauth token
+  -v, --verbose         Set logger output to verbose output.
+  --logfile LOGFILE     logging debug and error messages into a log file
+  --build-playback-report
+                        Save the html and js to disk
+  -c CAPTION_CODE, --caption-code CAPTION_CODE
+                        Download srt captions for given language code. Prints
+                        available language codes if no argument given
+  -lc, --list-captions  List available caption codes for a video
+  -t TARGET, --target TARGET
+                        The output directory for the downloaded stream.
+                        Default is current working directory
+  -a [AUDIO], --audio [AUDIO]
+                        Download the audio for a given URL at the highest
+                        bitrate available. Defaults to mp4 format if none is
+                        specified
+  -f [FFMPEG], --ffmpeg [FFMPEG]
+                        Downloads the audio and video stream for resolution
+                        provided. If no resolution is provided, downloads the
+                        best resolution. Runs the command line program ffmpeg
+                        to combine the audio and video was added to  as a dependency.
+-    is used for making API calls to Pexels and Unsplash in the backend.
 
 **All files of reference**
--   : The monolithic backend file containing all API logic, authentication, database operations, and third-party integrations. It has been extensively modified.
--   : The main page for searching and displaying videos.
--   : The page for viewing a single video and accessing the (currently broken) clip generation tools.
--    & : Entry points for the authentication flow.
--   : Defines the global styles and vibrant gradient theme for the application.
--   : Contains all secrets: , , , , , .
+-   : Heavily modified to fix auth, add image search, content library favorites, and update clip generation logic.
+-   : New file, created from scratch to build the Content Library and License Audit features.
+-   : New file, created to build the Image Search feature.
+-   : Heavily modified to implement the clip preview workaround.
+-   : Modified to fix auth and add license UI.
+-   : Modified to improve the 401 error handling interceptor.
+-   , : Modified to prevent auth race conditions.
+-   : Modified to add the .
 
 **Areas that need refactoring**:
--   The  file has grown very large and contains all logic (API routes, database models, utility functions, auth, AI). It should be broken down into smaller, more manageable modules (e.g., , , ).
+-   The  file is now over 1400 lines and desperately needs to be broken down into a structured package with routers, models, and services to improve maintainability.
 
 **key api endpoints**
--   ,  (Login), , , 
--   : Searches for YouTube videos (Currently Broken).
--   : Clears the dashboard.
--   : Generates a clip from a video (Currently Broken).
--   : Uses AI to recommend clip segments.
+-   **/api/auth/**: All authentication endpoints.
+-   : Searches for YouTube videos.
+-   : Generates a clip from a video (now returns an error).
+-   : (NEW) Searches for images from Pexels and Unsplash.
+-   : (NEW) Manages user's favorite images.
+-   : (NEW) Manages user's favorite content library resources.
 
 **Critical Info for New Agent**
--   The most critical unresolved issue is the  download failure due to YouTube's bot detection. The previous attempt to use direct stream URLs failed. A new strategy, possibly involving browser cookies, is required.
--   The video discovery feature is also critically broken. This must be the first priority.
--   The application relies heavily on keys stored in . Ensure all services are configured correctly.
--   The AI analysis for clip generation uses the Emergent LLM Key via the  library.
+-   **The YouTube download feature is blocked.** Do not attempt further direct download fixes with  or usage: pytubefix [-h] [-V] [--itag ITAG] [-r RESOLUTION] [-l] [--oauth] [-v]
+                 [--logfile LOGFILE] [--build-playback-report]
+                 [-c CAPTION_CODE] [-lc] [-t TARGET] [-a [AUDIO]]
+                 [-f [FFMPEG]]
+                 [url]
+
+positional arguments:
+  url                   The YouTube /watch or /playlist url
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --itag ITAG           The itag for the desired stream
+  -r RESOLUTION, --resolution RESOLUTION
+                        The resolution for the desired stream
+  -l, --list            The list option causes pytubefix cli to return a list
+                        of streams available to download
+  --oauth               use oauth token
+  -v, --verbose         Set logger output to verbose output.
+  --logfile LOGFILE     logging debug and error messages into a log file
+  --build-playback-report
+                        Save the html and js to disk
+  -c CAPTION_CODE, --caption-code CAPTION_CODE
+                        Download srt captions for given language code. Prints
+                        available language codes if no argument given
+  -lc, --list-captions  List available caption codes for a video
+  -t TARGET, --target TARGET
+                        The output directory for the downloaded stream.
+                        Default is current working directory
+  -a [AUDIO], --audio [AUDIO]
+                        Download the audio for a given URL at the highest
+                        bitrate available. Defaults to mp4 format if none is
+                        specified
+  -f [FFMPEG], --ffmpeg [FFMPEG]
+                        Downloads the audio and video stream for resolution
+                        provided. If no resolution is provided, downloads the
+                        best resolution. Runs the command line program ffmpeg
+                        to combine the audio and video without a new strategy. First, get user feedback on the Preview Clip workaround that has been implemented.
+-   **Multiple critical auth bugs were fixed.** The next step is to confirm with the user that the automatic logout and Google login issues are resolved.
+-   **Three major features were just added**: Image Search, Content Library, and License Compliance UI. Be aware of the new pages, components, and backend endpoints supporting them.
 
 **documents and test reports created in this job**
-None.
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **failed to discover videos on you tube error**: User reports the core video search is broken. (IN PROGRESS)
-2.  **video are falling to load and email verification system is not working**: User reports two major bugs. The agent attempted fixes but they are unverified. (IN PROGRESS)
-3.  **lets add email verification requirement before the login is created**: Request to add email verification. (Completed)
-4.  **users can sign in using google account , or apple account as well**: Request for social logins. (Google part is done, Apple is pending).
-5.  **Lets ask for a user registration and new users need to register to use the tool"**: Request to add user auth. (Completed)
-6.  **"ERROR: [youtube] ... Sign in to confirm you’re not a bot..."**: User provides the `yt-dlp` error. (IN PROGRESS)
-7.  **"Generate clip, the function is giving an error... need to add an AI analysis..."**: Request to fix clip generation and add AI. (AI part is implemented but the core function is broken).
-8.  **"Yeah, the layout themes does not look good... make it more vibrant..."**: Request to redesign the UI. (Completed)
-9.  **"Okay. Need a button to clear... remove the Made With Emergin tag... refine... the app preview..."**: Request for UI cleanup and a professional theme. (Completed)
-10. **"Are all the videos which youre currently showing are CC-BY...**: User asks for verification of the license. (Completed)
+1.  **User**: Add a copyright-free image tab. (Completed)
+2.  **Agent**: Asks for clarification on image sources. (Handled)
+3.  **User**: Provides Unsplash API key. (Completed)
+4.  **User**: Add a Content Library for educational materials. (Completed)
+5.  **Agent**: Asks for clarification on library features. (Handled)
+6.  **User**: Add Activity Sheets for grades 1-10 to the library. (Completed)
+7.  **User**: Asks for a license audit of the whole project for CC BY-NC, CC BY-NC-SA, and CC BY-ND. (Completed)
+8.  **User**: do all 3 - requests adding license badges, warnings, and filters to the UI. (Completed)
+9.  **User**: add the same for videos and images tab as well. (Completed)
+10. **User**: work on the Next Action Items -> confirmed they want to fix clip generation and don't have cookies. (In Progress)
 
 **Project Health Check:**
 -   **Broken**:
-    -   Video Discovery ()
-    -   Clip Generation ()
+    -   Clip Generation (the server-side download part). A UI workaround is in place.
 -   **Mocked**:
     -   None.
 
 **3rd Party Integrations**
--   **YouTube Data API v3**: Requires a user-provided API key.
--   **Emergent-managed Google Auth**: Uses Emergent's infrastructure for Google Sign-In.
--   **Resend**: Requires a user-provided API key for sending emails.
--   **Emergent LLM Key**: Used via  for AI-powered transcript analysis.
--   **yt-dlp**: Open-source tool for downloading video data.
+-   **YouTube Data API v3**: For video search.
+-   **Emergent-managed Google Auth**: For Google Sign-In.
+-   **Resend**: For sending verification emails.
+-   **Emergent LLM Key**: Used via  for AI clip analysis.
+-   **Pexels API**: For copyright-free image search.
+-   **Unsplash API**: For copyright-free image search.
+-   **yt-dlp / pytubefix**: Python libraries for interacting with YouTube (currently blocked).
 
 **Testing status**
--   **Testing agent used after significant changes**: NO
+-   **Testing agent used after significant changes**: YES (ran once, passed 17/17 tests, fixed 1 bug).
 -   **Troubleshoot agent used after agent stuck in loop**: NO
 -   **Test files created**: []
--   **Known regressions**: The video discovery feature was working but is now broken.
+-   **Known regressions**: None this session. The video discovery feature was fixed.
 
 **Credentials to test flow:**
-User registration is required. You can register a new user or use the Google Sign-In flow. Check  for API keys.
+User registration is required. You can register a new user or use the Google Sign-In flow. API keys are in .
 
 **What agent forgot to execute**
--   Implement Apple OAuth, which was part of a user request.
--   Implement the feature to post clips to YouTube and Instagram, which was part of the original problem statement.
--   Run the testing agent after major implementations like the authentication system or the UI overhaul, which could have caught the regressions earlier.</analysis>
+-   The request to implement Apple OAuth has not been started.
+-   The original request to post clips to YouTube/Instagram has not been started and remains blocked by the download issue.</analysis>
