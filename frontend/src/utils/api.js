@@ -4,7 +4,8 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Create axios instance with auth interceptor
 const api = axios.create({
-  baseURL: `${BACKEND_URL}/api`
+  baseURL: `${BACKEND_URL}/api`,
+  timeout: 30000 // 30 second timeout to prevent page freeze
 });
 
 // Add token to all requests
@@ -25,6 +26,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Handle timeout errors
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request timed out:', error.config?.url);
+      return Promise.reject(new Error('Request timed out. Please try again.'));
+    }
+    
     // Log 401 errors for debugging but don't auto-logout
     // This prevents race conditions during navigation
     if (error.response?.status === 401) {
