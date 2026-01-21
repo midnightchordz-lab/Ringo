@@ -1299,6 +1299,191 @@ export const ContentLibrary = () => {
         </div>
       )}
 
+      {/* Children's Literature View */}
+      {!isSearching && !loadingChildrens && selectedCategory === 'childrens-literature' && !showFavorites && (
+        <div data-testid="childrens-literature-section">
+          {/* Header */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-neutral-800 flex items-center gap-2">
+                  <BookOpenCheck className="w-6 h-6 text-pink-500" />
+                  Copyright-Free Children's Literature
+                </h2>
+                <p className="text-sm text-neutral-500 mt-1">
+                  Public domain & Creative Commons books from Project Gutenberg, StoryWeaver & Open Library
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-neutral-500">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span>All books are free to download, print & share</span>
+              </div>
+            </div>
+            
+            {/* Sources */}
+            {searchSources.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {searchSources.map((source) => (
+                  <span key={source} className="px-3 py-1 bg-pink-100 text-pink-700 text-xs rounded-full font-medium">
+                    {source}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Results Count */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-neutral-600">
+              Showing <span className="text-pink-600 font-bold">{childrensLiterature.length}</span> children's books
+            </p>
+          </div>
+
+          {/* Results Grid */}
+          {childrensLiterature.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <AnimatePresence>
+                {childrensLiterature.map((book) => (
+                  <motion.div
+                    key={book.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="studio-card p-5 hover:shadow-lg transition-all"
+                  >
+                    <div className="flex gap-4">
+                      {/* Book Cover */}
+                      <div className="w-20 h-28 flex-shrink-0 rounded-lg overflow-hidden bg-neutral-100 shadow-md">
+                        {book.cover ? (
+                          <img src={book.cover} alt={book.title} className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
+                            <Book className="w-8 h-8 text-pink-600" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Book Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="font-bold text-neutral-900 line-clamp-2 leading-tight">{book.title}</h3>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => handleFavorite(book)}
+                              className={`p-1.5 rounded-full transition-all ${
+                                isFavorited(book.id) ? 'bg-red-100 text-red-500' : 'bg-neutral-100 text-neutral-400 hover:bg-red-100 hover:text-red-500'
+                              }`}
+                            >
+                              <Heart className="w-4 h-4" fill={isFavorited(book.id) ? 'currentColor' : 'none'} />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-blue-600 font-medium mb-2">{book.author}</p>
+                        
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          <span className="px-2 py-0.5 bg-pink-100 text-pink-700 text-xs rounded-full font-medium">
+                            {book.source}
+                          </span>
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> {book.license}
+                          </span>
+                          {book.printable && (
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium flex items-center gap-1">
+                              <Printer className="w-3 h-3" /> Printable
+                            </span>
+                          )}
+                        </div>
+                        
+                        <p className="text-xs text-neutral-500 line-clamp-2 mb-3">{book.description}</p>
+                        
+                        {/* Grade Levels */}
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {book.grade_level?.map((level) => (
+                            <span key={level} className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full capitalize">
+                              {level}
+                            </span>
+                          ))}
+                        </div>
+                        
+                        {/* Download Buttons */}
+                        <div className="flex flex-wrap gap-2">
+                          {book.formats?.pdf && (
+                            <a
+                              href={book.formats.pdf}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                            >
+                              <Download className="w-3 h-3" /> PDF
+                            </a>
+                          )}
+                          {book.formats?.epub && (
+                            <a
+                              href={book.formats.epub}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                            >
+                              <Download className="w-3 h-3" /> EPUB
+                            </a>
+                          )}
+                          {book.formats?.html && (
+                            <a
+                              href={book.formats.html}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                            >
+                              <ExternalLink className="w-3 h-3" /> Read Online
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="studio-card p-16 text-center">
+              <BookOpenCheck className="w-20 h-20 text-pink-200 mx-auto mb-6" strokeWidth={1.5} />
+              <h3 className="text-xl font-bold text-neutral-800 mb-2">Search for Children's Literature</h3>
+              <p className="text-neutral-500 mb-6 max-w-md mx-auto">
+                Enter a search term above to find copyright-free children's books from Project Gutenberg, StoryWeaver, and Open Library.
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {['fairy tales', 'adventure stories', 'nursery rhymes', 'classic children', 'picture books'].map((term) => (
+                  <button
+                    key={term}
+                    onClick={() => {
+                      setSearchQuery(term);
+                      setTimeout(() => {
+                        fetchChildrensLiterature(term);
+                      }, 100);
+                    }}
+                    className="px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm hover:bg-pink-200 transition-colors"
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Loading State for Children's Literature */}
+      {loadingChildrens && selectedCategory === 'childrens-literature' && (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-neutral-600">Searching copyright-free children's books...</p>
+            <p className="text-xs text-neutral-500 mt-2">Project Gutenberg • StoryWeaver • Open Library</p>
+          </div>
+        </div>
+      )}
+
       {/* Free Books View */}
       {!isSearching && !loadingBooks && selectedCategory === 'free-books' && !showFavorites && (
         <div data-testid="free-books-section">
