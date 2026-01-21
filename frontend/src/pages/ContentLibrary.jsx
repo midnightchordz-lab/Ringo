@@ -783,6 +783,130 @@ const ReadingListDetailModal = ({ isOpen, onClose, list, onRemoveBook }) => {
   );
 };
 
+// Pagination Component
+const PaginationControls = ({ 
+  currentPage, 
+  totalPages, 
+  totalItems, 
+  perPage,
+  onPageChange, 
+  isLoading 
+}) => {
+  if (totalPages <= 1) return null;
+  
+  const startItem = (currentPage - 1) * perPage + 1;
+  const endItem = Math.min(currentPage * perPage, totalItems);
+  
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+  
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-4 bg-white rounded-xl shadow-sm border border-neutral-100" data-testid="pagination-controls">
+      {/* Results info */}
+      <div className="text-sm text-neutral-600">
+        Showing <span className="font-semibold text-neutral-900">{startItem}-{endItem}</span> of{' '}
+        <span className="font-semibold text-neutral-900">{totalItems}</span> results
+      </div>
+      
+      {/* Page controls */}
+      <div className="flex items-center gap-2">
+        {/* Previous button */}
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1 || isLoading}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+            currentPage === 1 || isLoading
+              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+          }`}
+          data-testid="pagination-prev"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Previous</span>
+        </button>
+        
+        {/* Page numbers */}
+        <div className="flex items-center gap-1">
+          {getPageNumbers()[0] > 1 && (
+            <>
+              <button
+                onClick={() => onPageChange(1)}
+                disabled={isLoading}
+                className="w-10 h-10 rounded-lg text-sm font-medium bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors"
+              >
+                1
+              </button>
+              {getPageNumbers()[0] > 2 && (
+                <span className="px-2 text-neutral-400">...</span>
+              )}
+            </>
+          )}
+          
+          {getPageNumbers().map((page) => (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              disabled={isLoading}
+              className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
+                currentPage === page
+                  ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+              data-testid={`pagination-page-${page}`}
+            >
+              {page}
+            </button>
+          ))}
+          
+          {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+            <>
+              {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
+                <span className="px-2 text-neutral-400">...</span>
+              )}
+              <button
+                onClick={() => onPageChange(totalPages)}
+                disabled={isLoading}
+                className="w-10 h-10 rounded-lg text-sm font-medium bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors"
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+        </div>
+        
+        {/* Next button */}
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages || isLoading}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+            currentPage === totalPages || isLoading
+              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+          }`}
+          data-testid="pagination-next"
+        >
+          <span className="hidden sm:inline">Next</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export const ContentLibrary = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
