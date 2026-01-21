@@ -276,9 +276,20 @@ Implemented comprehensive, multi-source search for all content categories:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 21, 2026 - Implemented comprehensive web-wide search for Courses, Videos, and Resources categories
+January 21, 2026 - Added dark/light theme toggle
 
 ## Recent Changes (Jan 21, 2026)
+
+### FEATURE: Dark Mode Toggle (COMPLETED)
+- **Added theme context** at `/app/frontend/src/context/ThemeContext.jsx`
+- **Theme toggle in sidebar** - Animated switch with sun/moon icons
+- **Persistent theme** - Saved to localStorage, respects system preference
+- **CSS updates** - Added dark mode variants to all utility classes in index.css
+- **Components updated**:
+  - Layout.jsx - Sidebar, navigation, user section
+  - Dashboard.jsx - Stats cards, video cards, loading state
+  - ContentLibrary.jsx - Search results, cards, badges
+- **Smooth transitions** - 300ms transition on background/color changes
 
 ### FEATURE: Comprehensive Web-Wide Search (COMPLETED)
 - **Problem**: Content Library categories (Courses, Videos, Resources) were returning limited results from only 1-2 sources
