@@ -14,6 +14,7 @@ import AuthCallback from '@/pages/AuthCallback';
 import MicrosoftCallback from '@/pages/MicrosoftCallback';
 import VerifyEmail from '@/pages/VerifyEmail';
 import PendingVerification from '@/pages/PendingVerification';
+import { ThemeProvider } from './context/ThemeContext';
 import '@/App.css';
 
 // Protected Route wrapper
@@ -57,12 +58,14 @@ function AppRouter() {
 
 function App() {
   return (
-    <div className="App min-h-screen">
-      <BrowserRouter>
-        <AppRouter />
-      </BrowserRouter>
-      <Toaster position="bottom-right" />
-    </div>
+    <ThemeProvider>
+      <div className="App min-h-screen">
+        <BrowserRouter>
+          <AppRouter />
+        </BrowserRouter>
+        <Toaster position="bottom-right" />
+      </div>
+    </ThemeProvider>
   );
 }
 
