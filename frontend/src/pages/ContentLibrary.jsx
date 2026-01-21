@@ -227,7 +227,7 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
               {result.source}
             </span>
             {result.relevance_score && (
-              <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
                 <Zap className="w-3 h-3" />
                 {result.relevance_score}/10
               </span>
@@ -242,13 +242,13 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       </div>
       
       {/* Description */}
-      <p className="text-neutral-600 text-sm mb-3 line-clamp-2">
+      <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-3 line-clamp-2">
         {result.ai_summary || result.description || 'No description available'}
       </p>
       
       {/* Authors */}
       {result.authors && result.authors.length > 0 && (
-        <p className="text-xs text-neutral-500 mb-2">
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">
           By: {result.authors.slice(0, 2).join(', ')}
           {result.year && ` (${result.year})`}
         </p>
@@ -258,7 +258,7 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       {result.grade_levels && result.grade_levels.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {result.grade_levels.slice(0, 3).map((level) => (
-            <span key={level} className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
+            <span key={level} className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs rounded-full">
               {level}
             </span>
           ))}
@@ -269,15 +269,15 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       {result.subjects && result.subjects.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-4">
           {result.subjects.slice(0, 3).map((subject, idx) => (
-            <span key={idx} className="px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded-full">
+            <span key={idx} className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-xs rounded-full">
               {typeof subject === 'string' ? subject.slice(0, 30) : subject}
             </span>
           ))}
         </div>
       )}
       
-      <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
-        <span className="text-xs text-neutral-500 capitalize">{result.type || result.category}</span>
+      <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-neutral-800">
+        <span className="text-xs text-neutral-500 dark:text-neutral-400 capitalize">{result.type || result.category}</span>
         <Button
           size="sm"
           onClick={() => window.open(result.url, '_blank')}
