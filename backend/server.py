@@ -61,7 +61,7 @@ if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
 # Frontend URL for email links
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://contentflow-65.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://ccclipmaker.preview.emergentagent.com")
 
 
 # ==================== YOUTUBE API OPTIMIZATION ====================
