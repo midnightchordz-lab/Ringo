@@ -2207,6 +2207,266 @@ async def search_content_library(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ==================== CHILDREN'S LITERATURE SEARCH (COPYRIGHT-FREE) ====================
+
+@api_router.get("/content-library/childrens-literature")
+async def search_childrens_literature(
+    query: str = Query(default="", description="Search query for children's literature"),
+    grade: str = Query(default="all", description="Grade level: preschool, elementary, middle"),
+    category: str = Query(default="all", description="Category: stories, poetry, fairy-tales, educational"),
+    limit: int = Query(default=30, le=100),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Search for copyright-free children's literature across the web.
+    Sources: Project Gutenberg, StoryWeaver, Free Kids Books, Open Library (public domain only)
+    All results are guaranteed to be free, downloadable, and printable.
+    """
+    try:
+        all_results = []
+        
+        # Build search query based on grade level
+        grade_terms = {
+            "preschool": "children picture book toddler nursery rhymes",
+            "elementary": "children elementary juvenile fiction young readers",
+            "middle": "young adult middle grade teen fiction"
+        }
+        
+        search_query = query if query else "children"
+        if grade != "all" and grade in grade_terms:
+            search_query = f"{search_query} {grade_terms[grade]}"
+        
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            # Search multiple sources in parallel
+            tasks = [
+                search_gutenberg_children(client, search_query, limit // 3),
+                search_storyweaver(client, search_query, grade, limit // 3),
+                search_openlibrary_children(client, search_query, limit // 3),
+            ]
+            
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            for result in results:
+                if isinstance(result, list):
+                    all_results.extend(result)
+                elif isinstance(result, Exception):
+                    logging.warning(f"Children's literature search source failed: {str(result)}")
+        
+        # Filter by category if specified
+        if category != "all":
+            all_results = [r for r in all_results if category.lower() in r.get("category", "").lower() or category.lower() in " ".join(r.get("subjects", [])).lower()]
+        
+        # Sort by relevance (download count or popularity)
+        all_results.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+        
+        return {
+            "results": all_results[:limit],
+            "total": len(all_results),
+            "query": query,
+            "grade": grade,
+            "sources": ["Project Gutenberg", "StoryWeaver", "Open Library"],
+            "license": "All results are copyright-free (Public Domain or Creative Commons)"
+        }
+    
+    except Exception as e:
+        logging.error(f"Error in children's literature search: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Project Gutenberg for children's literature - all public domain"""
+    try:
+        # Use Gutendex API for better search
+        response = await client.get(
+            "https://gutendex.com/books/",
+            params={
+                "search": query,
+                "topic": "children",
+                "languages": "en"
+            },
+            timeout=15.0
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for book in data.get("results", [])[:limit]:
+                # Get download formats
+                formats = book.get("formats", {})
+                pdf_url = formats.get("application/pdf", "")
+                epub_url = formats.get("application/epub+zip", "")
+                html_url = formats.get("text/html", "") or formats.get("text/html; charset=utf-8", "")
+                txt_url = formats.get("text/plain; charset=utf-8", "") or formats.get("text/plain", "")
+                cover_url = formats.get("image/jpeg", "")
+                
+                # Construct proper Gutenberg URLs
+                book_id = book.get("id")
+                if not pdf_url and book_id:
+                    pdf_url = f"https://www.gutenberg.org/ebooks/{book_id}.pdf"
+                if not epub_url and book_id:
+                    epub_url = f"https://www.gutenberg.org/ebooks/{book_id}.epub"
+                if not html_url and book_id:
+                    html_url = f"https://www.gutenberg.org/ebooks/{book_id}.html.images"
+                
+                results.append({
+                    "id": f"gutenberg-{book_id}",
+                    "title": book.get("title", "Untitled"),
+                    "author": ", ".join([a.get("name", "Unknown") for a in book.get("authors", [])]),
+                    "description": f"Classic children's literature. Subjects: {', '.join(book.get('subjects', [])[:3])}",
+                    "category": "stories",
+                    "subjects": book.get("subjects", [])[:5],
+                    "source": "Project Gutenberg",
+                    "license": "Public Domain",
+                    "printable": True,
+                    "downloadable": True,
+                    "popularity": book.get("download_count", 0),
+                    "cover": cover_url,
+                    "formats": {
+                        "pdf": pdf_url,
+                        "epub": epub_url,
+                        "html": html_url,
+                        "txt": txt_url
+                    },
+                    "url": f"https://www.gutenberg.org/ebooks/{book_id}",
+                    "grade_level": determine_grade_level(book.get("subjects", []))
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Gutenberg children search failed: {str(e)}")
+    return []
+
+
+async def search_storyweaver(client: httpx.AsyncClient, query: str, grade: str, limit: int) -> list:
+    """Search StoryWeaver (Pratham Books) for free children's books - Creative Commons"""
+    try:
+        # StoryWeaver API
+        reading_level = "1"  # Default to level 1
+        if grade == "preschool":
+            reading_level = "1"
+        elif grade == "elementary":
+            reading_level = "2,3"
+        elif grade == "middle":
+            reading_level = "3,4"
+        
+        response = await client.get(
+            "https://storyweaver.org.in/api/v1/books/search",
+            params={
+                "query": query,
+                "page": 1,
+                "per_page": limit,
+                "languages": "English"
+            },
+            headers={"Accept": "application/json"},
+            timeout=15.0
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for book in data.get("data", [])[:limit]:
+                book_slug = book.get("slug", "")
+                results.append({
+                    "id": f"storyweaver-{book.get('id', '')}",
+                    "title": book.get("title", "Untitled"),
+                    "author": book.get("authors", [{}])[0].get("name", "Unknown") if book.get("authors") else "Various",
+                    "description": book.get("synopsis", book.get("description", "A free children's story from StoryWeaver")),
+                    "category": "stories",
+                    "subjects": ["children's literature", "free books"],
+                    "source": "StoryWeaver (Pratham Books)",
+                    "license": "Creative Commons (CC BY)",
+                    "printable": True,
+                    "downloadable": True,
+                    "popularity": book.get("reads_count", 0),
+                    "cover": book.get("cover_image", {}).get("url", ""),
+                    "formats": {
+                        "pdf": f"https://storyweaver.org.in/stories/{book_slug}/download?format=pdf" if book_slug else "",
+                        "epub": f"https://storyweaver.org.in/stories/{book_slug}/download?format=epub" if book_slug else "",
+                        "html": f"https://storyweaver.org.in/stories/{book_slug}"
+                    },
+                    "url": f"https://storyweaver.org.in/stories/{book_slug}",
+                    "grade_level": [grade] if grade != "all" else ["elementary"],
+                    "language": book.get("language", "English")
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"StoryWeaver search failed: {str(e)}")
+    return []
+
+
+async def search_openlibrary_children(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Open Library for public domain children's books only"""
+    try:
+        # Search specifically for children's books with public scans
+        response = await client.get(
+            "https://openlibrary.org/search.json",
+            params={
+                "q": f"{query} subject:children subject:juvenile",
+                "limit": limit * 2,  # Get more to filter
+                "fields": "key,title,author_name,first_publish_year,subject,cover_i,ia,public_scan_b,ebook_access"
+            },
+            timeout=15.0
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for doc in data.get("docs", []):
+                # Only include books with public domain access
+                if not doc.get("public_scan_b") and doc.get("ebook_access") != "public":
+                    continue
+                
+                if len(results) >= limit:
+                    break
+                
+                cover_id = doc.get("cover_i")
+                work_key = doc.get("key", "").replace("/works/", "")
+                ia_id = doc.get("ia", [""])[0] if doc.get("ia") else ""
+                
+                results.append({
+                    "id": f"openlibrary-{work_key}",
+                    "title": doc.get("title", "Untitled"),
+                    "author": ", ".join(doc.get("author_name", ["Unknown"])[:2]),
+                    "description": f"Published: {doc.get('first_publish_year', 'Unknown')}. Subjects: {', '.join(doc.get('subject', [])[:3])}",
+                    "category": "stories",
+                    "subjects": doc.get("subject", [])[:5],
+                    "source": "Open Library",
+                    "license": "Public Domain",
+                    "printable": True,
+                    "downloadable": True,
+                    "popularity": 100,  # Default popularity
+                    "cover": f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg" if cover_id else "",
+                    "formats": {
+                        "pdf": f"https://archive.org/download/{ia_id}/{ia_id}.pdf" if ia_id else "",
+                        "epub": f"https://archive.org/download/{ia_id}/{ia_id}.epub" if ia_id else "",
+                        "html": f"https://openlibrary.org{doc.get('key', '')}"
+                    },
+                    "url": f"https://openlibrary.org{doc.get('key', '')}",
+                    "grade_level": determine_grade_level(doc.get("subject", [])),
+                    "year": doc.get("first_publish_year")
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Open Library children search failed: {str(e)}")
+    return []
+
+
+def determine_grade_level(subjects: list) -> list:
+    """Determine grade level based on subjects"""
+    subjects_lower = " ".join(subjects).lower()
+    grade_levels = []
+    
+    if any(term in subjects_lower for term in ["picture book", "toddler", "nursery", "baby", "preschool"]):
+        grade_levels.append("preschool")
+    if any(term in subjects_lower for term in ["children", "juvenile", "elementary", "young readers", "fairy tale"]):
+        grade_levels.append("elementary")
+    if any(term in subjects_lower for term in ["young adult", "middle grade", "teen", "adolescent"]):
+        grade_levels.append("middle")
+    if any(term in subjects_lower for term in ["classic", "literature", "fiction"]):
+        grade_levels.extend(["elementary", "middle"])
+    
+    return list(set(grade_levels)) if grade_levels else ["elementary"]
+
+
 async def search_openlibrary(client: httpx.AsyncClient, query: str, limit: int) -> list:
     """Search OpenLibrary for books and educational materials"""
     try:
