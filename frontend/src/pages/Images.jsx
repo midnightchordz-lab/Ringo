@@ -295,7 +295,7 @@ export const Images = () => {
             <h1 className="text-3xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
               Image Search
             </h1>
-            <p className="text-neutral-500">Find stunning copyright-free images</p>
+            <p className="text-neutral-500">Find stunning copyright-free images from across the web</p>
           </div>
         </div>
       </div>
@@ -312,7 +312,7 @@ export const Images = () => {
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             </div>
             <p className="text-xs text-emerald-700">
-              All images from <span className="font-bold">Unsplash</span> and <span className="font-bold">Pexels</span> are free for commercial use. No attribution required!
+              All images from <span className="font-bold">Pexels</span>, <span className="font-bold">Unsplash</span>, and <span className="font-bold">Pixabay</span> are free for commercial use. No attribution required!
             </p>
           </div>
         </div>
@@ -320,8 +320,8 @@ export const Images = () => {
 
       {/* Search Bar */}
       <div className="studio-card p-6 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative flex gap-3">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
               <Input
@@ -330,13 +330,13 @@ export const Images = () => {
                 placeholder="Search for images... (e.g., 'mountains', 'technology', 'food')"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch(1)}
                 className="studio-input-icon w-full"
               />
             </div>
             <Button
               data-testid="image-find-button"
-              onClick={handleSearch}
+              onClick={() => handleSearch(1)}
               disabled={loading}
               className="btn-primary min-w-[100px]"
             >
@@ -346,31 +346,65 @@ export const Images = () => {
                 'Find'
               )}
             </Button>
+            <Button
+              onClick={() => setShowFavorites(!showFavorites)}
+              className={`rounded-xl px-6 py-3 flex items-center gap-2 font-semibold transition-all ${
+                showFavorites 
+                  ? 'bg-red-500 hover:bg-red-600 text-white' 
+                  : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
+              }`}
+              data-testid="favorites-toggle"
+            >
+              <Heart className="w-4 h-4" fill={showFavorites ? 'currentColor' : 'none'} />
+              Favorites ({favorites.length})
+            </Button>
           </div>
-          <Button
-            onClick={() => setShowFavorites(!showFavorites)}
-            className={`rounded-xl px-6 py-3 flex items-center gap-2 font-semibold transition-all ${
-              showFavorites 
-                ? 'bg-red-500 hover:bg-red-600 text-white' 
-                : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
-            }`}
-            data-testid="favorites-toggle"
-          >
-            <Heart className="w-4 h-4" fill={showFavorites ? 'currentColor' : 'none'} />
-            Favorites ({favorites.length})
-          </Button>
+          
+          {/* Source Filter */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-neutral-500 flex items-center gap-1">
+              <Filter className="w-4 h-4" /> Source:
+            </span>
+            {[
+              { id: 'all', name: 'All Sources', color: 'bg-purple-500' },
+              { id: 'pexels', name: 'Pexels', color: 'bg-teal-500' },
+              { id: 'unsplash', name: 'Unsplash', color: 'bg-neutral-700' },
+              { id: 'pixabay', name: 'Pixabay', color: 'bg-green-500' }
+            ].map((source) => (
+              <button
+                key={source.id}
+                onClick={() => handleSourceFilter(source.id)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  selectedSource === source.id
+                    ? `${source.color} text-white shadow-md`
+                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                }`}
+              >
+                {source.name}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Results Count */}
-      {displayImages.length > 0 && (
+      {!showFavorites && totalImages > 0 && (
+        <div className="mb-6 flex items-center justify-between">
+          <p className="text-neutral-600">
+            Found <span className="font-bold text-purple-600">{totalImages.toLocaleString()}</span> images
+            {sources.length > 0 && (
+              <span className="text-sm text-neutral-500 ml-2">
+                from {sources.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}
+              </span>
+            )}
+          </p>
+        </div>
+      )}
+      
+      {showFavorites && (
         <div className="mb-6">
           <p className="text-neutral-600">
-            {showFavorites ? (
-              <>Showing <span className="font-bold text-red-500">{favorites.length}</span> favorite images</>
-            ) : (
-              <>Found <span className="font-bold text-blue-600">{images.length}</span> images</>
-            )}
+            Showing <span className="font-bold text-red-500">{favorites.length}</span> favorite images
           </p>
         </div>
       )}
