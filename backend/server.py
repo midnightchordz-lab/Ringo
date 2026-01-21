@@ -2507,14 +2507,15 @@ def determine_grade_level(subjects: list) -> list:
 async def search_internet_archive_children(client: httpx.AsyncClient, query: str, limit: int) -> list:
     """Search Internet Archive for public domain children's books with PDF downloads"""
     try:
-        # Internet Archive advanced search for children's books with PDFs
+        # Internet Archive advanced search for children's books that are public domain
+        # Use collection:opensource to get truly public domain items
         response = await client.get(
             "https://archive.org/advancedsearch.php",
             params={
-                "q": f'({query}) AND mediatype:texts AND subject:(children OR juvenile) AND format:PDF',
+                "q": f'({query}) AND mediatype:texts AND (subject:(children OR juvenile OR "fairy tales")) AND collection:(opensource OR gutenberg)',
                 "fl[]": ["identifier", "title", "creator", "description", "subject", "downloads", "year"],
                 "sort[]": "downloads desc",
-                "rows": limit,
+                "rows": limit * 2,  # Get more to filter
                 "page": 1,
                 "output": "json"
             },
@@ -2524,19 +2525,36 @@ async def search_internet_archive_children(client: httpx.AsyncClient, query: str
         if response.status_code == 200:
             data = response.json()
             results = []
-            for doc in data.get("response", {}).get("docs", [])[:limit]:
+            for doc in data.get("response", {}).get("docs", []):
+                if len(results) >= limit:
+                    break
+                    
                 identifier = doc.get("identifier", "")
+                if not identifier:
+                    continue
+                    
                 subjects = doc.get("subject", [])
                 if isinstance(subjects, str):
                     subjects = [subjects]
                 
+                # Clean up description
+                desc = doc.get("description", "")
+                if isinstance(desc, list):
+                    desc = desc[0] if desc else ""
+                desc = str(desc)[:200] if desc else "Public domain book from Internet Archive"
+                
+                # Clean up author/creator
+                creator = doc.get("creator", "Unknown")
+                if isinstance(creator, list):
+                    creator = ", ".join(creator[:2])
+                
                 results.append({
                     "id": f"archive-{identifier}",
                     "title": doc.get("title", "Untitled"),
-                    "author": doc.get("creator", "Unknown") if isinstance(doc.get("creator"), str) else ", ".join(doc.get("creator", ["Unknown"])[:2]),
-                    "description": doc.get("description", "Public domain book from Internet Archive")[:200] if doc.get("description") else "Public domain book from Internet Archive",
+                    "author": creator,
+                    "description": desc,
                     "category": "stories",
-                    "subjects": subjects[:5],
+                    "subjects": subjects[:5] if subjects else ["children's literature"],
                     "source": "Internet Archive",
                     "license": "Public Domain",
                     "printable": True,
@@ -2544,8 +2562,8 @@ async def search_internet_archive_children(client: httpx.AsyncClient, query: str
                     "popularity": doc.get("downloads", 0),
                     "cover": f"https://archive.org/services/img/{identifier}",
                     "formats": {
-                        "pdf": f"https://archive.org/download/{identifier}/{identifier}.pdf",
-                        "epub": f"https://archive.org/download/{identifier}/{identifier}.epub",
+                        "pdf": f"https://archive.org/details/{identifier}",  # Link to details page where user can download
+                        "epub": f"https://archive.org/details/{identifier}",
                         "html": f"https://archive.org/details/{identifier}"
                     },
                     "url": f"https://archive.org/details/{identifier}",
