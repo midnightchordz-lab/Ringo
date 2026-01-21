@@ -70,9 +70,9 @@ const VideoCard = ({ video }) => (
         </div>
       </div>
       <div className="p-4">
-        <h4 className="text-neutral-900 font-semibold line-clamp-2 mb-2 leading-tight">{video.title}</h4>
-        <p className="text-blue-600 text-sm font-medium mb-2">{video.channel}</p>
-        <div className="flex items-center justify-between text-xs text-neutral-500">
+        <h4 className="text-neutral-900 dark:text-neutral-100 font-semibold line-clamp-2 mb-2 leading-tight">{video.title}</h4>
+        <p className="text-blue-600 dark:text-blue-400 text-sm font-medium mb-2">{video.channel}</p>
+        <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
           <span>{(video.views || 0).toLocaleString()} views</span>
           <span>{Math.floor((video.duration || 0) / 60)}:{String((video.duration || 0) % 60).padStart(2, '0')}</span>
         </div>
@@ -120,10 +120,10 @@ export const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-neutral-50">
+      <div className="flex items-center justify-center h-screen bg-neutral-50 dark:bg-neutral-950">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-neutral-600 font-medium">Loading your dashboard...</p>
+          <p className="text-neutral-600 dark:text-neutral-400 font-medium">Loading your dashboard...</p>
         </div>
       </div>
     );
