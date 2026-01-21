@@ -2214,13 +2214,15 @@ async def search_childrens_literature(
     query: str = Query(default="", description="Search query for children's literature"),
     grade: str = Query(default="all", description="Grade level: preschool, elementary, middle"),
     category: str = Query(default="all", description="Category: stories, poetry, fairy-tales, educational"),
-    limit: int = Query(default=30, le=100),
+    page: int = Query(default=1, ge=1, description="Page number"),
+    per_page: int = Query(default=50, le=100, description="Results per page"),
     current_user: dict = Depends(get_current_user)
 ):
     """
     Search for copyright-free children's literature across the web.
-    Sources: Project Gutenberg, StoryWeaver, Free Kids Books, Open Library (public domain only)
+    Sources: Project Gutenberg, StoryWeaver, Open Library (public domain only)
     All results are guaranteed to be free, downloadable, and printable.
+    Supports pagination for accessing all available content.
     """
     try:
         all_results = []
@@ -2236,12 +2238,15 @@ async def search_childrens_literature(
         if grade != "all" and grade in grade_terms:
             search_query = f"{search_query} {grade_terms[grade]}"
         
-        async with httpx.AsyncClient(timeout=20.0) as client:
-            # Search multiple sources in parallel
+        # Fetch more results to support pagination
+        fetch_limit = per_page * 3  # Get enough for multiple pages
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # Search multiple sources in parallel with higher limits
             tasks = [
-                search_gutenberg_children(client, search_query, limit // 3),
-                search_storyweaver(client, search_query, grade, limit // 3),
-                search_openlibrary_children(client, search_query, limit // 3),
+                search_gutenberg_children(client, search_query, fetch_limit, page),
+                search_storyweaver(client, search_query, grade, fetch_limit, page),
+                search_openlibrary_children(client, search_query, fetch_limit),
             ]
             
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -2256,12 +2261,33 @@ async def search_childrens_literature(
         if category != "all":
             all_results = [r for r in all_results if category.lower() in r.get("category", "").lower() or category.lower() in " ".join(r.get("subjects", [])).lower()]
         
+        # Remove duplicates based on title
+        seen_titles = set()
+        unique_results = []
+        for r in all_results:
+            title_key = r.get("title", "").lower().strip()
+            if title_key not in seen_titles:
+                seen_titles.add(title_key)
+                unique_results.append(r)
+        
         # Sort by relevance (download count or popularity)
-        all_results.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+        unique_results.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+        
+        # Pagination
+        total_results = len(unique_results)
+        total_pages = (total_results + per_page - 1) // per_page
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_results = unique_results[start_idx:end_idx]
         
         return {
-            "results": all_results[:limit],
-            "total": len(all_results),
+            "results": paginated_results,
+            "total": total_results,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+            "has_prev": page > 1,
             "query": query,
             "grade": grade,
             "sources": ["Project Gutenberg", "StoryWeaver", "Open Library"],
