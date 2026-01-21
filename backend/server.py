@@ -2651,6 +2651,272 @@ async def search_oer_courses(client: httpx.AsyncClient, query: str, limit: int) 
     return results[:limit]
 
 
+# ==================== COURSE SEARCH FUNCTIONS ====================
+
+async def search_openstax_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search OpenStax for free textbooks and courses"""
+    try:
+        response = await client.get(
+            "https://openstax.org/apps/cms/api/v2/pages/",
+            params={
+                "type": "books.Book",
+                "fields": "title,description,cover_url,webview_rex_link",
+                "limit": min(limit, 50)
+            },
+            headers={"User-Agent": "ContentFlow/1.0"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            query_lower = query.lower()
+            
+            for item in data.get("items", []):
+                title = item.get("title", "")
+                desc = item.get("description", "")
+                
+                # Filter by query relevance
+                if query_lower in title.lower() or query_lower in desc.lower():
+                    results.append({
+                        "id": f"openstax_{item.get('id', '')}",
+                        "title": title,
+                        "description": desc[:200] if desc else "Free, peer-reviewed textbook from OpenStax",
+                        "type": "course",
+                        "category": "course",
+                        "source": "OpenStax",
+                        "url": item.get("webview_rex_link", f"https://openstax.org/details/{item.get('id', '')}"),
+                        "thumbnail": item.get("cover_url", "📚"),
+                        "license": "CC BY",
+                        "free": True
+                    })
+            return results[:limit]
+    except Exception as e:
+        logging.warning(f"OpenStax search failed: {str(e)}")
+    return []
+
+
+async def search_mit_ocw_real(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search MIT OpenCourseWare"""
+    try:
+        # MIT OCW search
+        response = await client.get(
+            f"https://ocw.mit.edu/search/?q={query.replace(' ', '+')}&t=Lecture%20Videos",
+            headers={"User-Agent": "ContentFlow/1.0"}
+        )
+        
+        # Since OCW doesn't have a public API, return search links
+        results = [{
+            "id": f"mit_ocw_{query.replace(' ', '_')}",
+            "title": f"{query} - MIT OpenCourseWare",
+            "description": f"Free courses from MIT covering {query}. Includes lecture videos, notes, and assignments.",
+            "type": "course",
+            "category": "course",
+            "source": "MIT OpenCourseWare",
+            "url": f"https://ocw.mit.edu/search/?q={query.replace(' ', '+')}",
+            "thumbnail": "🎓",
+            "license": "CC BY-NC-SA",
+            "free": True
+        }]
+        return results
+    except Exception as e:
+        logging.warning(f"MIT OCW search failed: {str(e)}")
+    return []
+
+
+async def search_youtube_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search YouTube for course playlists"""
+    youtube_api_key = os.environ.get("YOUTUBE_API_KEY", "")
+    
+    if not youtube_api_key:
+        return [{
+            "id": "yt_course_placeholder",
+            "title": f"{query} - Full Course (YouTube)",
+            "description": f"Find complete {query} courses and tutorials on YouTube",
+            "type": "course",
+            "category": "course",
+            "source": "YouTube",
+            "url": f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}+full+course+tutorial",
+            "thumbnail": "🎥",
+            "license": "Various",
+            "free": True
+        }]
+    
+    try:
+        response = await client.get(
+            "https://www.googleapis.com/youtube/v3/search",
+            params={
+                "part": "snippet",
+                "q": f"{query} full course tutorial",
+                "type": "playlist",
+                "maxResults": min(limit, 25),
+                "key": youtube_api_key
+            }
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("items", []):
+                snippet = item.get("snippet", {})
+                playlist_id = item.get("id", {}).get("playlistId", "")
+                results.append({
+                    "id": f"yt_course_{playlist_id}",
+                    "title": snippet.get("title", "Untitled"),
+                    "description": snippet.get("description", "")[:200],
+                    "type": "course",
+                    "category": "course",
+                    "source": "YouTube",
+                    "url": f"https://www.youtube.com/playlist?list={playlist_id}",
+                    "thumbnail": snippet.get("thumbnails", {}).get("medium", {}).get("url", "🎥"),
+                    "license": "Standard YouTube License",
+                    "free": True
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"YouTube courses search failed: {str(e)}")
+    return []
+
+
+# ==================== VIDEO SEARCH FUNCTIONS ====================
+
+async def search_internet_archive_videos(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Internet Archive for educational videos"""
+    try:
+        response = await client.get(
+            "https://archive.org/advancedsearch.php",
+            params={
+                "q": f"({query}) AND mediatype:movies AND (subject:educational OR subject:lecture OR subject:documentary)",
+                "fl[]": ["identifier", "title", "description", "creator", "year"],
+                "sort[]": "downloads desc",
+                "rows": min(limit, 50),
+                "output": "json"
+            },
+            headers={"User-Agent": "ContentFlow/1.0"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for doc in data.get("response", {}).get("docs", []):
+                identifier = doc.get("identifier", "")
+                results.append({
+                    "id": f"ia_video_{identifier}",
+                    "title": doc.get("title", "Untitled"),
+                    "description": str(doc.get("description", ""))[:200] if doc.get("description") else "Educational video from Internet Archive",
+                    "type": "video",
+                    "category": "video",
+                    "source": "Internet Archive",
+                    "url": f"https://archive.org/details/{identifier}",
+                    "thumbnail": f"https://archive.org/services/img/{identifier}",
+                    "license": "Public Domain / Open",
+                    "free": True,
+                    "year": doc.get("year")
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Internet Archive videos search failed: {str(e)}")
+    return []
+
+
+async def search_ted_talks(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search TED Talks"""
+    # TED doesn't have a public API, return search link
+    return [{
+        "id": f"ted_{query.replace(' ', '_')}",
+        "title": f"TED Talks about {query}",
+        "description": f"Inspiring talks from experts worldwide on {query}. Free to watch with transcripts in 100+ languages.",
+        "type": "video",
+        "category": "video",
+        "source": "TED",
+        "url": f"https://www.ted.com/search?q={query.replace(' ', '+')}",
+        "thumbnail": "🎤",
+        "license": "CC BY-NC-ND",
+        "free": True
+    }]
+
+
+# ==================== RESOURCE SEARCH FUNCTIONS ====================
+
+async def search_oer_commons_real(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search OER Commons - Open Educational Resources"""
+    try:
+        # OER Commons search page - they have limited API
+        return [{
+            "id": f"oer_{query.replace(' ', '_')}",
+            "title": f"{query} - OER Commons Resources",
+            "description": f"Open Educational Resources for {query}. Free to use, adapt, and share.",
+            "type": "resource",
+            "category": "resource",
+            "source": "OER Commons",
+            "url": f"https://www.oercommons.org/search?q={query.replace(' ', '+')}",
+            "thumbnail": "📚",
+            "license": "Various CC Licenses",
+            "free": True
+        }]
+    except Exception as e:
+        logging.warning(f"OER Commons search failed: {str(e)}")
+    return []
+
+
+async def search_merlot_resources(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search MERLOT - Multimedia Educational Resource for Learning and Online Teaching"""
+    try:
+        return [{
+            "id": f"merlot_{query.replace(' ', '_')}",
+            "title": f"{query} - MERLOT Learning Materials",
+            "description": f"Curated collection of free online teaching and learning materials for {query}.",
+            "type": "resource",
+            "category": "resource",
+            "source": "MERLOT",
+            "url": f"https://www.merlot.org/merlot/materials.htm?keywords={query.replace(' ', '+')}",
+            "thumbnail": "📖",
+            "license": "Various",
+            "free": True
+        }]
+    except Exception as e:
+        logging.warning(f"MERLOT search failed: {str(e)}")
+    return []
+
+
+async def search_internet_archive_texts(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Internet Archive for educational texts/documents"""
+    try:
+        response = await client.get(
+            "https://archive.org/advancedsearch.php",
+            params={
+                "q": f"({query}) AND mediatype:texts AND (subject:education OR subject:textbook OR subject:learning)",
+                "fl[]": ["identifier", "title", "description", "creator", "year"],
+                "sort[]": "downloads desc",
+                "rows": min(limit, 30),
+                "output": "json"
+            },
+            headers={"User-Agent": "ContentFlow/1.0"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for doc in data.get("response", {}).get("docs", []):
+                identifier = doc.get("identifier", "")
+                results.append({
+                    "id": f"ia_text_{identifier}",
+                    "title": doc.get("title", "Untitled"),
+                    "description": str(doc.get("description", ""))[:200] if doc.get("description") else "Educational resource from Internet Archive",
+                    "type": "resource",
+                    "category": "resource",
+                    "source": "Internet Archive",
+                    "url": f"https://archive.org/details/{identifier}",
+                    "download_url": f"https://archive.org/download/{identifier}",
+                    "thumbnail": f"https://archive.org/services/img/{identifier}",
+                    "license": "Public Domain / Open",
+                    "free": True
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Internet Archive texts search failed: {str(e)}")
+    return []
+
+
 async def search_mit_ocw(client: httpx.AsyncClient, query: str, limit: int) -> list:
     """Search MIT OpenCourseWare"""
     try:
