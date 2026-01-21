@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, Download, Link2, Heart, Image as ImageIcon, ExternalLink, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Search, Download, Link2, Heart, Image as ImageIcon, ExternalLink, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,24 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
       toast.info('Opening image in new tab');
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const getSourceColor = (source) => {
+    switch(source) {
+      case 'unsplash': return 'bg-neutral-800';
+      case 'pexels': return 'bg-teal-600';
+      case 'pixabay': return 'bg-green-600';
+      default: return 'bg-blue-600';
+    }
+  };
+
+  const getSourceName = (source) => {
+    switch(source) {
+      case 'unsplash': return 'Unsplash';
+      case 'pexels': return 'Pexels';
+      case 'pixabay': return 'Pixabay';
+      default: return source;
     }
   };
 
@@ -80,10 +98,8 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
         
         {/* Source Badge */}
         <div className="absolute top-2 left-2">
-          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg text-white shadow-lg ${
-            image.source === 'unsplash' ? 'bg-neutral-800' : 'bg-teal-600'
-          }`}>
-            {image.source === 'unsplash' ? 'Unsplash' : 'Pexels'}
+          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg text-white shadow-lg ${getSourceColor(image.source)}`}>
+            {getSourceName(image.source)}
           </span>
         </div>
         
@@ -97,17 +113,73 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
       
       <div className="p-4">
         <p className="text-neutral-900 font-medium text-sm line-clamp-1 mb-2">{image.title || 'Untitled'}</p>
-        <a 
-          href={image.photographer_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-700 text-xs font-medium flex items-center gap-1"
-        >
-          by {image.photographer}
-          <ExternalLink className="w-3 h-3" />
-        </a>
+        <div className="flex items-center justify-between">
+          <a 
+            href={image.photographer_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-700 text-xs font-medium flex items-center gap-1"
+          >
+            by {image.photographer}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+          {image.likes > 0 && (
+            <span className="text-xs text-neutral-500 flex items-center gap-1">
+              <Heart className="w-3 h-3" /> {image.likes}
+            </span>
+          )}
+        </div>
       </div>
     </motion.div>
+  );
+};
+
+// Pagination Component
+const PaginationControls = ({ currentPage, totalPages, totalItems, perPage, onPageChange, isLoading }) => {
+  if (totalPages <= 1) return null;
+  
+  const startItem = (currentPage - 1) * perPage + 1;
+  const endItem = Math.min(currentPage * perPage, totalItems);
+  
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-4 bg-white rounded-xl shadow-sm border border-neutral-100">
+      <div className="text-sm text-neutral-600">
+        Showing <span className="font-semibold text-neutral-900">{startItem}-{endItem}</span> of{' '}
+        <span className="font-semibold text-neutral-900">{totalItems.toLocaleString()}</span> images
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1 || isLoading}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+            currentPage === 1 || isLoading
+              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+          }`}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Previous
+        </button>
+        
+        <span className="px-4 py-2 bg-purple-500 text-white rounded-lg font-semibold">
+          {currentPage} / {totalPages}
+        </span>
+        
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages || isLoading}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+            currentPage === totalPages || isLoading
+              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+          }`}
+        >
+          Next
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
   );
 };
 
@@ -117,6 +189,12 @@ export const Images = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalImages, setTotalImages] = useState(0);
+  const [selectedSource, setSelectedSource] = useState('all');
+  const [sources, setSources] = useState([]);
+  const perPage = 50;
 
   useEffect(() => {
     fetchFavorites();
@@ -131,7 +209,7 @@ export const Images = () => {
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (page = 1) => {
     if (!searchQuery.trim()) {
       toast.error('Please enter a search term');
       return;
@@ -140,15 +218,41 @@ export const Images = () => {
     setLoading(true);
     try {
       const response = await api.get('/images/search', {
-        params: { query: searchQuery, per_page: 30 }
+        params: { 
+          query: searchQuery, 
+          page: page,
+          per_page: perPage,
+          source: selectedSource
+        }
       });
       setImages(response.data.images || []);
-      toast.success(`Found ${response.data.total} images!`);
+      setTotalImages(response.data.total || 0);
+      setTotalPages(response.data.total_pages || 1);
+      setCurrentPage(response.data.page || 1);
+      setSources(response.data.sources || []);
+      
+      if (page === 1) {
+        toast.success(`Found ${response.data.total.toLocaleString()} images!`);
+      }
     } catch (error) {
       console.error('Error searching images:', error);
       toast.error('Failed to search images');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    handleSearch(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSourceFilter = (source) => {
+    setSelectedSource(source);
+    if (searchQuery.trim()) {
+      setCurrentPage(1);
+      setTimeout(() => handleSearch(1), 100);
     }
   };
 
