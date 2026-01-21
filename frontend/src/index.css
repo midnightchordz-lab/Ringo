@@ -213,6 +213,15 @@
   @apply bg-neutral-300 rounded-full hover:bg-neutral-400;
 }
 
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  @apply bg-neutral-800;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-neutral-600 hover:bg-neutral-500;
+}
+
 /* Animated gradient background */
 @keyframes gradient-shift {
   0%, 100% {
