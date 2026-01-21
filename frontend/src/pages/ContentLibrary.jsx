@@ -1355,13 +1355,13 @@ export const ContentLibrary = () => {
                 placeholder="Search for worksheets, books, articles... (e.g., 'STEM worksheets', 'math practice')"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch(1)}
                 className="studio-input-icon w-full"
               />
             </div>
             <Button
               data-testid="library-find-button"
-              onClick={handleSearch}
+              onClick={() => handleSearch(1)}
               disabled={isSearching}
               className="btn-primary min-w-[100px]"
             >
