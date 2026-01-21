@@ -2503,6 +2503,60 @@ def determine_grade_level(subjects: list) -> list:
     return list(set(grade_levels)) if grade_levels else ["elementary"]
 
 
+async def search_internet_archive_children(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Internet Archive for public domain children's books with PDF downloads"""
+    try:
+        # Internet Archive advanced search for children's books with PDFs
+        response = await client.get(
+            "https://archive.org/advancedsearch.php",
+            params={
+                "q": f'({query}) AND mediatype:texts AND subject:(children OR juvenile) AND format:PDF',
+                "fl[]": ["identifier", "title", "creator", "description", "subject", "downloads", "year"],
+                "sort[]": "downloads desc",
+                "rows": limit,
+                "page": 1,
+                "output": "json"
+            },
+            timeout=20.0
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for doc in data.get("response", {}).get("docs", [])[:limit]:
+                identifier = doc.get("identifier", "")
+                subjects = doc.get("subject", [])
+                if isinstance(subjects, str):
+                    subjects = [subjects]
+                
+                results.append({
+                    "id": f"archive-{identifier}",
+                    "title": doc.get("title", "Untitled"),
+                    "author": doc.get("creator", "Unknown") if isinstance(doc.get("creator"), str) else ", ".join(doc.get("creator", ["Unknown"])[:2]),
+                    "description": doc.get("description", "Public domain book from Internet Archive")[:200] if doc.get("description") else "Public domain book from Internet Archive",
+                    "category": "stories",
+                    "subjects": subjects[:5],
+                    "source": "Internet Archive",
+                    "license": "Public Domain",
+                    "printable": True,
+                    "downloadable": True,
+                    "popularity": doc.get("downloads", 0),
+                    "cover": f"https://archive.org/services/img/{identifier}",
+                    "formats": {
+                        "pdf": f"https://archive.org/download/{identifier}/{identifier}.pdf",
+                        "epub": f"https://archive.org/download/{identifier}/{identifier}.epub",
+                        "html": f"https://archive.org/details/{identifier}"
+                    },
+                    "url": f"https://archive.org/details/{identifier}",
+                    "grade_level": determine_grade_level(subjects),
+                    "year": doc.get("year")
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Internet Archive children search failed: {str(e)}")
+    return []
+
+
 async def search_openlibrary(client: httpx.AsyncClient, query: str, limit: int) -> list:
     """Search OpenLibrary for books and educational materials"""
     try:
