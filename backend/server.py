@@ -2368,6 +2368,9 @@ async def search_wikipedia_articles(client: httpx.AsyncClient, query: str, limit
                 "srlimit": min(limit, 50),
                 "format": "json",
                 "srprop": "snippet|titlesnippet|size"
+            },
+            headers={
+                "User-Agent": "ContentFlow/1.0 (Educational Content Search; contact@contentflow.app)"
             }
         )
         
@@ -2384,11 +2387,13 @@ async def search_wikipedia_articles(client: httpx.AsyncClient, query: str, limit
                     "category": "article",
                     "source": "Wikipedia",
                     "url": f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}",
-                    "thumbnail": f"https://en.wikipedia.org/wiki/Special:FilePath/{title.replace(' ', '_')}?width=200",
+                    "thumbnail": "📄",
                     "license": "CC BY-SA",
                     "free": True
                 })
             return results
+        else:
+            logging.warning(f"Wikipedia API returned status {response.status_code}")
     except Exception as e:
         logging.warning(f"Wikipedia search failed: {str(e)}")
     return []
