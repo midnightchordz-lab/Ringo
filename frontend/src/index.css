@@ -122,9 +122,17 @@
     @apply bg-white border-2 border-neutral-200 text-neutral-700 font-medium rounded-full px-6 py-3 hover:bg-neutral-50 hover:border-neutral-300 hover:-translate-y-0.5 transition-all duration-300;
   }
   
+  .dark .btn-secondary {
+    @apply bg-neutral-800 border-neutral-700 text-neutral-200 hover:bg-neutral-700 hover:border-neutral-600;
+  }
+  
   /* Input style */
   .studio-input {
     @apply rounded-xl border-neutral-200 bg-neutral-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all h-12 px-4 text-neutral-900 placeholder:text-neutral-400;
+  }
+  
+  .dark .studio-input {
+    @apply border-neutral-700 bg-neutral-800 focus:bg-neutral-900 focus:ring-blue-900 text-neutral-100 placeholder:text-neutral-500;
   }
   
   /* Input with icon - needs more left padding */
@@ -132,9 +140,17 @@
     @apply rounded-xl border-neutral-200 bg-neutral-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all h-12 pl-12 pr-4 text-neutral-900 placeholder:text-neutral-400;
   }
   
+  .dark .studio-input-icon {
+    @apply border-neutral-700 bg-neutral-800 focus:bg-neutral-900 focus:ring-blue-900 text-neutral-100 placeholder:text-neutral-500;
+  }
+  
   /* Sidebar active state */
   .sidebar-active {
     @apply bg-blue-50 text-blue-600 border-l-4 border-blue-600;
+  }
+  
+  .dark .sidebar-active {
+    @apply bg-blue-900/30 text-blue-400;
   }
   
   /* Icon container with color background */
@@ -146,20 +162,40 @@
     @apply bg-blue-100 text-blue-600;
   }
   
+  .dark .icon-blue {
+    @apply bg-blue-900/40 text-blue-400;
+  }
+  
   .icon-coral {
     @apply bg-red-100 text-red-500;
+  }
+  
+  .dark .icon-coral {
+    @apply bg-red-900/40 text-red-400;
   }
   
   .icon-yellow {
     @apply bg-yellow-100 text-yellow-600;
   }
   
+  .dark .icon-yellow {
+    @apply bg-yellow-900/40 text-yellow-400;
+  }
+  
   .icon-green {
     @apply bg-emerald-100 text-emerald-600;
   }
   
+  .dark .icon-green {
+    @apply bg-emerald-900/40 text-emerald-400;
+  }
+  
   .icon-purple {
     @apply bg-purple-100 text-purple-600;
+  }
+  
+  .dark .icon-purple {
+    @apply bg-purple-900/40 text-purple-400;
   }
 }
 
