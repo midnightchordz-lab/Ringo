@@ -562,8 +562,8 @@ async def microsoft_login(request: Request):
         parsed = urlparse(referer)
         frontend_url = f"{parsed.scheme}://{parsed.netloc}"
     else:
-        # Default to preview URL if available, otherwise localhost
-        frontend_url = "https://contentflow-65.preview.emergentagent.com"
+        # Use FRONTEND_URL from environment, fallback to localhost for local dev
+        frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
     
     redirect_uri = f"{frontend_url}/auth/microsoft/callback"
     
