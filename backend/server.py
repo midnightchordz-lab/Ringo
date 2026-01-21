@@ -2320,31 +2320,29 @@ async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit
                 "languages": "en",
                 "page": page
             },
-            timeout=20.0
+            timeout=20.0,
+            follow_redirects=True
         )
         
         if response.status_code == 200:
             data = response.json()
             results = []
             for book in data.get("results", [])[:limit]:
-                # Get download formats
+                # Get download formats from Gutendex response
                 formats = book.get("formats", {})
-                pdf_url = formats.get("application/pdf", "")
+                book_id = book.get("id")
+                
+                # Extract actual format URLs from Gutendex
                 epub_url = formats.get("application/epub+zip", "")
                 html_url = formats.get("text/html", "") or formats.get("text/html; charset=utf-8", "")
                 txt_url = formats.get("text/plain; charset=utf-8", "") or formats.get("text/plain", "")
                 cover_url = formats.get("image/jpeg", "")
+                kindle_url = formats.get("application/x-mobipocket-ebook", "")
                 
-                # Construct proper Gutenberg URLs
-                book_id = book.get("id")
-                if not pdf_url and book_id:
-                    # PDF not directly available - link to landing page
-                    pdf_url = f"https://www.gutenberg.org/ebooks/{book_id}"
-                if not epub_url and book_id:
-                    epub_url = f"https://www.gutenberg.org/ebooks/{book_id}.epub.images"
-                if not html_url and book_id:
-                    html_url = f"https://www.gutenberg.org/ebooks/{book_id}.html.images"
+                # Gutenberg landing page for all download options (including PDF if available)
+                download_page = f"https://www.gutenberg.org/ebooks/{book_id}" if book_id else ""
                 
+                # Use landing page for "Download" button - users can choose their format
                 results.append({
                     "id": f"gutenberg-{book_id}",
                     "title": book.get("title", "Untitled"),
@@ -2359,12 +2357,13 @@ async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit
                     "popularity": book.get("download_count", 0),
                     "cover": cover_url,
                     "formats": {
-                        "pdf": pdf_url,
-                        "epub": epub_url,
-                        "html": html_url,
-                        "txt": txt_url
+                        "pdf": download_page,  # Landing page for all formats
+                        "epub": epub_url or f"https://www.gutenberg.org/ebooks/{book_id}.epub3.images",
+                        "html": html_url or f"https://www.gutenberg.org/ebooks/{book_id}.html.images",
+                        "txt": txt_url,
+                        "kindle": kindle_url
                     },
-                    "url": f"https://www.gutenberg.org/ebooks/{book_id}",
+                    "url": download_page,
                     "grade_level": determine_grade_level(book.get("subjects", []))
                 })
             return results
