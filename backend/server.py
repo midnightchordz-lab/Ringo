@@ -2876,8 +2876,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Classic children's story following Alice through a fantastical world.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/11.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/11.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/11",
+            "epub": "https://www.gutenberg.org/ebooks/11.epub.images",
             "html": "https://www.gutenberg.org/ebooks/11.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/11/pg11.cover.medium.jpg",
@@ -2893,8 +2893,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Classic detective stories featuring the famous Sherlock Holmes.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1661.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1661.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1661",
+            "epub": "https://www.gutenberg.org/ebooks/1661.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1661.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1661/pg1661.cover.medium.jpg",
@@ -2910,8 +2910,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "A young boy's adventures along the Mississippi River.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/74.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/74.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/74",
+            "epub": "https://www.gutenberg.org/ebooks/74.epub.images",
             "html": "https://www.gutenberg.org/ebooks/74.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/74/pg74.cover.medium.jpg",
@@ -2927,8 +2927,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "A classic novel about love, family, and social expectations in Regency England.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1342.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1342.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1342",
+            "epub": "https://www.gutenberg.org/ebooks/1342.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1342.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1342/pg1342.cover.medium.jpg",
@@ -2944,8 +2944,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "Historical novel set during the French Revolution.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/98.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/98.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/98",
+            "epub": "https://www.gutenberg.org/ebooks/98.epub.images",
             "html": "https://www.gutenberg.org/ebooks/98.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/98/pg98.cover.medium.jpg",
@@ -2962,8 +2962,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Collection of Poe's famous poems including 'The Raven'.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1065.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1065.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1065",
+            "epub": "https://www.gutenberg.org/ebooks/1065.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1065.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1065/pg1065.cover.medium.jpg",
@@ -2979,8 +2979,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "Groundbreaking collection of American poetry.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1322.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1322.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1322",
+            "epub": "https://www.gutenberg.org/ebooks/1322.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1322.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1322/pg1322.cover.medium.jpg",
@@ -2996,8 +2996,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["preschool", "elementary"],
         "description": "Classic collection of children's poetry.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/12242.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/12242.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/12242",
+            "epub": "https://www.gutenberg.org/ebooks/12242.epub.images",
             "html": "https://www.gutenberg.org/ebooks/12242.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/12242/pg12242.cover.medium.jpg",
@@ -3014,8 +3014,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high", "university"],
         "description": "Essential guide to English grammar and writing style.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/37134.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/37134.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/37134",
+            "epub": "https://www.gutenberg.org/ebooks/37134.epub.images",
             "html": "https://www.gutenberg.org/ebooks/37134.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/37134/pg37134.cover.medium.jpg",
@@ -3031,8 +3031,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Comprehensive English grammar textbook with exercises.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/15877.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/15877.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/15877",
+            "epub": "https://www.gutenberg.org/ebooks/15877.epub.images",
             "html": "https://www.gutenberg.org/ebooks/15877.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/15877/pg15877.cover.medium.jpg",
@@ -3049,8 +3049,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Introduction to algebraic concepts with exercises.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/33283.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/33283.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/33283",
+            "epub": "https://www.gutenberg.org/ebooks/33283.epub.images",
             "html": "https://www.gutenberg.org/ebooks/33283.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/33283/pg33283.cover.medium.jpg",
@@ -3066,8 +3066,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Comprehensive arithmetic textbook with practical problems.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/17384.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/17384.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/17384",
+            "epub": "https://www.gutenberg.org/ebooks/17384.epub.images",
             "html": "https://www.gutenberg.org/ebooks/17384.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/17384/pg17384.cover.medium.jpg",
@@ -3083,8 +3083,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high"],
         "description": "Classic geometry textbook with proofs and exercises.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/13700.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/13700.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/13700",
+            "epub": "https://www.gutenberg.org/ebooks/13700.epub.images",
             "html": "https://www.gutenberg.org/ebooks/13700.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/13700/pg13700.cover.medium.jpg",
@@ -3101,8 +3101,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "Introduction to psychology and human behavior.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/28054.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/28054.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/28054",
+            "epub": "https://www.gutenberg.org/ebooks/28054.epub.images",
             "html": "https://www.gutenberg.org/ebooks/28054.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/28054/pg28054.cover.medium.jpg",
@@ -3118,8 +3118,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "Darwin's groundbreaking work on evolution and natural selection.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/2009.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/2009.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/2009",
+            "epub": "https://www.gutenberg.org/ebooks/2009.epub.images",
             "html": "https://www.gutenberg.org/ebooks/2009.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/2009/pg2009.cover.medium.jpg",
@@ -3136,8 +3136,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["preschool", "elementary"],
         "description": "Classic collection of moral fables with animal characters.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/19994.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/19994.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/19994",
+            "epub": "https://www.gutenberg.org/ebooks/19994.epub.images",
             "html": "https://www.gutenberg.org/ebooks/19994.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/19994/pg19994.cover.medium.jpg",
@@ -3153,8 +3153,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Classic collection of fairy tales including Cinderella, Snow White, and more.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/2591.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/2591.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/2591",
+            "epub": "https://www.gutenberg.org/ebooks/2591.epub.images",
             "html": "https://www.gutenberg.org/ebooks/2591.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/2591/pg2591.cover.medium.jpg",
@@ -3170,8 +3170,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Dorothy's magical adventure in the Land of Oz.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/27200.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/27200.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/27200",
+            "epub": "https://www.gutenberg.org/ebooks/27200.epub.images",
             "html": "https://www.gutenberg.org/ebooks/27200.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/27200/pg27200.cover.medium.jpg",
@@ -3187,8 +3187,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "The story of the boy who never grew up and his adventures in Neverland.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/16.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/16.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/16",
+            "epub": "https://www.gutenberg.org/ebooks/16.epub.images",
             "html": "https://www.gutenberg.org/ebooks/16.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/16/pg16.cover.medium.jpg",
@@ -3205,8 +3205,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "The story of orphan Pip's journey from humble beginnings to gentleman.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1400.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1400.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1400",
+            "epub": "https://www.gutenberg.org/ebooks/1400.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1400.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1400/pg1400.cover.medium.jpg",
@@ -3222,8 +3222,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "The story of an orphan boy who escapes a workhouse and meets a gang of pickpockets.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/730.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/730.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/730",
+            "epub": "https://www.gutenberg.org/ebooks/730.epub.images",
             "html": "https://www.gutenberg.org/ebooks/730.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/730/pg730.cover.medium.jpg",
@@ -3239,8 +3239,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Huck Finn's adventures rafting down the Mississippi River.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/76.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/76.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/76",
+            "epub": "https://www.gutenberg.org/ebooks/76.epub.images",
             "html": "https://www.gutenberg.org/ebooks/76.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/76/pg76.cover.medium.jpg",
@@ -3256,8 +3256,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "The story of an orphaned governess and her complex relationship with Mr. Rochester.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1260.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1260.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1260",
+            "epub": "https://www.gutenberg.org/ebooks/1260.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1260.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1260/pg1260.cover.medium.jpg",
@@ -3273,8 +3273,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "A tale of passionate and destructive love on the Yorkshire moors.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/768.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/768.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/768",
+            "epub": "https://www.gutenberg.org/ebooks/768.epub.images",
             "html": "https://www.gutenberg.org/ebooks/768.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/768/pg768.cover.medium.jpg",
@@ -3290,8 +3290,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "A short story about a woman's mental deterioration, an early feminist work.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1952.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1952.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1952",
+            "epub": "https://www.gutenberg.org/ebooks/1952.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1952.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1952/pg1952.cover.medium.jpg",
@@ -3308,8 +3308,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "A young boy's adventure with pirates searching for buried treasure.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/120.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/120.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/120",
+            "epub": "https://www.gutenberg.org/ebooks/120.epub.images",
             "html": "https://www.gutenberg.org/ebooks/120.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/120/pg120.cover.medium.jpg",
@@ -3325,8 +3325,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "A scientist travels to the far future and discovers the fate of humanity.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/35.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/35.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/35",
+            "epub": "https://www.gutenberg.org/ebooks/35.epub.images",
             "html": "https://www.gutenberg.org/ebooks/35.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/35/pg35.cover.medium.jpg",
@@ -3342,8 +3342,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Martians invade Earth in this classic science fiction story.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/36.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/36.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/36",
+            "epub": "https://www.gutenberg.org/ebooks/36.epub.images",
             "html": "https://www.gutenberg.org/ebooks/36.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/36/pg36.cover.medium.jpg",
@@ -3359,8 +3359,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "A journey into the African Congo exploring colonialism and human nature.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/219.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/219.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/219",
+            "epub": "https://www.gutenberg.org/ebooks/219.epub.images",
             "html": "https://www.gutenberg.org/ebooks/219.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/219/pg219.cover.medium.jpg",
@@ -3376,8 +3376,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "The first Sherlock Holmes novel, introducing the famous detective.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/244.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/244.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/244",
+            "epub": "https://www.gutenberg.org/ebooks/244.epub.images",
             "html": "https://www.gutenberg.org/ebooks/244.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/244/pg244.cover.medium.jpg",
@@ -3393,8 +3393,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Sherlock Holmes investigates a mysterious treasure and murder.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/2097.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/2097.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/2097",
+            "epub": "https://www.gutenberg.org/ebooks/2097.epub.images",
             "html": "https://www.gutenberg.org/ebooks/2097.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/2097/pg2097.cover.medium.jpg",
@@ -3411,8 +3411,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "The story of the four March sisters growing up during the Civil War.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/514.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/514.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/514",
+            "epub": "https://www.gutenberg.org/ebooks/514.epub.images",
             "html": "https://www.gutenberg.org/ebooks/514.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/514/pg514.cover.medium.jpg",
@@ -3428,8 +3428,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "A lawyer investigates the connection between a scientist and a murderer.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/43.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/43.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/43",
+            "epub": "https://www.gutenberg.org/ebooks/43.epub.images",
             "html": "https://www.gutenberg.org/ebooks/43.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/43/pg43.cover.medium.jpg",
@@ -3445,8 +3445,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "The classic vampire novel told through letters and diary entries.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/345.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/345.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/345",
+            "epub": "https://www.gutenberg.org/ebooks/345.epub.images",
             "html": "https://www.gutenberg.org/ebooks/345.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/345/pg345.cover.medium.jpg",
@@ -3462,8 +3462,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "A scientist creates a living creature with tragic consequences.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/84.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/84.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/84",
+            "epub": "https://www.gutenberg.org/ebooks/84.epub.images",
             "html": "https://www.gutenberg.org/ebooks/84.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
@@ -3479,8 +3479,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "Swift's famous satirical essay on poverty in Ireland.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1080.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1080.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1080",
+            "epub": "https://www.gutenberg.org/ebooks/1080.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1080.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1080/pg1080.cover.medium.jpg",
@@ -3496,8 +3496,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle", "high"],
         "description": "A ship's surgeon travels to strange lands with tiny and giant people.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/829.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/829.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/829",
+            "epub": "https://www.gutenberg.org/ebooks/829.epub.images",
             "html": "https://www.gutenberg.org/ebooks/829.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/829/pg829.cover.medium.jpg",
@@ -3513,8 +3513,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "Captain Ahab's obsessive quest to hunt the white whale.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/2701.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/2701.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/2701",
+            "epub": "https://www.gutenberg.org/ebooks/2701.epub.images",
             "html": "https://www.gutenberg.org/ebooks/2701.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/2701/pg2701.cover.medium.jpg",
@@ -3530,8 +3530,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "A wrongfully imprisoned man escapes and seeks revenge on those who betrayed him.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1184.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1184.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1184",
+            "epub": "https://www.gutenberg.org/ebooks/1184.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1184.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1184/pg1184.cover.medium.jpg",
@@ -3547,8 +3547,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "D'Artagnan joins three musketeers in adventure and intrigue in France.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1257.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1257.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1257",
+            "epub": "https://www.gutenberg.org/ebooks/1257.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1257.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1257/pg1257.cover.medium.jpg",
@@ -3565,8 +3565,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Alice enters a magical world through a mirror in this sequel to Wonderland.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/12.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/12.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/12",
+            "epub": "https://www.gutenberg.org/ebooks/12.epub.images",
             "html": "https://www.gutenberg.org/ebooks/12.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/12/pg12.cover.medium.jpg",
@@ -3582,8 +3582,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "The autobiography of a former slave and abolitionist leader.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/23.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/23.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/23",
+            "epub": "https://www.gutenberg.org/ebooks/23.epub.images",
             "html": "https://www.gutenberg.org/ebooks/23.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/23/pg23.cover.medium.jpg",
@@ -3599,8 +3599,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Sherlock Holmes investigates a legendary demonic hound on the moors.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/2852.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/2852.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/2852",
+            "epub": "https://www.gutenberg.org/ebooks/2852.epub.images",
             "html": "https://www.gutenberg.org/ebooks/2852.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/2852/pg2852.cover.medium.jpg",
@@ -3616,8 +3616,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Stories of Mowgli, a boy raised by wolves in the Indian jungle.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/17192.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/17192.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/17192",
+            "epub": "https://www.gutenberg.org/ebooks/17192.epub.images",
             "html": "https://www.gutenberg.org/ebooks/17192.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/17192/pg17192.cover.medium.jpg",
@@ -3633,8 +3633,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "More adventures of Mowgli and the animals of the jungle.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/2781.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/2781.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/2781",
+            "epub": "https://www.gutenberg.org/ebooks/2781.epub.images",
             "html": "https://www.gutenberg.org/ebooks/2781.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/2781/pg2781.cover.medium.jpg",
@@ -3650,8 +3650,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "An orphaned girl discovers a hidden garden and transforms lives.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1597.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1597.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1597",
+            "epub": "https://www.gutenberg.org/ebooks/1597.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1597.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1597/pg1597.cover.medium.jpg",
@@ -3667,8 +3667,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "A wealthy girl loses everything but keeps her dignity and imagination.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/479.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/479.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/479",
+            "epub": "https://www.gutenberg.org/ebooks/479.epub.images",
             "html": "https://www.gutenberg.org/ebooks/479.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/479/pg479.cover.medium.jpg",
@@ -3684,8 +3684,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Sara Crewe's journey from riches to rags and back at a London boarding school.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/113.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/113.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/113",
+            "epub": "https://www.gutenberg.org/ebooks/113.epub.images",
             "html": "https://www.gutenberg.org/ebooks/113.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/113/pg113.cover.medium.jpg",
@@ -3701,8 +3701,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "A feminist utopian novel about a society of women.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/32.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/32.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/32",
+            "epub": "https://www.gutenberg.org/ebooks/32.epub.images",
             "html": "https://www.gutenberg.org/ebooks/32.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/32/pg32.cover.medium.jpg",
@@ -3718,8 +3718,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "A young man's portrait ages while he remains youthful, exploring vanity and morality.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/174.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/174.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/174",
+            "epub": "https://www.gutenberg.org/ebooks/174.epub.images",
             "html": "https://www.gutenberg.org/ebooks/174.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/174/pg174.cover.medium.jpg",
@@ -3735,8 +3735,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["preschool", "elementary"],
         "description": "Adventures of Mole, Rat, Toad, and Badger along the riverbank.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/885.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/885.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/885",
+            "epub": "https://www.gutenberg.org/ebooks/885.epub.images",
             "html": "https://www.gutenberg.org/ebooks/885.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/885/pg885.cover.medium.jpg",
@@ -3752,8 +3752,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Classic tales of Robin Hood and his band of outlaws in Sherwood Forest.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/902.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/902.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/902",
+            "epub": "https://www.gutenberg.org/ebooks/902.epub.images",
             "html": "https://www.gutenberg.org/ebooks/902.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/902/pg902.cover.medium.jpg",
@@ -3769,8 +3769,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "An imaginative orphan girl is adopted by siblings on Prince Edward Island.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/45.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/45.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/45",
+            "epub": "https://www.gutenberg.org/ebooks/45.epub.images",
             "html": "https://www.gutenberg.org/ebooks/45.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/45/pg45.cover.medium.jpg",
@@ -3786,8 +3786,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["elementary", "middle"],
         "description": "Anne continues her adventures as a teacher in Avonlea.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/47.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/47.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/47",
+            "epub": "https://www.gutenberg.org/ebooks/47.epub.images",
             "html": "https://www.gutenberg.org/ebooks/47.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/47/pg47.cover.medium.jpg",
@@ -3803,8 +3803,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "A domesticated dog returns to his wild instincts in the Yukon.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1837.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1837.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1837",
+            "epub": "https://www.gutenberg.org/ebooks/1837.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1837.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1837/pg1837.cover.medium.jpg",
@@ -3820,8 +3820,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "A wild wolf-dog learns to live among humans in the Yukon.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/910.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/910.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/910",
+            "epub": "https://www.gutenberg.org/ebooks/910.epub.images",
             "html": "https://www.gutenberg.org/ebooks/910.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/910/pg910.cover.medium.jpg",
@@ -3837,8 +3837,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "Buck's transformation from pet to leader of a wolf pack.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/215.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/215.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/215",
+            "epub": "https://www.gutenberg.org/ebooks/215.epub.images",
             "html": "https://www.gutenberg.org/ebooks/215.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/215/pg215.cover.medium.jpg",
@@ -3855,8 +3855,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["preschool", "elementary"],
         "description": "Classic nursery rhymes for young children.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/14838.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/14838.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/14838",
+            "epub": "https://www.gutenberg.org/ebooks/14838.epub.images",
             "html": "https://www.gutenberg.org/ebooks/14838.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/14838/pg14838.cover.medium.jpg",
@@ -3872,8 +3872,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["preschool", "elementary"],
         "description": "Stories explaining natural phenomena for young readers.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/10607.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/10607.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/10607",
+            "epub": "https://www.gutenberg.org/ebooks/10607.epub.images",
             "html": "https://www.gutenberg.org/ebooks/10607.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/10607/pg10607.cover.medium.jpg",
@@ -3889,8 +3889,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["preschool", "elementary", "middle"],
         "description": "Classic fairy tales including The Little Mermaid and The Ugly Duckling.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/1515.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/1515.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/1515",
+            "epub": "https://www.gutenberg.org/ebooks/1515.epub.images",
             "html": "https://www.gutenberg.org/ebooks/1515.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/1515/pg1515.cover.medium.jpg",
@@ -3906,8 +3906,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["middle", "high"],
         "description": "A Swedish immigrant family's struggles on the Nebraska prairie.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/24.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/24.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/24",
+            "epub": "https://www.gutenberg.org/ebooks/24.epub.images",
             "html": "https://www.gutenberg.org/ebooks/24.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/24/pg24.cover.medium.jpg",
@@ -3923,8 +3923,8 @@ FREE_EDUCATIONAL_BOOKS = [
         "grade_level": ["high", "university"],
         "description": "The adventures of a man who believes he is a knight.",
         "formats": {
-            "pdf": "https://www.gutenberg.org/ebooks/996.pdf",
-            "epub": "https://www.gutenberg.org/ebooks/996.epub",
+            "pdf": "https://www.gutenberg.org/ebooks/996",
+            "epub": "https://www.gutenberg.org/ebooks/996.epub.images",
             "html": "https://www.gutenberg.org/ebooks/996.html.images"
         },
         "cover": "https://www.gutenberg.org/cache/epub/996/pg996.cover.medium.jpg",
