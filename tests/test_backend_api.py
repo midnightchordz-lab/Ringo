@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://vidstudio-7.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://contentflow-65.preview.emergentagent.com')
 
 # Test credentials
 TEST_USER_EMAIL = "testuser123@test.com"

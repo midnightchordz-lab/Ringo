@@ -61,7 +61,7 @@ if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
 # Frontend URL for email links
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://vidstudio-7.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://contentflow-65.preview.emergentagent.com")
 
 
 # ==================== YOUTUBE API OPTIMIZATION ====================
@@ -563,7 +563,7 @@ async def microsoft_login(request: Request):
         frontend_url = f"{parsed.scheme}://{parsed.netloc}"
     else:
         # Default to preview URL if available, otherwise localhost
-        frontend_url = "https://vidstudio-7.preview.emergentagent.com"
+        frontend_url = "https://contentflow-65.preview.emergentagent.com"
     
     redirect_uri = f"{frontend_url}/auth/microsoft/callback"
     
