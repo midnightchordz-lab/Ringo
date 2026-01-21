@@ -1746,15 +1746,25 @@ export const ContentLibrary = () => {
               <p className="text-neutral-500 mb-6">Try selecting a different category or grade level</p>
               <Button
                 onClick={() => {
-                  api.get('/content-library/free-books', { params: { limit: 50 } })
-                    .then(res => setFreeBooks(res.data.books || []))
-                    .catch(err => console.error(err));
+                  fetchFreeBooks(1);
                 }}
                 className="bg-amber-500 hover:bg-amber-600 text-white rounded-full px-6"
               >
                 Show All Books
               </Button>
             </div>
+          )}
+          
+          {/* Pagination for Free Books */}
+          {freeBooks.length > 0 && (
+            <PaginationControls
+              currentPage={freeBooksPage}
+              totalPages={freeBooksTotalPages}
+              totalItems={freeBooksTotalResults}
+              perPage={perPage}
+              onPageChange={handleFreeBooksPageChange}
+              isLoading={loadingBooks}
+            />
           )}
         </div>
       )}
