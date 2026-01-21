@@ -421,19 +421,33 @@ export const Images = () => {
 
       {/* Image Grid */}
       {!loading && displayImages.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          <AnimatePresence>
-            {displayImages.map((image) => (
-              <ImageCard
-                key={image.id}
-                image={image}
-                onFavorite={handleFavorite}
-                onCopyUrl={handleCopyUrl}
-                isFavorited={isFavorited(image.id)}
-              />
-            ))}
-          </AnimatePresence>
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <AnimatePresence>
+              {displayImages.map((image) => (
+                <ImageCard
+                  key={image.id}
+                  image={image}
+                  onFavorite={handleFavorite}
+                  onCopyUrl={handleCopyUrl}
+                  isFavorited={isFavorited(image.id)}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
+          
+          {/* Pagination */}
+          {!showFavorites && (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalImages}
+              perPage={perPage}
+              onPageChange={handlePageChange}
+              isLoading={loading}
+            />
+          )}
+        </>
       )}
 
       {/* Empty State */}
