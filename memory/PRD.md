@@ -276,11 +276,35 @@ Implemented comprehensive, multi-source search for all content categories:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 21, 2026 - Fixed Gutenberg PDF download 404 errors, implemented pagination for Content Library
+January 21, 2026 - Implemented comprehensive web-wide search for Courses, Videos, and Resources categories
 
 ## Recent Changes (Jan 21, 2026)
 
-### BUG FIX: Gutenberg PDF 404 Errors
+### FEATURE: Comprehensive Web-Wide Search (COMPLETED)
+- **Problem**: Content Library categories (Courses, Videos, Resources) were returning limited results from only 1-2 sources
+- **Solution**: Implemented multi-source search for each category:
+  - **Courses**: Added Wikiversity, Wikibooks, freeCodeCamp, Codecademy APIs (total 7 sources)
+  - **Videos**: Enhanced YouTube CC search + Internet Archive enhanced + TED Talks (3 sources)
+  - **Resources**: Added Smithsonian, Library of Congress, PBS LearningMedia, BBC Bitesize, National Geographic (total 8 sources)
+- **New search functions added**:
+  - `search_wikiversity_courses()` - MediaWiki API for Wikiversity
+  - `search_wikibooks_courses()` - MediaWiki API for Wikibooks
+  - `search_freecodecamp_courses()` - freeCodeCamp curriculum
+  - `search_codecademy_courses()` - Codecademy courses
+  - `search_youtube_videos_comprehensive()` - Enhanced YouTube CC search
+  - `search_internet_archive_videos_enhanced()` - Multi-category video search
+  - `search_smithsonian_resources()` - Smithsonian Learning Lab
+  - `search_national_geographic_edu()` - National Geographic Education
+  - `search_library_of_congress()` - Library of Congress API
+  - `search_pbs_learningmedia()` - PBS LearningMedia
+  - `search_bbc_bitesize()` - BBC Bitesize education
+- **Files changed**: `/app/backend/server.py`
+- **Test results**:
+  - Courses: 28+ results from 7 sources
+  - Videos: 186+ results from 3 sources (all CC licensed)
+  - Resources: 37+ results from 8 sources
+
+### BUG FIX: Gutenberg PDF 404 Errors (Previous session)
 - **Problem**: PDF download links returned 404 because Project Gutenberg doesn't serve direct .pdf files at `/ebooks/{id}.pdf`
 - **Solution**: Updated all book URLs:
   - "Download" button now links to Gutenberg landing page (`/ebooks/{id}`) where users can choose format
