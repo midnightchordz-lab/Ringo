@@ -1523,7 +1523,10 @@ export const ContentLibrary = () => {
           {/* Results Count */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-neutral-600">
-              Showing <span className="text-pink-600 font-bold">{childrensLiterature.length}</span> children's books
+              Showing <span className="text-pink-600 font-bold">{childrensTotalResults}</span> children's books
+              {childrensTotalPages > 1 && (
+                <span className="text-neutral-500 ml-2">(Page {childrensPage} of {childrensTotalPages})</span>
+              )}
             </p>
           </div>
 
