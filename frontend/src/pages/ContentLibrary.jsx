@@ -1693,11 +1693,16 @@ export const ContentLibrary = () => {
               <button
                 key={cat}
                 onClick={() => {
-                  const params = { limit: 50 };
+                  const params = { page: 1, per_page: perPage };
                   if (cat !== 'all') params.category = cat;
                   if (selectedLevel !== 'all') params.grade = selectedLevel;
                   api.get('/content-library/free-books', { params })
-                    .then(res => setFreeBooks(res.data.books || []))
+                    .then(res => {
+                      setFreeBooks(res.data.books || []);
+                      setFreeBooksPage(res.data.page || 1);
+                      setFreeBooksTotalPages(res.data.total_pages || 1);
+                      setFreeBooksTotalResults(res.data.total || 0);
+                    })
                     .catch(err => console.error(err));
                 }}
                 className={`px-4 py-2 rounded-full text-sm font-medium capitalize transition-all ${
@@ -1715,7 +1720,7 @@ export const ContentLibrary = () => {
           {/* Books Count */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-neutral-600">
-              Showing <span className="text-amber-600 font-bold">{freeBooks.length}</span> free downloadable books
+              Showing <span className="text-amber-600 font-bold">{freeBooksTotalResults}</span> free downloadable books
             </p>
             <div className="flex items-center gap-2 text-xs text-neutral-500">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
