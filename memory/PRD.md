@@ -80,7 +80,7 @@ Created modular architecture for maintainability:
 - Source badges (Pexels/Unsplash)
 - Photographer attribution with links
 
-### Core Features - Content Library (ENHANCED Jan 20, 2026)
+### Core Features - Content Library (ENHANCED Jan 21, 2026)
 - **Dynamic AI-Powered Search** - searches across multiple sources in real-time:
   - OpenLibrary (3M+ books)
   - Internet Archive (35M+ items)
@@ -97,6 +97,33 @@ Created modular architecture for maintainability:
 - Quick search suggestions for common queries
 - Source badges showing where content came from
 - License information for each result
+
+### Web-Wide Search Enhancement (Jan 21, 2026) ✅ NEW
+Implemented comprehensive, multi-source search for all content categories:
+
+**COURSES** (7 sources):
+- OpenStax - Free peer-reviewed textbooks
+- MIT OpenCourseWare - MIT course materials
+- Wikiversity - Free learning resources (MediaWiki API)
+- Wikibooks - Free textbooks (MediaWiki API)
+- freeCodeCamp - Free coding courses
+- Codecademy - Interactive coding tutorials
+- YouTube Educational - Course playlists
+
+**VIDEOS** (3 sources):
+- YouTube (Creative Commons) - CC-licensed educational videos
+- Internet Archive - Public domain documentaries & lectures
+- TED Talks - Expert talks on various topics
+
+**RESOURCES** (8 sources):
+- OER Commons - Open Educational Resources
+- MERLOT - Curated learning materials
+- Internet Archive - Educational texts & documents
+- Smithsonian Learning Lab - Museum resources
+- Library of Congress - Primary historical sources
+- PBS LearningMedia - PreK-12 educational resources
+- BBC Bitesize - UK educational content
+- National Geographic Education - Geography & science resources
 
 ### Core Features - Reading Lists (NEW Jan 20, 2026)
 - **Create curated book collections** for specific grades or subjects
