@@ -407,8 +407,9 @@ const FreeBookCard = ({ book, onFavorite, isFavorited, onAddToList, readingLists
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                title="Download from Project Gutenberg"
               >
-                <Download className="w-3 h-3" /> PDF
+                <Download className="w-3 h-3" /> Download
               </a>
             )}
             {book.formats?.epub && (
@@ -417,6 +418,7 @@ const FreeBookCard = ({ book, onFavorite, isFavorited, onAddToList, readingLists
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                title="Download EPUB format"
               >
                 <Download className="w-3 h-3" /> EPUB
               </a>
@@ -427,6 +429,7 @@ const FreeBookCard = ({ book, onFavorite, isFavorited, onAddToList, readingLists
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                title="Read online in browser"
               >
                 <ExternalLink className="w-3 h-3" /> Read Online
               </a>
