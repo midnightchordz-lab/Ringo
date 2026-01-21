@@ -2256,6 +2256,7 @@ async def search_childrens_literature(
                 search_gutenberg_children(client, search_query, fetch_limit, page),
                 search_storyweaver(client, search_query, grade, fetch_limit, page),
                 search_openlibrary_children(client, search_query, fetch_limit),
+                search_internet_archive_children(client, search_query, fetch_limit),
             ]
             
             results = await asyncio.gather(*tasks, return_exceptions=True)
