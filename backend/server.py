@@ -2575,6 +2575,71 @@ async def search_youtube_educational(client: httpx.AsyncClient, query: str, limi
     return []
 
 
+async def search_educational_resources(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search for educational resources - worksheets, templates, guides"""
+    results = []
+    
+    # Educational resource platforms
+    resource_sites = [
+        {
+            "name": "Teachers Pay Teachers (Free)",
+            "url": f"https://www.teacherspayteachers.com/Browse/Search:{query.replace(' ', '%20')}/Price-Range/Free",
+            "description": "Free educational worksheets and resources from teachers worldwide"
+        },
+        {
+            "name": "Education.com (Free)",
+            "url": f"https://www.education.com/worksheets/?q={query.replace(' ', '+')}",
+            "description": "Free printable worksheets for all grade levels"
+        },
+        {
+            "name": "K12 Reader",
+            "url": f"https://www.k12reader.com/?s={query.replace(' ', '+')}",
+            "description": "Free reading worksheets and educational materials"
+        },
+        {
+            "name": "Super Teacher Worksheets",
+            "url": f"https://www.superteacherworksheets.com/search.html?q={query.replace(' ', '+')}",
+            "description": "Printable worksheets for teachers and parents"
+        },
+        {
+            "name": "Worksheet Works",
+            "url": f"https://www.worksheetworks.com/",
+            "description": "Free customizable worksheet generator"
+        },
+        {
+            "name": "CommonLit",
+            "url": f"https://www.commonlit.org/en/library?searchText={query.replace(' ', '+')}",
+            "description": "Free reading passages and literacy resources"
+        },
+        {
+            "name": "ReadWriteThink",
+            "url": f"https://www.readwritethink.org/search?term={query.replace(' ', '+')}",
+            "description": "Free K-12 lesson plans and resources"
+        },
+        {
+            "name": "PBS LearningMedia",
+            "url": f"https://www.pbslearningmedia.org/search/?q={query.replace(' ', '+')}",
+            "description": "Free educational videos and resources from PBS"
+        }
+    ]
+    
+    for i, site in enumerate(resource_sites[:limit]):
+        results.append({
+            "id": f"resource_{i}_{query.replace(' ', '_')}",
+            "title": f"{query.title()} resources on {site['name']}",
+            "description": site['description'],
+            "type": "resource",
+            "category": "resource",
+            "source": site['name'],
+            "url": site['url'],
+            "thumbnail": "📚",
+            "license": "Free to access",
+            "free": True
+        })
+    
+    return results
+
+
 # ==================== CHILDREN'S LITERATURE SEARCH (COPYRIGHT-FREE) ====================
 
 @api_router.get("/content-library/childrens-literature")
