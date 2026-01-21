@@ -211,10 +211,11 @@ Created modular architecture for maintainability:
 - POST `/api/reading-lists/{id}/copy` - Copy public list to own lists (NEW)
 
 ### Content Library
-- GET `/api/content-library/search` - Dynamic search across web sources (NEW)
+- GET `/api/content-library/search` - Dynamic search with pagination (page, per_page params)
+- GET `/api/content-library/childrens-literature` - Children's literature search with pagination
 - GET `/api/content-library/worksheets/search` - Worksheet-specific search (NEW)
-- GET `/api/content-library/free-books` - Get curated free downloadable books (NEW)
-- GET `/api/content-library/free-books/search` - Search free books by title/author (NEW)
+- GET `/api/content-library/free-books` - Get curated free books with pagination (page, per_page params)
+- GET `/api/content-library/free-books/search` - Search free books with pagination
 - GET `/api/content-library/favorites` - Get favorite resources
 - POST `/api/content-library/favorites` - Add resource to favorites
 - DELETE `/api/content-library/favorites/{resource_id}` - Remove from favorites
