@@ -96,16 +96,45 @@ export const Layout = () => {
         </nav>
         
         {/* User Section */}
-        <div className="p-4 border-t border-neutral-100 space-y-3">
+        <div className="p-4 border-t border-neutral-100 dark:border-neutral-800 space-y-3">
+          {/* Theme Toggle */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            data-testid="theme-toggle"
+          >
+            <div className="flex items-center space-x-3">
+              {theme === 'dark' ? (
+                <Moon className="w-5 h-5 text-indigo-500" />
+              ) : (
+                <Sun className="w-5 h-5 text-amber-500" />
+              )}
+              <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+              </span>
+            </div>
+            <div className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${
+              theme === 'dark' ? 'bg-indigo-600' : 'bg-neutral-300'
+            }`}>
+              <motion.div 
+                className="w-4 h-4 bg-white rounded-full shadow-sm"
+                animate={{ x: theme === 'dark' ? 24 : 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              />
+            </div>
+          </motion.button>
+          
           {/* User Card */}
-          <div className="studio-card p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div className="studio-card p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                 {(user.full_name || 'U').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-neutral-900 truncate">{user.full_name || 'User'}</p>
-                <p className="text-xs text-neutral-500 truncate">{user.email || ''}</p>
+                <p className="text-sm font-bold text-neutral-900 dark:text-neutral-100 truncate">{user.full_name || 'User'}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{user.email || ''}</p>
               </div>
             </div>
           </div>
@@ -113,7 +142,7 @@ export const Layout = () => {
           {/* Logout Button */}
           <Button
             onClick={handleLogout}
-            className="w-full bg-neutral-100 text-neutral-700 hover:bg-red-50 hover:text-red-600 font-semibold rounded-xl py-2.5 flex items-center justify-center transition-colors"
+            className="w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 font-semibold rounded-xl py-2.5 flex items-center justify-center transition-colors"
             data-testid="logout-button"
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -135,7 +164,7 @@ export const Layout = () => {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 w-full bg-white border-t border-neutral-200 z-50 shadow-lg">
+      <nav className="lg:hidden fixed bottom-0 w-full bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 z-50 shadow-lg transition-colors duration-300">
         <div className="flex justify-around items-center h-16 px-2">
           {navItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
