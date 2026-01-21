@@ -1658,6 +1658,18 @@ export const ContentLibrary = () => {
               </div>
             </div>
           )}
+          
+          {/* Pagination for Children's Literature */}
+          {childrensLiterature.length > 0 && (
+            <PaginationControls
+              currentPage={childrensPage}
+              totalPages={childrensTotalPages}
+              totalItems={childrensTotalResults}
+              perPage={perPage}
+              onPageChange={handleChildrensPageChange}
+              isLoading={loadingChildrens}
+            />
+          )}
         </div>
       )}
 
