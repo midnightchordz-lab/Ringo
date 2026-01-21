@@ -934,6 +934,25 @@ export const ContentLibrary = () => {
   const [showListDetail, setShowListDetail] = useState(false);
   const [includePublicLists, setIncludePublicLists] = useState(false);
   const [pendingBook, setPendingBook] = useState(null);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const [perPage] = useState(50);
+  
+  // Pagination state for different sections
+  const [childrensPage, setChildrensPage] = useState(1);
+  const [childrensTotalPages, setChildrensTotalPages] = useState(1);
+  const [childrensTotalResults, setChildrensTotalResults] = useState(0);
+  
+  const [freeBooksPage, setFreeBooksPage] = useState(1);
+  const [freeBooksTotalPages, setFreeBooksTotalPages] = useState(1);
+  const [freeBooksTotalResults, setFreeBooksTotalResults] = useState(0);
+  
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchTotalPages, setSearchTotalPages] = useState(1);
+  const [searchTotalResults, setSearchTotalResults] = useState(0);
 
   useEffect(() => {
     fetchFavorites();
