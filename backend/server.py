@@ -2898,6 +2898,742 @@ FREE_EDUCATIONAL_BOOKS = [
         "cover": "https://www.gutenberg.org/cache/epub/16/pg16.cover.medium.jpg",
         "license": "public-domain",
         "printable": True
+    },
+    # Additional Children's Literature - Classic Stories
+    {
+        "id": "gutenberg-1400",
+        "title": "Great Expectations",
+        "author": "Charles Dickens",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "The story of orphan Pip's journey from humble beginnings to gentleman.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1400.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1400.epub",
+            "html": "https://www.gutenberg.org/ebooks/1400.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1400/pg1400.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-730",
+        "title": "Oliver Twist",
+        "author": "Charles Dickens",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "The story of an orphan boy who escapes a workhouse and meets a gang of pickpockets.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/730.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/730.epub",
+            "html": "https://www.gutenberg.org/ebooks/730.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/730/pg730.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-76",
+        "title": "Adventures of Huckleberry Finn",
+        "author": "Mark Twain",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "Huck Finn's adventures rafting down the Mississippi River.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/76.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/76.epub",
+            "html": "https://www.gutenberg.org/ebooks/76.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/76/pg76.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1260",
+        "title": "Jane Eyre",
+        "author": "Charlotte Brontë",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "The story of an orphaned governess and her complex relationship with Mr. Rochester.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1260.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1260.epub",
+            "html": "https://www.gutenberg.org/ebooks/1260.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1260/pg1260.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-768",
+        "title": "Wuthering Heights",
+        "author": "Emily Brontë",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "A tale of passionate and destructive love on the Yorkshire moors.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/768.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/768.epub",
+            "html": "https://www.gutenberg.org/ebooks/768.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/768/pg768.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1952",
+        "title": "The Yellow Wallpaper",
+        "author": "Charlotte Perkins Gilman",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "A short story about a woman's mental deterioration, an early feminist work.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1952.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1952.epub",
+            "html": "https://www.gutenberg.org/ebooks/1952.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1952/pg1952.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Children's Classic Literature
+    {
+        "id": "gutenberg-120",
+        "title": "Treasure Island",
+        "author": "Robert Louis Stevenson",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "A young boy's adventure with pirates searching for buried treasure.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/120.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/120.epub",
+            "html": "https://www.gutenberg.org/ebooks/120.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/120/pg120.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-35",
+        "title": "The Time Machine",
+        "author": "H. G. Wells",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "A scientist travels to the far future and discovers the fate of humanity.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/35.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/35.epub",
+            "html": "https://www.gutenberg.org/ebooks/35.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/35/pg35.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-36",
+        "title": "The War of the Worlds",
+        "author": "H. G. Wells",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "Martians invade Earth in this classic science fiction story.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/36.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/36.epub",
+            "html": "https://www.gutenberg.org/ebooks/36.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/36/pg36.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-219",
+        "title": "Heart of Darkness",
+        "author": "Joseph Conrad",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "A journey into the African Congo exploring colonialism and human nature.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/219.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/219.epub",
+            "html": "https://www.gutenberg.org/ebooks/219.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/219/pg219.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-244",
+        "title": "A Study in Scarlet",
+        "author": "Arthur Conan Doyle",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "The first Sherlock Holmes novel, introducing the famous detective.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/244.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/244.epub",
+            "html": "https://www.gutenberg.org/ebooks/244.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/244/pg244.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-2097",
+        "title": "The Sign of the Four",
+        "author": "Arthur Conan Doyle",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "Sherlock Holmes investigates a mysterious treasure and murder.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/2097.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/2097.epub",
+            "html": "https://www.gutenberg.org/ebooks/2097.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/2097/pg2097.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # More Children's Classics
+    {
+        "id": "gutenberg-514",
+        "title": "Little Women",
+        "author": "Louisa May Alcott",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "The story of the four March sisters growing up during the Civil War.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/514.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/514.epub",
+            "html": "https://www.gutenberg.org/ebooks/514.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/514/pg514.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-43",
+        "title": "The Strange Case of Dr. Jekyll and Mr. Hyde",
+        "author": "Robert Louis Stevenson",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "A lawyer investigates the connection between a scientist and a murderer.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/43.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/43.epub",
+            "html": "https://www.gutenberg.org/ebooks/43.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/43/pg43.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-345",
+        "title": "Dracula",
+        "author": "Bram Stoker",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "The classic vampire novel told through letters and diary entries.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/345.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/345.epub",
+            "html": "https://www.gutenberg.org/ebooks/345.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/345/pg345.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-84",
+        "title": "Frankenstein",
+        "author": "Mary Shelley",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "A scientist creates a living creature with tragic consequences.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/84.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/84.epub",
+            "html": "https://www.gutenberg.org/ebooks/84.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1080",
+        "title": "A Modest Proposal",
+        "author": "Jonathan Swift",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "Swift's famous satirical essay on poverty in Ireland.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1080.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1080.epub",
+            "html": "https://www.gutenberg.org/ebooks/1080.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1080/pg1080.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-829",
+        "title": "Gulliver's Travels",
+        "author": "Jonathan Swift",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle", "high"],
+        "description": "A ship's surgeon travels to strange lands with tiny and giant people.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/829.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/829.epub",
+            "html": "https://www.gutenberg.org/ebooks/829.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/829/pg829.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-2701",
+        "title": "Moby Dick",
+        "author": "Herman Melville",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "Captain Ahab's obsessive quest to hunt the white whale.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/2701.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/2701.epub",
+            "html": "https://www.gutenberg.org/ebooks/2701.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/2701/pg2701.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1184",
+        "title": "The Count of Monte Cristo",
+        "author": "Alexandre Dumas",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "A wrongfully imprisoned man escapes and seeks revenge on those who betrayed him.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1184.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1184.epub",
+            "html": "https://www.gutenberg.org/ebooks/1184.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1184/pg1184.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1257",
+        "title": "The Three Musketeers",
+        "author": "Alexandre Dumas",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "D'Artagnan joins three musketeers in adventure and intrigue in France.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1257.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1257.epub",
+            "html": "https://www.gutenberg.org/ebooks/1257.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1257/pg1257.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Young Children's Literature
+    {
+        "id": "gutenberg-12",
+        "title": "Through the Looking-Glass",
+        "author": "Lewis Carroll",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Alice enters a magical world through a mirror in this sequel to Wonderland.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/12.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/12.epub",
+            "html": "https://www.gutenberg.org/ebooks/12.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/12/pg12.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-23",
+        "title": "Narrative of the Life of Frederick Douglass",
+        "author": "Frederick Douglass",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "The autobiography of a former slave and abolitionist leader.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/23.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/23.epub",
+            "html": "https://www.gutenberg.org/ebooks/23.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/23/pg23.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-2852",
+        "title": "The Hound of the Baskervilles",
+        "author": "Arthur Conan Doyle",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "Sherlock Holmes investigates a legendary demonic hound on the moors.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/2852.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/2852.epub",
+            "html": "https://www.gutenberg.org/ebooks/2852.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/2852/pg2852.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-17192",
+        "title": "The Jungle Book",
+        "author": "Rudyard Kipling",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Stories of Mowgli, a boy raised by wolves in the Indian jungle.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/17192.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/17192.epub",
+            "html": "https://www.gutenberg.org/ebooks/17192.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/17192/pg17192.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-2781",
+        "title": "The Second Jungle Book",
+        "author": "Rudyard Kipling",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "More adventures of Mowgli and the animals of the jungle.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/2781.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/2781.epub",
+            "html": "https://www.gutenberg.org/ebooks/2781.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/2781/pg2781.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1597",
+        "title": "The Secret Garden",
+        "author": "Frances Hodgson Burnett",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "An orphaned girl discovers a hidden garden and transforms lives.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1597.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1597.epub",
+            "html": "https://www.gutenberg.org/ebooks/1597.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1597/pg1597.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-479",
+        "title": "A Little Princess",
+        "author": "Frances Hodgson Burnett",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "A wealthy girl loses everything but keeps her dignity and imagination.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/479.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/479.epub",
+            "html": "https://www.gutenberg.org/ebooks/479.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/479/pg479.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-113",
+        "title": "The Secret Garden",
+        "author": "Frances Hodgson Burnett",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Sara Crewe's journey from riches to rags and back at a London boarding school.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/113.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/113.epub",
+            "html": "https://www.gutenberg.org/ebooks/113.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/113/pg113.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-32",
+        "title": "Herland",
+        "author": "Charlotte Perkins Gilman",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "A feminist utopian novel about a society of women.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/32.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/32.epub",
+            "html": "https://www.gutenberg.org/ebooks/32.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/32/pg32.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-174",
+        "title": "The Picture of Dorian Gray",
+        "author": "Oscar Wilde",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "A young man's portrait ages while he remains youthful, exploring vanity and morality.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/174.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/174.epub",
+            "html": "https://www.gutenberg.org/ebooks/174.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/174/pg174.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-885",
+        "title": "The Wind in the Willows",
+        "author": "Kenneth Grahame",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["preschool", "elementary"],
+        "description": "Adventures of Mole, Rat, Toad, and Badger along the riverbank.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/885.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/885.epub",
+            "html": "https://www.gutenberg.org/ebooks/885.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/885/pg885.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-902",
+        "title": "The Merry Adventures of Robin Hood",
+        "author": "Howard Pyle",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Classic tales of Robin Hood and his band of outlaws in Sherwood Forest.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/902.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/902.epub",
+            "html": "https://www.gutenberg.org/ebooks/902.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/902/pg902.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-45",
+        "title": "Anne of Green Gables",
+        "author": "L. M. Montgomery",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "An imaginative orphan girl is adopted by siblings on Prince Edward Island.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/45.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/45.epub",
+            "html": "https://www.gutenberg.org/ebooks/45.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/45/pg45.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-47",
+        "title": "Anne of Avonlea",
+        "author": "L. M. Montgomery",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["elementary", "middle"],
+        "description": "Anne continues her adventures as a teacher in Avonlea.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/47.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/47.epub",
+            "html": "https://www.gutenberg.org/ebooks/47.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/47/pg47.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1837",
+        "title": "The Call of the Wild",
+        "author": "Jack London",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "A domesticated dog returns to his wild instincts in the Yukon.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1837.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1837.epub",
+            "html": "https://www.gutenberg.org/ebooks/1837.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1837/pg1837.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-910",
+        "title": "White Fang",
+        "author": "Jack London",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "A wild wolf-dog learns to live among humans in the Yukon.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/910.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/910.epub",
+            "html": "https://www.gutenberg.org/ebooks/910.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/910/pg910.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-215",
+        "title": "The Call of the Wild",
+        "author": "Jack London",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "Buck's transformation from pet to leader of a wolf pack.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/215.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/215.epub",
+            "html": "https://www.gutenberg.org/ebooks/215.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/215/pg215.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    # Children's Poetry
+    {
+        "id": "gutenberg-14838",
+        "title": "Mother Goose Nursery Rhymes",
+        "author": "Various",
+        "category": "poetry",
+        "subject": "literature",
+        "grade_level": ["preschool", "elementary"],
+        "description": "Classic nursery rhymes for young children.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/14838.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/14838.epub",
+            "html": "https://www.gutenberg.org/ebooks/14838.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/14838/pg14838.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-10607",
+        "title": "The Book of Nature Myths",
+        "author": "Florence Holbrook",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["preschool", "elementary"],
+        "description": "Stories explaining natural phenomena for young readers.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/10607.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/10607.epub",
+            "html": "https://www.gutenberg.org/ebooks/10607.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/10607/pg10607.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-1515",
+        "title": "Andersen's Fairy Tales",
+        "author": "Hans Christian Andersen",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["preschool", "elementary", "middle"],
+        "description": "Classic fairy tales including The Little Mermaid and The Ugly Duckling.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/1515.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/1515.epub",
+            "html": "https://www.gutenberg.org/ebooks/1515.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/1515/pg1515.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-24",
+        "title": "O Pioneers!",
+        "author": "Willa Cather",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["middle", "high"],
+        "description": "A Swedish immigrant family's struggles on the Nebraska prairie.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/24.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/24.epub",
+            "html": "https://www.gutenberg.org/ebooks/24.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/24/pg24.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
+    },
+    {
+        "id": "gutenberg-996",
+        "title": "Don Quixote",
+        "author": "Miguel de Cervantes",
+        "category": "stories",
+        "subject": "literature",
+        "grade_level": ["high", "university"],
+        "description": "The adventures of a man who believes he is a knight.",
+        "formats": {
+            "pdf": "https://www.gutenberg.org/ebooks/996.pdf",
+            "epub": "https://www.gutenberg.org/ebooks/996.epub",
+            "html": "https://www.gutenberg.org/ebooks/996.html.images"
+        },
+        "cover": "https://www.gutenberg.org/cache/epub/996/pg996.cover.medium.jpg",
+        "license": "public-domain",
+        "printable": True
     }
 ]
 
