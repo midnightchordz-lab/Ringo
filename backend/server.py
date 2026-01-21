@@ -2287,7 +2287,7 @@ async def search_content_library(
                 tasks.append(search_youtube_educational(client, query, fetch_limit))
                 
             if category in ["all", "resource", "worksheet"]:
-                tasks.append(search_oer_commons(client, enhanced_query, fetch_limit))
+                tasks.append(search_educational_resources(client, enhanced_query, fetch_limit))
             
             if category in ["all", "book"]:
                 tasks.append(search_openlibrary(client, enhanced_query, fetch_limit // 2))
