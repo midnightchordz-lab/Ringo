@@ -1,8 +1,9 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Clock, Sparkles, TrendingUp, LogOut, Image, Library, Video, ChevronRight } from 'lucide-react';
+import { Home, Clock, Sparkles, TrendingUp, LogOut, Image, Library, Video, ChevronRight, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useTheme } from '../context/ThemeContext';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Dashboard', color: 'blue' },
@@ -13,17 +14,18 @@ const navItems = [
 ];
 
 const colorClasses = {
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', active: 'from-blue-600 to-indigo-600' },
-  coral: { bg: 'bg-red-100', text: 'text-red-500', active: 'from-red-500 to-orange-500' },
-  purple: { bg: 'bg-purple-100', text: 'text-purple-600', active: 'from-purple-600 to-pink-600' },
-  green: { bg: 'bg-emerald-100', text: 'text-emerald-600', active: 'from-emerald-600 to-green-600' },
-  yellow: { bg: 'bg-amber-100', text: 'text-amber-600', active: 'from-amber-500 to-yellow-500' },
-  gray: { bg: 'bg-neutral-100', text: 'text-neutral-600', active: 'from-neutral-600 to-neutral-700' },
+  blue: { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-600 dark:text-blue-400', active: 'from-blue-600 to-indigo-600' },
+  coral: { bg: 'bg-red-100 dark:bg-red-900/40', text: 'text-red-500 dark:text-red-400', active: 'from-red-500 to-orange-500' },
+  purple: { bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-600 dark:text-purple-400', active: 'from-purple-600 to-pink-600' },
+  green: { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-600 dark:text-emerald-400', active: 'from-emerald-600 to-green-600' },
+  yellow: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-600 dark:text-amber-400', active: 'from-amber-500 to-yellow-500' },
+  gray: { bg: 'bg-neutral-100 dark:bg-neutral-800', text: 'text-neutral-600 dark:text-neutral-400', active: 'from-neutral-600 to-neutral-700' },
 };
 
 export const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -35,11 +37,11 @@ export const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-neutral-50">
+    <div className="flex h-screen bg-neutral-50 dark:bg-neutral-950 transition-colors duration-300">
       {/* Desktop Sidebar - Light & Clean */}
-      <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-neutral-200 shadow-sm">
+      <aside className="hidden lg:flex flex-col w-72 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 shadow-sm transition-colors duration-300">
         {/* Logo */}
-        <div className="p-6 border-b border-neutral-100">
+        <div className="p-6 border-b border-neutral-100 dark:border-neutral-800">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -51,7 +53,7 @@ export const Layout = () => {
               <h1 className="text-xl font-bold text-gradient" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 ContentFlow
               </h1>
-              <p className="text-xs font-medium text-neutral-500">Creative Studio</p>
+              <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Creative Studio</p>
             </div>
           </div>
         </div>
@@ -75,7 +77,7 @@ export const Layout = () => {
                   className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive
                       ? `bg-gradient-to-r ${colors.active} text-white shadow-lg`
-                      : 'text-neutral-600 hover:bg-neutral-100'
+                      : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                   }`}
                 >
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
