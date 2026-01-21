@@ -249,20 +249,20 @@ Created modular architecture for maintainability:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 21, 2026 - Implemented pagination for all Content Library searches (50 items per page with navigation controls)
+January 21, 2026 - Fixed Gutenberg PDF download 404 errors, implemented pagination for Content Library
 
 ## Recent Changes (Jan 21, 2026)
+
+### BUG FIX: Gutenberg PDF 404 Errors
+- **Problem**: PDF download links returned 404 because Project Gutenberg doesn't serve direct .pdf files at `/ebooks/{id}.pdf`
+- **Solution**: Updated all book URLs:
+  - "Download" button now links to Gutenberg landing page (`/ebooks/{id}`) where users can choose format
+  - EPUB links corrected to use `.epub.images` suffix for direct download
+  - HTML links corrected to use `.html.images` suffix for online reading
+- **Files changed**: `/app/backend/server.py` (FREE_EDUCATIONAL_BOOKS array and dynamic search functions)
+- **Frontend updated**: Button labels changed from "PDF" to "Download" with helpful tooltips
+
 ### Pagination Feature Implementation
-- **Backend**: Added `page` and `per_page` query parameters to:
-  - `/api/content-library/free-books` (default 50 per page)
-  - `/api/content-library/free-books/search` (default 50 per page)
-  - `/api/content-library/search` (default 50 per page)
-  - `/api/content-library/childrens-literature` (default 50 per page)
-- **Response format** includes: `page`, `per_page`, `total`, `total_pages`, `has_next`, `has_prev`
-- **Frontend**: Added `PaginationControls` component with:
-  - "Showing X-Y of Z results" display
-  - Previous/Next buttons (disabled appropriately)
-  - Clickable page numbers with ellipsis for many pages
-  - Smooth scroll to top on page change
-- **Tests**: 12 pytest tests covering all pagination scenarios (100% pass rate)
-- **Test file**: `/app/tests/test_pagination_api.py`
+- **Backend**: Added `page` and `per_page` query parameters to all Content Library endpoints
+- **Frontend**: Added `PaginationControls` component with page navigation
+- **Tests**: 12 pytest tests passing (100% success rate)
