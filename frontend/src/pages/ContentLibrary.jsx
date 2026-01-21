@@ -1861,10 +1861,10 @@ export const ContentLibrary = () => {
       {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && selectedCategory !== 'childrens-literature' && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-zinc-500">
-              Found <span className="text-[#BEF264] font-bold">{displayResults.length}</span> resources
+            <p className="text-neutral-600">
+              Found <span className="text-emerald-600 font-bold">{searchTotalResults}</span> resources
               {searchSources.length > 0 && (
-                <span className="text-xs text-zinc-600 ml-2">
+                <span className="text-xs text-neutral-500 ml-2">
                   from {searchSources.join(', ')}
                 </span>
               )}
@@ -1882,6 +1882,16 @@ export const ContentLibrary = () => {
               ))}
             </AnimatePresence>
           </div>
+          
+          {/* Pagination for Search Results */}
+          <PaginationControls
+            currentPage={searchPage}
+            totalPages={searchTotalPages}
+            totalItems={searchTotalResults}
+            perPage={perPage}
+            onPageChange={handleSearchPageChange}
+            isLoading={isSearching}
+          />
         </div>
       )}
 
