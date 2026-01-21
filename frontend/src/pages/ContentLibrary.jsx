@@ -1147,7 +1147,7 @@ export const ContentLibrary = () => {
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (page = 1) => {
     if (!searchQuery.trim()) {
       toast.error('Please enter a search term');
       return;
@@ -1163,12 +1163,18 @@ export const ContentLibrary = () => {
           params: { 
             query: searchQuery,
             grade: selectedLevel !== 'all' ? selectedLevel : 'all',
-            limit: 50
+            page: page,
+            per_page: perPage
           }
         });
         setChildrensLiterature(response.data.results || []);
         setSearchSources(response.data.sources || []);
-        toast.success(`Found ${response.data.total} copyright-free children's books!`);
+        setChildrensPage(response.data.page || 1);
+        setChildrensTotalPages(response.data.total_pages || 1);
+        setChildrensTotalResults(response.data.total || 0);
+        if (page === 1) {
+          toast.success(`Found ${response.data.total} copyright-free children's books!`);
+        }
       } catch (error) {
         console.error('Error searching children\'s literature:', error);
         toast.error('Search failed');
@@ -1184,11 +1190,18 @@ export const ContentLibrary = () => {
         const response = await api.get('/content-library/free-books/search', {
           params: { 
             query: searchQuery,
-            grade: selectedLevel !== 'all' ? selectedLevel : undefined
+            grade: selectedLevel !== 'all' ? selectedLevel : undefined,
+            page: page,
+            per_page: perPage
           }
         });
         setFreeBooks(response.data.books || []);
-        toast.success(`Found ${response.data.total} books!`);
+        setFreeBooksPage(response.data.page || 1);
+        setFreeBooksTotalPages(response.data.total_pages || 1);
+        setFreeBooksTotalResults(response.data.total || 0);
+        if (page === 1) {
+          toast.success(`Found ${response.data.total} books!`);
+        }
       } catch (error) {
         console.error('Error searching free books:', error);
         toast.error('Search failed');
@@ -1204,13 +1217,19 @@ export const ContentLibrary = () => {
           query: searchQuery,
           category: selectedCategory,
           grade: selectedLevel !== 'all' ? selectedLevel : undefined,
-          limit: 30
+          page: page,
+          per_page: perPage
         }
       });
       
       setSearchResults(response.data.results || []);
       setSearchSources(response.data.sources || []);
-      toast.success(`Found ${response.data.total} resources!`);
+      setSearchPage(response.data.page || 1);
+      setSearchTotalPages(response.data.total_pages || 1);
+      setSearchTotalResults(response.data.total || 0);
+      if (page === 1) {
+        toast.success(`Found ${response.data.total} resources!`);
+      }
     } catch (error) {
       console.error('Error searching content:', error);
       toast.error('Search failed. Please try again.');
