@@ -1118,15 +1118,18 @@ export const ContentLibrary = () => {
     }
   }, [selectedCategory, selectedLevel]);
 
-  const fetchFreeBooks = async () => {
+  const fetchFreeBooks = async (page = 1) => {
     setLoadingBooks(true);
     try {
-      const params = { limit: 50 };
+      const params = { page: page, per_page: perPage };
       if (selectedLevel !== 'all') {
         params.grade = selectedLevel;
       }
       const response = await api.get('/content-library/free-books', { params });
       setFreeBooks(response.data.books || []);
+      setFreeBooksPage(response.data.page || 1);
+      setFreeBooksTotalPages(response.data.total_pages || 1);
+      setFreeBooksTotalResults(response.data.total || 0);
     } catch (error) {
       console.error('Error fetching free books:', error);
       toast.error('Failed to load free books');
