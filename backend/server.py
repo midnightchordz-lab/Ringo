@@ -2349,12 +2349,12 @@ async def search_content_library(
 def get_active_sources_v2(category: str) -> list:
     """Get list of sources used for a category"""
     sources = {
-        "all": ["OpenAlex", "arXiv", "PubMed", "Wikipedia", "DOAJ", "OpenStax", "MIT OCW", "YouTube", "Internet Archive", "TED", "OER Commons", "MERLOT", "OpenLibrary"],
+        "all": ["OpenAlex", "arXiv", "PubMed", "Wikipedia", "DOAJ", "OpenStax", "MIT OCW", "Wikiversity", "Wikibooks", "freeCodeCamp", "YouTube", "Internet Archive", "TED", "OER Commons", "MERLOT", "Smithsonian", "Library of Congress", "PBS LearningMedia", "BBC Bitesize", "National Geographic", "OpenLibrary"],
         "article": ["OpenAlex (240M+ papers)", "arXiv", "PubMed Central", "Wikipedia", "DOAJ"],
-        "course": ["OpenStax", "MIT OpenCourseWare", "YouTube Educational"],
-        "video": ["YouTube", "Internet Archive", "TED Talks"],
-        "resource": ["OER Commons", "MERLOT", "Internet Archive"],
-        "worksheet": ["OER Commons", "Internet Archive"],
+        "course": ["OpenStax", "MIT OpenCourseWare", "Wikiversity", "Wikibooks", "freeCodeCamp", "Codecademy", "YouTube Educational"],
+        "video": ["YouTube (Creative Commons)", "Internet Archive", "TED Talks"],
+        "resource": ["OER Commons", "MERLOT", "Internet Archive", "Smithsonian Learning Lab", "Library of Congress", "PBS LearningMedia", "BBC Bitesize", "National Geographic Education"],
+        "worksheet": ["OER Commons", "Internet Archive", "PBS LearningMedia"],
         "book": ["OpenLibrary", "Internet Archive"]
     }
     return sources.get(category, sources["all"])
