@@ -1293,13 +1293,8 @@ export const ContentLibrary = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Filter results by category
-  let displayResults = searchResults;
-  if (selectedCategory !== 'all') {
-    displayResults = searchResults.filter(r => 
-      (r.type || r.category) === selectedCategory
-    );
-  }
+  // Results are already filtered by category from the backend
+  const displayResults = searchResults;
 
   const selectedLevelInfo = EDUCATION_LEVELS.find(l => l.id === selectedLevel);
 
