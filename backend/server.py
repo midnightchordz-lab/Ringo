@@ -2237,61 +2237,46 @@ async def search_content_library(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Dynamic search for copyright-free educational content across multiple sources.
-    Searches different sources based on category selected.
+    Dynamic search for copyright-free educational content across the ENTIRE WEB.
+    Searches multiple open-access APIs for real, current content.
     """
     try:
-        # Enhance query with category and grade level for better results
-        enhanced_query = query
-        
-        # Add category-specific terms to improve search
-        category_terms = {
-            "article": "article research paper publication study",
-            "course": "course tutorial lesson learning module class",
-            "video": "video tutorial lecture educational documentary",
-            "resource": "resource material guide template tool",
-            "worksheet": "worksheet exercise practice activity printable",
-            "book": "book ebook textbook guide manual"
-        }
-        
-        grade_keywords = {
-            "preschool": "preschool kindergarten early childhood toddler",
-            "elementary": "elementary school kids children grades 1-5 primary",
-            "middle": "middle school grades 6-8 junior high teens",
-            "high": "high school grades 9-12 secondary advanced",
-            "university": "college university higher education academic"
-        }
-        
-        if category != "all" and category in category_terms:
-            enhanced_query = f"{query} {category_terms[category]}"
-        
-        if grade != "all" and grade in grade_keywords:
-            enhanced_query = f"{enhanced_query} {grade_keywords[grade]}"
-        
         all_results = []
-        fetch_limit = per_page * 3  # Get enough results for pagination
+        fetch_limit = per_page * 2  # Get enough results
         
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=20.0) as client:
             tasks = []
             
-            # Choose sources based on category
+            # ARTICLES - Search multiple open-access sources
             if category in ["all", "article"]:
-                tasks.append(search_wikipedia_articles(client, query, fetch_limit))
-                tasks.append(search_arxiv_articles(client, query, fetch_limit // 2))
+                tasks.append(search_openalex_articles(client, query, fetch_limit))  # 240M+ papers
+                tasks.append(search_arxiv_articles(client, query, fetch_limit // 2))  # Academic preprints
+                tasks.append(search_pubmed_articles(client, query, fetch_limit // 2))  # Medical/science
+                tasks.append(search_wikipedia_articles(client, query, fetch_limit // 3))  # Encyclopedia
+                tasks.append(search_doaj_articles(client, query, fetch_limit // 2))  # Open access journals
             
+            # COURSES - Search course aggregators and platforms
             if category in ["all", "course"]:
-                tasks.append(search_oer_courses(client, enhanced_query, fetch_limit))
-                tasks.append(search_mit_ocw(client, query, fetch_limit // 2))
+                tasks.append(search_openstax_courses(client, query, fetch_limit))  # Free textbooks
+                tasks.append(search_mit_ocw_real(client, query, fetch_limit))  # MIT courses
+                tasks.append(search_youtube_courses(client, query, fetch_limit))  # Video courses
             
+            # VIDEOS - Search video platforms for educational content
             if category in ["all", "video"]:
                 tasks.append(search_youtube_educational(client, query, fetch_limit))
-                
-            if category in ["all", "resource", "worksheet"]:
-                tasks.append(search_educational_resources(client, enhanced_query, fetch_limit))
+                tasks.append(search_internet_archive_videos(client, query, fetch_limit // 2))
+                tasks.append(search_ted_talks(client, query, fetch_limit // 2))
             
+            # RESOURCES - Search educational resource repositories
+            if category in ["all", "resource", "worksheet"]:
+                tasks.append(search_oer_commons_real(client, query, fetch_limit))
+                tasks.append(search_merlot_resources(client, query, fetch_limit // 2))
+                tasks.append(search_internet_archive_texts(client, query, fetch_limit // 2))
+            
+            # BOOKS
             if category in ["all", "book"]:
-                tasks.append(search_openlibrary(client, enhanced_query, fetch_limit // 2))
-                tasks.append(search_internet_archive(client, enhanced_query, fetch_limit // 2))
+                tasks.append(search_openlibrary(client, query, fetch_limit // 2))
+                tasks.append(search_internet_archive(client, query, fetch_limit // 2))
             
             # Run all searches in parallel
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -2302,7 +2287,7 @@ async def search_content_library(
                 elif isinstance(result, Exception):
                     logging.warning(f"Search source failed: {str(result)}")
         
-        # Filter by category if specified (for mixed results)
+        # Filter by category if specified
         if category != "all":
             all_results = [r for r in all_results if r.get("type") == category or r.get("category") == category]
         
@@ -2311,10 +2296,18 @@ async def search_content_library(
         unique_results = []
         for r in all_results:
             url = r.get("url", "")
-            if url and url not in seen_urls:
-                seen_urls.add(url)
+            title = r.get("title", "")
+            key = url or title
+            if key and key not in seen_urls:
+                seen_urls.add(key)
                 unique_results.append(r)
         all_results = unique_results
+        
+        # Sort by relevance (items with more metadata first)
+        all_results.sort(key=lambda x: (
+            1 if x.get("description") else 0,
+            1 if x.get("thumbnail") and x.get("thumbnail") != "📄" else 0
+        ), reverse=True)
         
         # Pagination
         total_results = len(all_results)
@@ -2334,7 +2327,7 @@ async def search_content_library(
             "query": query,
             "category": category,
             "grade": grade,
-            "sources": get_active_sources(category)
+            "sources": get_active_sources_v2(category)
         }
     
     except Exception as e:
@@ -2342,18 +2335,187 @@ async def search_content_library(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def get_active_sources(category: str) -> list:
+def get_active_sources_v2(category: str) -> list:
     """Get list of sources used for a category"""
     sources = {
-        "all": ["Wikipedia", "arXiv", "OER Commons", "MIT OCW", "YouTube", "OpenLibrary", "Internet Archive"],
-        "article": ["Wikipedia", "arXiv"],
-        "course": ["OER Commons", "MIT OpenCourseWare"],
-        "video": ["YouTube Educational"],
-        "resource": ["OER Commons"],
-        "worksheet": ["OER Commons"],
+        "all": ["OpenAlex", "arXiv", "PubMed", "Wikipedia", "DOAJ", "OpenStax", "MIT OCW", "YouTube", "Internet Archive", "TED", "OER Commons", "MERLOT", "OpenLibrary"],
+        "article": ["OpenAlex (240M+ papers)", "arXiv", "PubMed Central", "Wikipedia", "DOAJ"],
+        "course": ["OpenStax", "MIT OpenCourseWare", "YouTube Educational"],
+        "video": ["YouTube", "Internet Archive", "TED Talks"],
+        "resource": ["OER Commons", "MERLOT", "Internet Archive"],
+        "worksheet": ["OER Commons", "Internet Archive"],
         "book": ["OpenLibrary", "Internet Archive"]
     }
     return sources.get(category, sources["all"])
+
+
+# ==================== ARTICLE SEARCH FUNCTIONS ====================
+
+async def search_openalex_articles(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search OpenAlex - 240 million scholarly works, completely free"""
+    try:
+        response = await client.get(
+            "https://api.openalex.org/works",
+            params={
+                "search": query,
+                "filter": "is_oa:true",  # Only open access
+                "per_page": min(limit, 50),
+                "sort": "relevance_score:desc",
+                "mailto": "contentflow@example.com"
+            },
+            headers={"User-Agent": "ContentFlow/1.0 (Educational Search)"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("results", []):
+                title = item.get("title", "Untitled")
+                authors = item.get("authorships", [])
+                author_names = ", ".join([a.get("author", {}).get("display_name", "") for a in authors[:3]])
+                
+                # Get the best available URL
+                url = item.get("primary_location", {}).get("landing_page_url", "") or item.get("doi", "")
+                if url and url.startswith("https://doi.org/"):
+                    url = url
+                elif item.get("doi"):
+                    url = f"https://doi.org/{item.get('doi')}"
+                
+                pdf_url = item.get("primary_location", {}).get("pdf_url", "")
+                
+                results.append({
+                    "id": f"openalex_{item.get('id', '').split('/')[-1]}",
+                    "title": title,
+                    "description": f"By {author_names}. Published {item.get('publication_year', 'N/A')}. Cited {item.get('cited_by_count', 0)} times.",
+                    "type": "article",
+                    "category": "article",
+                    "source": "OpenAlex",
+                    "url": url,
+                    "download_url": pdf_url,
+                    "thumbnail": "📄",
+                    "license": "Open Access",
+                    "free": True,
+                    "year": item.get("publication_year"),
+                    "citations": item.get("cited_by_count", 0)
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"OpenAlex search failed: {str(e)}")
+    return []
+
+
+async def search_pubmed_articles(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search PubMed Central for free medical/science articles"""
+    try:
+        # First search for IDs
+        search_response = await client.get(
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
+            params={
+                "db": "pmc",  # PubMed Central (free full text)
+                "term": f"{query} AND open access[filter]",
+                "retmax": min(limit, 50),
+                "retmode": "json",
+                "sort": "relevance"
+            },
+            headers={"User-Agent": "ContentFlow/1.0"}
+        )
+        
+        if search_response.status_code == 200:
+            search_data = search_response.json()
+            ids = search_data.get("esearchresult", {}).get("idlist", [])
+            
+            if not ids:
+                return []
+            
+            # Fetch details for the IDs
+            detail_response = await client.get(
+                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi",
+                params={
+                    "db": "pmc",
+                    "id": ",".join(ids[:20]),
+                    "retmode": "json"
+                },
+                headers={"User-Agent": "ContentFlow/1.0"}
+            )
+            
+            if detail_response.status_code == 200:
+                detail_data = detail_response.json()
+                results = []
+                
+                for pmcid in ids[:20]:
+                    item = detail_data.get("result", {}).get(pmcid, {})
+                    if item and isinstance(item, dict):
+                        title = item.get("title", "Untitled")
+                        authors = item.get("authors", [])
+                        author_str = ", ".join([a.get("name", "") for a in authors[:3]]) if authors else "Unknown"
+                        
+                        results.append({
+                            "id": f"pmc_{pmcid}",
+                            "title": title,
+                            "description": f"By {author_str}. {item.get('source', '')} ({item.get('pubdate', '')})",
+                            "type": "article",
+                            "category": "article",
+                            "source": "PubMed Central",
+                            "url": f"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC{pmcid}/",
+                            "download_url": f"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC{pmcid}/pdf/",
+                            "thumbnail": "📄",
+                            "license": "Open Access",
+                            "free": True
+                        })
+                return results
+    except Exception as e:
+        logging.warning(f"PubMed search failed: {str(e)}")
+    return []
+
+
+async def search_doaj_articles(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search DOAJ - Directory of Open Access Journals"""
+    try:
+        response = await client.get(
+            "https://doaj.org/api/search/articles/" + query.replace(" ", "%20"),
+            params={
+                "pageSize": min(limit, 50)
+            },
+            headers={"User-Agent": "ContentFlow/1.0"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("results", []):
+                bibjson = item.get("bibjson", {})
+                title = bibjson.get("title", "Untitled")
+                authors = bibjson.get("author", [])
+                author_str = ", ".join([a.get("name", "") for a in authors[:3]]) if authors else "Unknown"
+                
+                # Get URL
+                links = bibjson.get("link", [])
+                url = ""
+                for link in links:
+                    if link.get("type") == "fulltext":
+                        url = link.get("url", "")
+                        break
+                if not url and links:
+                    url = links[0].get("url", "")
+                
+                journal = bibjson.get("journal", {})
+                
+                results.append({
+                    "id": f"doaj_{item.get('id', '')}",
+                    "title": title,
+                    "description": f"By {author_str}. Published in {journal.get('title', 'Open Access Journal')}",
+                    "type": "article",
+                    "category": "article",
+                    "source": "DOAJ",
+                    "url": url,
+                    "thumbnail": "📄",
+                    "license": "Open Access",
+                    "free": True
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"DOAJ search failed: {str(e)}")
+    return []
 
 
 async def search_wikipedia_articles(client: httpx.AsyncClient, query: str, limit: int) -> list:
