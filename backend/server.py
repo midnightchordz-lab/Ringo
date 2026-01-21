@@ -3068,6 +3068,436 @@ async def search_educational_resources(client: httpx.AsyncClient, query: str, li
     return results
 
 
+# ==================== ENHANCED COURSE SEARCH FUNCTIONS ====================
+
+async def search_wikiversity_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Wikiversity for free educational courses and learning resources"""
+    try:
+        response = await client.get(
+            "https://en.wikiversity.org/w/api.php",
+            params={
+                "action": "query",
+                "list": "search",
+                "srsearch": query,
+                "srnamespace": "0",  # Main namespace
+                "srlimit": min(limit, 50),
+                "format": "json"
+            },
+            headers={"User-Agent": "ContentFlow/1.0 (Educational Search)"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("query", {}).get("search", []):
+                title = item.get("title", "Untitled")
+                snippet = item.get("snippet", "").replace('<span class="searchmatch">', '').replace('</span>', '')
+                page_id = item.get("pageid", "")
+                
+                results.append({
+                    "id": f"wikiversity_{page_id}",
+                    "title": title,
+                    "description": snippet[:200] if snippet else f"Free educational resource about {query} from Wikiversity",
+                    "type": "course",
+                    "category": "course",
+                    "source": "Wikiversity",
+                    "url": f"https://en.wikiversity.org/wiki/{title.replace(' ', '_')}",
+                    "thumbnail": "📖",
+                    "license": "CC BY-SA",
+                    "free": True
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Wikiversity search failed: {str(e)}")
+    return []
+
+
+async def search_wikibooks_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Wikibooks for free textbooks and educational content"""
+    try:
+        response = await client.get(
+            "https://en.wikibooks.org/w/api.php",
+            params={
+                "action": "query",
+                "list": "search",
+                "srsearch": query,
+                "srnamespace": "0",
+                "srlimit": min(limit, 50),
+                "format": "json"
+            },
+            headers={"User-Agent": "ContentFlow/1.0 (Educational Search)"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("query", {}).get("search", []):
+                title = item.get("title", "Untitled")
+                snippet = item.get("snippet", "").replace('<span class="searchmatch">', '').replace('</span>', '')
+                page_id = item.get("pageid", "")
+                
+                results.append({
+                    "id": f"wikibooks_{page_id}",
+                    "title": title,
+                    "description": snippet[:200] if snippet else f"Free textbook about {query} from Wikibooks",
+                    "type": "course",
+                    "category": "course",
+                    "source": "Wikibooks",
+                    "url": f"https://en.wikibooks.org/wiki/{title.replace(' ', '_')}",
+                    "thumbnail": "📚",
+                    "license": "CC BY-SA",
+                    "free": True
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Wikibooks search failed: {str(e)}")
+    return []
+
+
+async def search_freecodecamp_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search freeCodeCamp for programming courses"""
+    try:
+        # freeCodeCamp forum/news search
+        response = await client.get(
+            "https://www.freecodecamp.org/news/search/",
+            params={"query": query},
+            headers={"User-Agent": "ContentFlow/1.0"},
+            follow_redirects=True
+        )
+        
+        # Since freeCodeCamp doesn't have a public API, return curated search results
+        results = [{
+            "id": f"fcc_{query.replace(' ', '_')}",
+            "title": f"{query} tutorials on freeCodeCamp",
+            "description": f"Learn {query} for free with freeCodeCamp's comprehensive curriculum, including 3,000+ hours of coding practice.",
+            "type": "course",
+            "category": "course",
+            "source": "freeCodeCamp",
+            "url": f"https://www.freecodecamp.org/news/search/?query={query.replace(' ', '+')}",
+            "thumbnail": "💻",
+            "license": "Free",
+            "free": True
+        }]
+        
+        # Add specific freeCodeCamp certifications if query matches
+        cert_keywords = {
+            "web": "Responsive Web Design Certification",
+            "javascript": "JavaScript Algorithms and Data Structures Certification",
+            "python": "Scientific Computing with Python Certification",
+            "data": "Data Analysis with Python Certification",
+            "machine learning": "Machine Learning with Python Certification",
+            "api": "Back End Development and APIs Certification"
+        }
+        
+        for keyword, cert_name in cert_keywords.items():
+            if keyword in query.lower():
+                results.append({
+                    "id": f"fcc_cert_{keyword}",
+                    "title": cert_name,
+                    "description": f"Free {cert_name.lower()} from freeCodeCamp. Includes projects and hands-on practice.",
+                    "type": "course",
+                    "category": "course",
+                    "source": "freeCodeCamp",
+                    "url": f"https://www.freecodecamp.org/learn/",
+                    "thumbnail": "🎓",
+                    "license": "Free",
+                    "free": True
+                })
+                break
+        
+        return results[:limit]
+    except Exception as e:
+        logging.warning(f"freeCodeCamp search failed: {str(e)}")
+    return []
+
+
+async def search_codecademy_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Codecademy for free coding courses"""
+    return [{
+        "id": f"codecademy_{query.replace(' ', '_')}",
+        "title": f"Learn {query} on Codecademy",
+        "description": f"Interactive {query} courses with hands-on coding practice. Many free courses available.",
+        "type": "course",
+        "category": "course",
+        "source": "Codecademy",
+        "url": f"https://www.codecademy.com/search?query={query.replace(' ', '+')}",
+        "thumbnail": "💻",
+        "license": "Free + Premium",
+        "free": True
+    }]
+
+
+# ==================== ENHANCED VIDEO SEARCH FUNCTIONS ====================
+
+async def search_youtube_videos_comprehensive(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Comprehensive YouTube video search with multiple educational queries"""
+    youtube_api_key = os.environ.get("YOUTUBE_API_KEY", "")
+    
+    if not youtube_api_key:
+        # Return multiple placeholder search links
+        return [
+            {
+                "id": f"yt_edu_{query.replace(' ', '_')}",
+                "title": f"{query} educational videos",
+                "description": f"Educational videos about {query} on YouTube",
+                "type": "video",
+                "category": "video",
+                "source": "YouTube",
+                "url": f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}+educational",
+                "thumbnail": "🎥",
+                "license": "Various",
+                "free": True
+            },
+            {
+                "id": f"yt_tutorial_{query.replace(' ', '_')}",
+                "title": f"{query} tutorial",
+                "description": f"Step-by-step tutorials for {query}",
+                "type": "video",
+                "category": "video",
+                "source": "YouTube",
+                "url": f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}+tutorial",
+                "thumbnail": "🎥",
+                "license": "Various",
+                "free": True
+            },
+            {
+                "id": f"yt_lecture_{query.replace(' ', '_')}",
+                "title": f"{query} lecture",
+                "description": f"University lectures and academic content on {query}",
+                "type": "video",
+                "category": "video",
+                "source": "YouTube",
+                "url": f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}+lecture+university",
+                "thumbnail": "🎓",
+                "license": "Various",
+                "free": True
+            }
+        ]
+    
+    try:
+        # Search for Creative Commons licensed educational videos
+        response = await client.get(
+            "https://www.googleapis.com/youtube/v3/search",
+            params={
+                "part": "snippet",
+                "q": f"{query} educational tutorial",
+                "type": "video",
+                "videoLicense": "creativeCommon",
+                "videoDuration": "medium",  # 4-20 minutes
+                "maxResults": min(limit, 50),
+                "order": "relevance",
+                "key": youtube_api_key
+            }
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("items", []):
+                snippet = item.get("snippet", {})
+                video_id = item.get("id", {}).get("videoId", "")
+                results.append({
+                    "id": f"yt_cc_{video_id}",
+                    "title": snippet.get("title", "Untitled"),
+                    "description": snippet.get("description", "")[:200],
+                    "type": "video",
+                    "category": "video",
+                    "source": "YouTube (CC)",
+                    "url": f"https://www.youtube.com/watch?v={video_id}",
+                    "thumbnail": snippet.get("thumbnails", {}).get("high", {}).get("url", 
+                        snippet.get("thumbnails", {}).get("medium", {}).get("url", "🎥")),
+                    "license": "Creative Commons",
+                    "free": True,
+                    "channel": snippet.get("channelTitle", "")
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"YouTube comprehensive search failed: {str(e)}")
+    return []
+
+
+async def search_internet_archive_videos_enhanced(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Enhanced Internet Archive video search with broader categories"""
+    try:
+        # Search multiple categories
+        categories = [
+            ("movies", "educational OR lecture OR documentary OR tutorial"),
+            ("movies", "science OR history OR mathematics OR technology"),
+            ("movies", "course OR lesson OR training")
+        ]
+        
+        all_results = []
+        
+        for mediatype, subject_filter in categories:
+            if len(all_results) >= limit:
+                break
+                
+            try:
+                response = await client.get(
+                    "https://archive.org/advancedsearch.php",
+                    params={
+                        "q": f"({query}) AND mediatype:{mediatype} AND ({subject_filter})",
+                        "fl[]": ["identifier", "title", "description", "creator", "year", "downloads"],
+                        "sort[]": "downloads desc",
+                        "rows": min(limit // 2, 25),
+                        "output": "json"
+                    },
+                    headers={"User-Agent": "ContentFlow/1.0"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    for doc in data.get("response", {}).get("docs", []):
+                        identifier = doc.get("identifier", "")
+                        if identifier and not any(r["id"].endswith(identifier) for r in all_results):
+                            all_results.append({
+                                "id": f"ia_video_enhanced_{identifier}",
+                                "title": doc.get("title", "Untitled"),
+                                "description": str(doc.get("description", ""))[:200] if doc.get("description") else f"Educational video from Internet Archive about {query}",
+                                "type": "video",
+                                "category": "video",
+                                "source": "Internet Archive",
+                                "url": f"https://archive.org/details/{identifier}",
+                                "thumbnail": f"https://archive.org/services/img/{identifier}",
+                                "license": "Public Domain / Open",
+                                "free": True,
+                                "year": doc.get("year"),
+                                "downloads": doc.get("downloads", 0)
+                            })
+            except Exception as inner_e:
+                logging.warning(f"IA video category search failed: {str(inner_e)}")
+                continue
+        
+        # Sort by downloads
+        all_results.sort(key=lambda x: x.get("downloads", 0), reverse=True)
+        return all_results[:limit]
+        
+    except Exception as e:
+        logging.warning(f"Internet Archive enhanced videos search failed: {str(e)}")
+    return []
+
+
+# ==================== ENHANCED RESOURCE SEARCH FUNCTIONS ====================
+
+async def search_smithsonian_resources(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Smithsonian Learning Lab for educational resources"""
+    return [{
+        "id": f"smithsonian_{query.replace(' ', '_')}",
+        "title": f"{query} - Smithsonian Learning Lab",
+        "description": f"Explore {query} through millions of digitized images, recordings, and texts from Smithsonian collections.",
+        "type": "resource",
+        "category": "resource",
+        "source": "Smithsonian Learning Lab",
+        "url": f"https://learninglab.si.edu/search?st={query.replace(' ', '+')}",
+        "thumbnail": "🏛️",
+        "license": "Educational Use",
+        "free": True
+    }]
+
+
+async def search_national_geographic_edu(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search National Geographic Education resources"""
+    return [{
+        "id": f"natgeo_edu_{query.replace(' ', '_')}",
+        "title": f"{query} - National Geographic Education",
+        "description": f"Educational resources about {query} with maps, videos, and activities from National Geographic.",
+        "type": "resource",
+        "category": "resource",
+        "source": "National Geographic Education",
+        "url": f"https://education.nationalgeographic.org/resource-library?q={query.replace(' ', '+')}",
+        "thumbnail": "🌍",
+        "license": "Educational Use",
+        "free": True
+    }]
+
+
+async def search_library_of_congress(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Library of Congress for educational primary sources"""
+    try:
+        response = await client.get(
+            "https://www.loc.gov/search/",
+            params={
+                "q": query,
+                "fo": "json",
+                "c": min(limit, 25),
+                "fa": "access-restricted:false"
+            },
+            headers={"User-Agent": "ContentFlow/1.0"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("results", []):
+                title = item.get("title", "Untitled")
+                if isinstance(title, list):
+                    title = title[0] if title else "Untitled"
+                    
+                description = item.get("description", [""])[0] if isinstance(item.get("description"), list) else item.get("description", "")
+                
+                results.append({
+                    "id": f"loc_{item.get('id', '')}",
+                    "title": title[:100],
+                    "description": str(description)[:200] if description else f"Primary source from Library of Congress about {query}",
+                    "type": "resource",
+                    "category": "resource",
+                    "source": "Library of Congress",
+                    "url": item.get("url", f"https://www.loc.gov/search/?q={query}"),
+                    "thumbnail": item.get("image_url", ["🏛️"])[0] if isinstance(item.get("image_url"), list) else item.get("image_url", "🏛️"),
+                    "license": "Public Domain",
+                    "free": True
+                })
+            return results[:limit]
+    except Exception as e:
+        logging.warning(f"Library of Congress search failed: {str(e)}")
+    
+    # Fallback to search link
+    return [{
+        "id": f"loc_{query.replace(' ', '_')}",
+        "title": f"{query} - Library of Congress",
+        "description": f"Primary sources and historical materials about {query} from the Library of Congress.",
+        "type": "resource",
+        "category": "resource",
+        "source": "Library of Congress",
+        "url": f"https://www.loc.gov/search/?q={query.replace(' ', '+')}",
+        "thumbnail": "🏛️",
+        "license": "Public Domain",
+        "free": True
+    }]
+
+
+async def search_pbs_learningmedia(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search PBS LearningMedia for educational videos and resources"""
+    return [{
+        "id": f"pbs_{query.replace(' ', '_')}",
+        "title": f"{query} - PBS LearningMedia",
+        "description": f"Free PreK-12 educational videos, lesson plans, and interactive resources about {query}.",
+        "type": "resource",
+        "category": "resource",
+        "source": "PBS LearningMedia",
+        "url": f"https://www.pbslearningmedia.org/search/?q={query.replace(' ', '+')}",
+        "thumbnail": "📺",
+        "license": "Free for Educators",
+        "free": True
+    }]
+
+
+async def search_bbc_bitesize(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search BBC Bitesize for educational content"""
+    return [{
+        "id": f"bbc_{query.replace(' ', '_')}",
+        "title": f"{query} - BBC Bitesize",
+        "description": f"Free learning resources for students aged 5-16+ covering {query}. Includes videos, guides, and quizzes.",
+        "type": "resource",
+        "category": "resource",
+        "source": "BBC Bitesize",
+        "url": f"https://www.bbc.co.uk/bitesize/search?q={query.replace(' ', '+')}",
+        "thumbnail": "📚",
+        "license": "Free",
+        "free": True
+    }]
+
+
 # ==================== CHILDREN'S LITERATURE SEARCH (COPYRIGHT-FREE) ====================
 
 @api_router.get("/content-library/childrens-literature")
