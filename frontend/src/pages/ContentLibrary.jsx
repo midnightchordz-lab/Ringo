@@ -1271,6 +1271,25 @@ export const ContentLibrary = () => {
     return favorites.some(f => f.resource_id === resourceId);
   };
 
+  // Pagination handlers
+  const handleChildrensPageChange = (newPage) => {
+    setChildrensPage(newPage);
+    fetchChildrensLiterature(searchQuery, newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  const handleFreeBooksPageChange = (newPage) => {
+    setFreeBooksPage(newPage);
+    fetchFreeBooks(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  const handleSearchPageChange = (newPage) => {
+    setSearchPage(newPage);
+    handleSearch(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Filter results by category
   let displayResults = searchResults;
   if (selectedCategory !== 'all') {
