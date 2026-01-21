@@ -179,55 +179,61 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={`glass-card p-5 hover:border-violet-500/50 transition-all group ${
-        licenseInfo.commercial === false ? `border-l-4 ${licenseInfo.borderColor}` : ''
-      }`}
+      className="studio-card p-5 hover:shadow-lg transition-all group"
       data-testid="search-result-card"
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          {result.thumbnail ? (
+      {/* Header with thumbnail and title */}
+      <div className="flex gap-4 mb-3">
+        {/* Thumbnail */}
+        <div className="w-16 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-neutral-100">
+          {result.thumbnail && result.thumbnail !== '📄' && result.thumbnail !== '📚' && result.thumbnail !== '🎓' && result.thumbnail !== '🎥' && result.thumbnail !== '📖' ? (
             <img 
               src={result.thumbnail} 
               alt={result.title}
-              className="w-12 h-12 rounded-lg object-cover bg-zinc-800"
+              className="w-full h-full object-cover"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'flex';
               }}
             />
           ) : null}
-          <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center ${result.thumbnail ? 'hidden' : ''}`}>
-            <TypeIcon className="w-6 h-6 text-violet-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-white group-hover:text-violet-400 transition-colors line-clamp-1">
-              {result.title}
-            </h3>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${getSourceColor(result.source)}`}>
-                {result.source}
-              </span>
-              {result.relevance_score && (
-                <span className="text-xs text-[#BEF264] font-semibold flex items-center gap-1">
-                  <Zap className="w-3 h-3" />
-                  {result.relevance_score}/10
-                </span>
-              )}
-            </div>
+          <div className={`w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center ${result.thumbnail && result.thumbnail !== '📄' && result.thumbnail !== '📚' && result.thumbnail !== '🎓' && result.thumbnail !== '🎥' && result.thumbnail !== '📖' ? 'hidden' : ''}`}>
+            <TypeIcon className="w-8 h-8 text-blue-600" />
           </div>
         </div>
-        <button
-          onClick={() => onFavorite(result)}
-          className={`p-2 rounded-full transition-all ${
-            isFavorited 
-              ? 'bg-red-500/20 text-red-500' 
-              : 'bg-zinc-800 text-zinc-500 hover:bg-red-500/20 hover:text-red-500'
-          }`}
-          data-testid="favorite-result-button"
-        >
-          <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
-        </button>
+        
+        {/* Title and source */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-bold text-neutral-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight text-base">
+              {result.title}
+            </h3>
+            <button
+              onClick={() => onFavorite(result)}
+              className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
+                isFavorited 
+                  ? 'bg-red-100 text-red-500' 
+                  : 'bg-neutral-100 text-neutral-400 hover:bg-red-100 hover:text-red-500'
+              }`}
+              data-testid="favorite-result-button"
+            >
+              <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
+            </button>
+          </div>
+          
+          {/* Source badge */}
+          <div className="flex items-center gap-2 mt-2">
+            <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${getSourceColor(result.source)}`}>
+              {result.source}
+            </span>
+            {result.relevance_score && (
+              <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                <Zap className="w-3 h-3" />
+                {result.relevance_score}/10
+              </span>
+            )}
+          </div>
+        </div>
       </div>
       
       {/* License Badge */}
@@ -236,13 +242,13 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       </div>
       
       {/* Description */}
-      <p className="text-zinc-400 text-sm mb-3 line-clamp-2">
+      <p className="text-neutral-600 text-sm mb-3 line-clamp-2">
         {result.ai_summary || result.description || 'No description available'}
       </p>
       
       {/* Authors */}
       {result.authors && result.authors.length > 0 && (
-        <p className="text-xs text-zinc-500 mb-2">
+        <p className="text-xs text-neutral-500 mb-2">
           By: {result.authors.slice(0, 2).join(', ')}
           {result.year && ` (${result.year})`}
         </p>
@@ -252,7 +258,7 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       {result.grade_levels && result.grade_levels.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {result.grade_levels.slice(0, 3).map((level) => (
-            <span key={level} className="px-2 py-0.5 bg-violet-500/20 text-violet-300 text-xs rounded-full">
+            <span key={level} className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
               {level}
             </span>
           ))}
@@ -263,14 +269,14 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       {result.subjects && result.subjects.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-4">
           {result.subjects.slice(0, 3).map((subject, idx) => (
-            <span key={idx} className="px-2 py-0.5 bg-zinc-800 text-zinc-400 text-xs rounded-full">
+            <span key={idx} className="px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded-full">
               {typeof subject === 'string' ? subject.slice(0, 30) : subject}
             </span>
           ))}
         </div>
       )}
       
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
         <span className="text-xs text-neutral-500 capitalize">{result.type || result.category}</span>
         <Button
           size="sm"
