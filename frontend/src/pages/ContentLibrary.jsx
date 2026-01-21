@@ -1956,20 +1956,20 @@ export const ContentLibrary = () => {
 
       {/* Empty Search State */}
       {!isSearching && hasSearched && displayResults.length === 0 && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && selectedCategory !== 'childrens-literature' && (
-        <div className="glass-card p-20 text-center">
-          <FileQuestion className="w-20 h-20 text-zinc-700 mx-auto mb-6" strokeWidth={1.5} />
-          <h3 className="text-xl font-bold text-white mb-2">No Results Found</h3>
-          <p className="text-zinc-500 mb-6">Try different keywords or browse suggestions below</p>
+        <div className="studio-card p-20 text-center">
+          <FileQuestion className="w-20 h-20 text-neutral-300 mx-auto mb-6" strokeWidth={1.5} />
+          <h3 className="text-xl font-bold text-neutral-800 mb-2">No Results Found</h3>
+          <p className="text-neutral-500 mb-6">Try different keywords or browse suggestions below</p>
           <div className="flex flex-wrap justify-center gap-2">
             {SEARCH_SUGGESTIONS.slice(0, 5).map((suggestion) => (
               <Button
                 key={suggestion}
                 onClick={() => {
                   setSearchQuery(suggestion);
-                  setTimeout(() => handleSearch(), 100);
+                  setTimeout(() => handleSearch(1), 100);
                 }}
                 variant="outline"
-                className="rounded-full border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                className="rounded-full border-neutral-300 text-neutral-600 hover:bg-neutral-100"
               >
                 {suggestion}
               </Button>
