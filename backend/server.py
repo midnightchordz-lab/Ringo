@@ -2142,11 +2142,12 @@ async def search_content_library(
     grade: str = Query(default="all", description="Education level filter: preschool, elementary, middle, high, university"),
     page: int = Query(default=1, ge=1, description="Page number"),
     per_page: int = Query(default=50, le=100, description="Results per page"),
+    enhance: bool = Query(default=False, description="Use AI to enhance results (slower)"),
     current_user: dict = Depends(get_current_user)
 ):
     """
     Dynamic search for copyright-free educational content across multiple sources.
-    Searches: OpenLibrary, Internet Archive, Wikipedia, and uses AI for enhancement.
+    Searches: OpenLibrary, Internet Archive, Wikipedia, and optionally uses AI for enhancement.
     Supports pagination for accessing all available content.
     """
     try:
@@ -2183,11 +2184,16 @@ async def search_content_library(
                 elif isinstance(result, Exception):
                     logging.warning(f"Search source failed: {str(result)}")
         
-        # Use AI to enhance and categorize results if we have any
-        if all_results and len(all_results) > 0:
+        # Use AI to enhance results ONLY if requested (it's slow)
+        if enhance and all_results and len(all_results) > 0:
             try:
-                enhanced_results = await ai_enhance_results(query, all_results, grade)
+                enhanced_results = await asyncio.wait_for(
+                    ai_enhance_results(query, all_results, grade),
+                    timeout=10.0  # 10 second timeout for AI
+                )
                 all_results = enhanced_results
+            except asyncio.TimeoutError:
+                logging.warning("AI enhancement timed out, returning raw results")
             except Exception as ai_error:
                 logging.warning(f"AI enhancement failed, returning raw results: {str(ai_error)}")
         
