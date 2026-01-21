@@ -2338,9 +2338,10 @@ async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit
                 # Construct proper Gutenberg URLs
                 book_id = book.get("id")
                 if not pdf_url and book_id:
-                    pdf_url = f"https://www.gutenberg.org/ebooks/{book_id}.pdf"
+                    # PDF not directly available - link to landing page
+                    pdf_url = f"https://www.gutenberg.org/ebooks/{book_id}"
                 if not epub_url and book_id:
-                    epub_url = f"https://www.gutenberg.org/ebooks/{book_id}.epub"
+                    epub_url = f"https://www.gutenberg.org/ebooks/{book_id}.epub.images"
                 if not html_url and book_id:
                     html_url = f"https://www.gutenberg.org/ebooks/{book_id}.html.images"
                 
