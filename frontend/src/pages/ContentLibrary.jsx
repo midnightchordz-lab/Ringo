@@ -88,6 +88,7 @@ const LICENSE_TYPES = {
 // Content Categories for filtering
 const CATEGORIES = [
   { id: 'all', name: 'All Content', icon: Library, color: 'from-violet-500 to-purple-500' },
+  { id: 'childrens-literature', name: "Children's Literature", icon: BookOpenCheck, color: 'from-pink-500 to-rose-500' },
   { id: 'free-books', name: 'Free Books', icon: Book, color: 'from-amber-500 to-orange-500' },
   { id: 'reading-lists', name: 'Reading Lists', icon: List, color: 'from-indigo-500 to-blue-500' },
   { id: 'worksheet', name: 'Worksheets', icon: ClipboardList, color: 'from-lime-500 to-green-500' },
