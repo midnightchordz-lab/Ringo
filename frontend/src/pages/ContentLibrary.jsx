@@ -1006,6 +1006,28 @@ export const ContentLibrary = () => {
     setIsSearching(true);
     setHasSearched(true);
     
+    // If in children's literature category, search children's books
+    if (selectedCategory === 'childrens-literature') {
+      try {
+        const response = await api.get('/content-library/childrens-literature', {
+          params: { 
+            query: searchQuery,
+            grade: selectedLevel !== 'all' ? selectedLevel : 'all',
+            limit: 50
+          }
+        });
+        setChildrensLiterature(response.data.results || []);
+        setSearchSources(response.data.sources || []);
+        toast.success(`Found ${response.data.total} copyright-free children's books!`);
+      } catch (error) {
+        console.error('Error searching children\'s literature:', error);
+        toast.error('Search failed');
+      } finally {
+        setIsSearching(false);
+      }
+      return;
+    }
+    
     // If in free-books category, search within free books
     if (selectedCategory === 'free-books') {
       try {
