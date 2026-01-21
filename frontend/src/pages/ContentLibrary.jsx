@@ -1648,7 +1648,7 @@ export const ContentLibrary = () => {
       )}
 
       {/* Search Results */}
-      {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && (
+      {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && selectedCategory !== 'childrens-literature' && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <p className="text-zinc-500">
