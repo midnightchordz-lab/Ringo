@@ -185,7 +185,7 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
       {/* Header with thumbnail and title */}
       <div className="flex gap-4 mb-3">
         {/* Thumbnail */}
-        <div className="w-16 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-neutral-100">
+        <div className="w-16 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-800">
           {result.thumbnail && result.thumbnail !== '📄' && result.thumbnail !== '📚' && result.thumbnail !== '🎓' && result.thumbnail !== '🎥' && result.thumbnail !== '📖' ? (
             <img 
               src={result.thumbnail} 
@@ -197,23 +197,23 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
               }}
             />
           ) : null}
-          <div className={`w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center ${result.thumbnail && result.thumbnail !== '📄' && result.thumbnail !== '📚' && result.thumbnail !== '🎓' && result.thumbnail !== '🎥' && result.thumbnail !== '📖' ? 'hidden' : ''}`}>
-            <TypeIcon className="w-8 h-8 text-blue-600" />
+          <div className={`w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 flex items-center justify-center ${result.thumbnail && result.thumbnail !== '📄' && result.thumbnail !== '📚' && result.thumbnail !== '🎓' && result.thumbnail !== '🎥' && result.thumbnail !== '📖' ? 'hidden' : ''}`}>
+            <TypeIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
         
         {/* Title and source */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-bold text-neutral-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight text-base">
+            <h3 className="font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 leading-tight text-base">
               {result.title}
             </h3>
             <button
               onClick={() => onFavorite(result)}
               className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
                 isFavorited 
-                  ? 'bg-red-100 text-red-500' 
-                  : 'bg-neutral-100 text-neutral-400 hover:bg-red-100 hover:text-red-500'
+                  ? 'bg-red-100 dark:bg-red-900/40 text-red-500 dark:text-red-400' 
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-500 dark:hover:text-red-400'
               }`}
               data-testid="favorite-result-button"
             >
