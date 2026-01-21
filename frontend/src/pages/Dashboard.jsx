@@ -8,10 +8,10 @@ import { toast } from 'sonner';
 
 const StatCard = ({ icon: Icon, label, value, color, trend }) => {
   const colorClasses = {
-    blue: { bg: 'bg-blue-50', icon: 'bg-blue-100 text-blue-600', border: 'border-blue-100' },
-    coral: { bg: 'bg-red-50', icon: 'bg-red-100 text-red-500', border: 'border-red-100' },
-    purple: { bg: 'bg-purple-50', icon: 'bg-purple-100 text-purple-600', border: 'border-purple-100' },
-    yellow: { bg: 'bg-amber-50', icon: 'bg-amber-100 text-amber-600', border: 'border-amber-100' },
+    blue: { bg: 'bg-blue-50 dark:bg-blue-900/20', icon: 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-800' },
+    coral: { bg: 'bg-red-50 dark:bg-red-900/20', icon: 'bg-red-100 dark:bg-red-900/40 text-red-500 dark:text-red-400', border: 'border-red-100 dark:border-red-800' },
+    purple: { bg: 'bg-purple-50 dark:bg-purple-900/20', icon: 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-800' },
+    yellow: { bg: 'bg-amber-50 dark:bg-amber-900/20', icon: 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-800' },
   };
   const classes = colorClasses[color] || colorClasses.blue;
 
@@ -26,13 +26,13 @@ const StatCard = ({ icon: Icon, label, value, color, trend }) => {
           <Icon className="w-6 h-6" strokeWidth={2} />
         </div>
         {trend && (
-          <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
+          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-1 rounded-full">
             {trend}
           </span>
         )}
       </div>
-      <p className="text-neutral-500 text-sm font-medium mb-1">{label}</p>
-      <h3 className="text-3xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium mb-1">{label}</p>
+      <h3 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100" style={{ fontFamily: 'Outfit, sans-serif' }}>
         {value}
       </h3>
     </motion.div>
@@ -45,7 +45,7 @@ const VideoCard = ({ video }) => (
       whileHover={{ y: -8 }}
       className="studio-card studio-card-hover overflow-hidden group"
     >
-      <div className="relative aspect-video bg-neutral-100">
+      <div className="relative aspect-video bg-neutral-100 dark:bg-neutral-800">
         <img
           src={video.thumbnail}
           alt={video.title}
@@ -53,8 +53,8 @@ const VideoCard = ({ video }) => (
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-xl">
-            <Play className="w-6 h-6 text-blue-600 ml-1" fill="currentColor" />
+          <div className="w-14 h-14 bg-white dark:bg-neutral-800 rounded-full flex items-center justify-center shadow-xl">
+            <Play className="w-6 h-6 text-blue-600 dark:text-blue-400 ml-1" fill="currentColor" />
           </div>
         </div>
         <div className="absolute top-3 left-3">
