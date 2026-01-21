@@ -966,19 +966,23 @@ export const ContentLibrary = () => {
     }
   }, [selectedCategory, selectedLevel]);
   
-  const fetchChildrensLiterature = async (query = '') => {
+  const fetchChildrensLiterature = async (query = '', page = 1) => {
     setLoadingChildrens(true);
     try {
       const response = await api.get('/content-library/childrens-literature', {
         params: {
           query: query,
           grade: selectedLevel !== 'all' ? selectedLevel : 'all',
-          limit: 50
+          page: page,
+          per_page: perPage
         }
       });
       setChildrensLiterature(response.data.results || []);
       setSearchSources(response.data.sources || []);
-      if (response.data.results?.length > 0) {
+      setChildrensPage(response.data.page || 1);
+      setChildrensTotalPages(response.data.total_pages || 1);
+      setChildrensTotalResults(response.data.total || 0);
+      if (response.data.results?.length > 0 && page === 1) {
         toast.success(`Found ${response.data.total} copyright-free children's books!`);
       }
     } catch (error) {
