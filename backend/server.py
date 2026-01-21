@@ -2407,8 +2407,11 @@ async def search_arxiv_articles(client: httpx.AsyncClient, query: str, limit: in
             params={
                 "search_query": f"all:{query}",
                 "start": 0,
-                "max_results": min(limit, 50),
+                "max_results": min(limit, 30),
                 "sortBy": "relevance"
+            },
+            headers={
+                "User-Agent": "ContentFlow/1.0 (Educational Content Search)"
             }
         )
         
@@ -2427,8 +2430,8 @@ async def search_arxiv_articles(client: httpx.AsyncClient, query: str, limit: in
                     arxiv_id = link.text.split("/")[-1] if link.text else ""
                     results.append({
                         "id": f"arxiv_{arxiv_id}",
-                        "title": title.text.strip() if title.text else "Untitled",
-                        "description": (summary.text.strip()[:200] + "...") if summary is not None and summary.text else "",
+                        "title": " ".join(title.text.strip().split()) if title.text else "Untitled",
+                        "description": (" ".join(summary.text.strip().split())[:200] + "...") if summary is not None and summary.text else "",
                         "type": "article",
                         "category": "article",
                         "source": "arXiv",
@@ -2439,6 +2442,8 @@ async def search_arxiv_articles(client: httpx.AsyncClient, query: str, limit: in
                         "free": True
                     })
             return results
+        else:
+            logging.warning(f"arXiv API returned status {response.status_code}")
     except Exception as e:
         logging.warning(f"arXiv search failed: {str(e)}")
     return []
