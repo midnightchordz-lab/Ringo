@@ -1979,50 +1979,66 @@ export const ContentLibrary = () => {
       )}
 
       {/* Initial State - Before Search */}
-      {!isSearching && !loadingBooks && !hasSearched && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && selectedCategory !== 'childrens-literature' && (
-        <div className="glass-card p-16 text-center">
-          <BookOpenCheck className="w-24 h-24 text-violet-500/50 mx-auto mb-6" strokeWidth={1.5} />
-          <h3 className="text-2xl font-bold text-white mb-3">Discover Free Educational Content</h3>
-          <p className="text-zinc-500 mb-8 max-w-lg mx-auto">
+      {!isSearching && !loadingBooks && !loadingChildrens && !hasSearched && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && selectedCategory !== 'childrens-literature' && (
+        <div className="studio-card p-16 text-center">
+          <BookOpenCheck className="w-24 h-24 text-emerald-500/50 mx-auto mb-6" strokeWidth={1.5} />
+          <h3 className="text-2xl font-bold text-neutral-800 mb-3">Discover Free Educational Content</h3>
+          <p className="text-neutral-500 mb-8 max-w-lg mx-auto">
             Search millions of copyright-free resources including worksheets, books, articles, 
             and educational materials from trusted sources worldwide.
           </p>
           
           {/* Featured Sources */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
-            <div className="glass-card p-4 text-center">
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
               <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <BookOpen className="w-5 h-5 text-blue-400" />
+                <BookOpen className="w-5 h-5 text-blue-500" />
               </div>
-              <p className="text-xs font-semibold text-white">OpenLibrary</p>
-              <p className="text-xs text-zinc-500">3M+ Books</p>
+              <p className="text-xs font-semibold text-neutral-800">OpenLibrary</p>
+              <p className="text-xs text-neutral-500">3M+ Books</p>
             </div>
-            <div className="glass-card p-4 text-center">
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
               <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <History className="w-5 h-5 text-amber-400" />
+                <History className="w-5 h-5 text-amber-500" />
               </div>
-              <p className="text-xs font-semibold text-white">Internet Archive</p>
-              <p className="text-xs text-zinc-500">35M+ Items</p>
+              <p className="text-xs font-semibold text-neutral-800">Internet Archive</p>
+              <p className="text-xs text-neutral-500">35M+ Items</p>
             </div>
-            <div className="glass-card p-4 text-center">
-              <div className="w-10 h-10 bg-zinc-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <Globe className="w-5 h-5 text-zinc-400" />
+            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 text-center">
+              <div className="w-10 h-10 bg-neutral-400/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <Globe className="w-5 h-5 text-neutral-600" />
               </div>
-              <p className="text-xs font-semibold text-white">Wikipedia</p>
-              <p className="text-xs text-zinc-500">6M+ Articles</p>
+              <p className="text-xs font-semibold text-neutral-800">Wikipedia</p>
+              <p className="text-xs text-neutral-500">6M+ Articles</p>
             </div>
-            <div className="glass-card p-4 text-center">
+            <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center">
               <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <ClipboardList className="w-5 h-5 text-green-400" />
+                <ClipboardList className="w-5 h-5 text-green-500" />
               </div>
-              <p className="text-xs font-semibold text-white">Worksheets</p>
-              <p className="text-xs text-zinc-500">100K+ Sheets</p>
+              <p className="text-xs font-semibold text-neutral-800">Worksheets</p>
+              <p className="text-xs text-neutral-500">100K+ Sheets</p>
             </div>
           </div>
 
-          <p className="text-xs text-zinc-600">
-            Try searching: "STEM worksheets", "math practice grade 5", "science experiments", "reading comprehension"
+          <p className="text-sm text-neutral-600 mb-6">
+            Try searching: "STEM worksheets", "math practice grade 5", "science experiments"
           </p>
+          
+          {/* Quick Search Suggestions */}
+          <div className="flex flex-wrap justify-center gap-2">
+            {['Math worksheets', 'Science experiments', 'Reading activities', 'History lessons', 'Art projects'].map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => {
+                  setSearchQuery(suggestion);
+                  setTimeout(() => handleSearch(1), 100);
+                }}
+                className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm hover:bg-emerald-200 transition-colors"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
         </div>
       )}
       
