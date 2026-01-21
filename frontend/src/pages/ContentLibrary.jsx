@@ -1305,7 +1305,7 @@ export const ContentLibrary = () => {
   const selectedLevelInfo = EDUCATION_LEVELS.find(l => l.id === selectedLevel);
 
   return (
-    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 min-h-screen">
+    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 dark:bg-neutral-950 min-h-screen transition-colors duration-300">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -1313,30 +1313,30 @@ export const ContentLibrary = () => {
             <Library className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100" style={{ fontFamily: 'Outfit, sans-serif' }}>
               Content Library
             </h1>
-            <p className="text-neutral-500">Search copyright-free educational resources across the web</p>
+            <p className="text-neutral-500 dark:text-neutral-400">Search copyright-free educational resources across the web</p>
           </div>
         </div>
       </div>
 
       {/* AI-Powered Badge */}
-      <div className="studio-card p-4 mb-6 border-l-4 border-purple-500 bg-purple-50">
+      <div className="studio-card p-4 mb-6 border-l-4 border-purple-500 bg-purple-50 dark:bg-purple-900/20">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-purple-600" />
+          <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm font-semibold text-purple-800">AI-Powered Search</span>
+              <span className="text-sm font-semibold text-purple-800 dark:text-purple-300">AI-Powered Search</span>
               <Zap className="w-4 h-4 text-amber-500" />
             </div>
-            <p className="text-xs text-purple-700">
-              Searches <span className="text-blue-600 font-semibold">OpenLibrary</span>, 
-              <span className="text-amber-600 font-semibold"> Internet Archive</span>, 
-              <span className="text-neutral-700 font-semibold"> Wikipedia</span>, and 
-              <span className="text-emerald-600 font-semibold"> educational worksheet sites</span> 
+            <p className="text-xs text-purple-700 dark:text-purple-400">
+              Searches <span className="text-blue-600 dark:text-blue-400 font-semibold">OpenLibrary</span>, 
+              <span className="text-amber-600 dark:text-amber-400 font-semibold"> Internet Archive</span>, 
+              <span className="text-neutral-700 dark:text-neutral-300 font-semibold"> Wikipedia</span>, and 
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold"> educational worksheet sites</span> 
               {' '}for free content. AI categorizes and ranks results.
             </p>
           </div>
@@ -1349,7 +1349,7 @@ export const ContentLibrary = () => {
           {/* Search Input */}
           <div className="flex-1 relative flex gap-2">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-neutral-500" />
               <Input
                 data-testid="library-search-input"
                 type="text"
