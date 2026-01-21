@@ -1270,14 +1270,14 @@ export const ContentLibrary = () => {
             <Button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`rounded-full px-4 py-2 flex items-center gap-2 whitespace-nowrap transition-all ${
+              className={`rounded-full px-4 py-2 flex items-center gap-2 whitespace-nowrap transition-all font-medium ${
                 isActive
-                  ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
-                  : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
+                  ? `bg-gradient-to-r ${category.color} text-white shadow-lg scale-105`
+                  : 'bg-white border-2 border-neutral-200 text-neutral-700 hover:border-neutral-400 hover:bg-neutral-50 shadow-sm'
               }`}
               data-testid={`category-${category.id}`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className={`w-4 h-4 ${isActive ? '' : 'text-neutral-500'}`} />
               {category.name}
             </Button>
           );
