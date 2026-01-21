@@ -1805,110 +1805,201 @@ class FavoriteImageModel(BaseModel):
 async def search_images(
     query: str = Query(..., description="Search query for images"),
     page: int = Query(default=1, ge=1),
-    per_page: int = Query(default=30, le=50),
+    per_page: int = Query(default=50, le=100),
+    source: str = Query(default="all", description="Filter by source: all, unsplash, pexels, pixabay"),
     current_user: dict = Depends(get_current_user)
 ):
-    """Search for copyright-free images from Unsplash and Pexels"""
+    """Search for copyright-free images from Unsplash, Pexels, and Pixabay"""
     try:
         images = []
+        total_available = 0
         
-        # Get API keys from environment or use defaults
+        # Get API keys from environment
         unsplash_key = os.environ.get('UNSPLASH_API_KEY', '')
         pexels_key = os.environ.get('PEXELS_API_KEY', 'QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq')
+        pixabay_key = os.environ.get('PIXABAY_API_KEY', '')
         
-        async with httpx.AsyncClient() as client:
-            # Search Unsplash (if key available)
-            if unsplash_key:
-                try:
-                    unsplash_response = await client.get(
-                        "https://api.unsplash.com/search/photos",
-                        params={
-                            "query": query,
-                            "page": page,
-                            "per_page": per_page // 2,
-                            "orientation": "landscape"
-                        },
-                        headers={
-                            "Authorization": f"Client-ID {unsplash_key}"
-                        },
-                        timeout=10.0
-                    )
-                    if unsplash_response.status_code == 200:
-                        unsplash_data = unsplash_response.json()
-                        for photo in unsplash_data.get("results", []):
-                            images.append({
-                                "id": f"unsplash_{photo['id']}",
-                                "url": photo["urls"]["regular"],
-                                "thumbnail": photo["urls"]["small"],
-                                "title": photo.get("description") or photo.get("alt_description") or "Untitled",
-                                "photographer": photo["user"]["name"],
-                                "photographer_url": photo["user"]["links"]["html"],
-                                "source": "unsplash",
-                                "download_url": photo["urls"]["full"],
-                                "width": photo["width"],
-                                "height": photo["height"],
-                                "color": photo.get("color", "#000000"),
-                                "likes": photo.get("likes", 0)
-                            })
-                except Exception as e:
-                    logging.warning(f"Unsplash API error: {str(e)}")
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            tasks = []
+            
+            # Search Unsplash (if key available and source matches)
+            if unsplash_key and source in ["all", "unsplash"]:
+                tasks.append(search_unsplash_images(client, query, page, per_page, unsplash_key))
             
             # Search Pexels (primary source)
-            try:
-                pexels_response = await client.get(
-                    "https://api.pexels.com/v1/search",
-                    params={
-                        "query": query,
-                        "page": page,
-                        "per_page": per_page  # Get full amount from Pexels
-                    },
-                    headers={
-                        "Authorization": pexels_key
-                    },
-                    timeout=10.0
-                )
-                if pexels_response.status_code == 200:
-                    pexels_data = pexels_response.json()
-                    for photo in pexels_data.get("photos", []):
-                        images.append({
-                            "id": f"pexels_{photo['id']}",
-                            "url": photo["src"]["large"],
-                            "thumbnail": photo["src"]["medium"],
-                            "title": photo.get("alt") or "Untitled",
-                            "photographer": photo["photographer"],
-                            "photographer_url": photo["photographer_url"],
-                            "source": "pexels",
-                            "download_url": photo["src"]["original"],
-                            "width": photo["width"],
-                            "height": photo["height"],
-                            "color": photo.get("avg_color", "#000000"),
-                            "likes": 0
-                        })
-            except Exception as e:
-                logging.warning(f"Pexels API error: {str(e)}")
+            if source in ["all", "pexels"]:
+                tasks.append(search_pexels_images(client, query, page, per_page, pexels_key))
+            
+            # Search Pixabay (if key available)
+            if pixabay_key and source in ["all", "pixabay"]:
+                tasks.append(search_pixabay_images(client, query, page, per_page, pixabay_key))
+            
+            # Run all searches in parallel
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            for result in results:
+                if isinstance(result, dict):
+                    images.extend(result.get("images", []))
+                    total_available += result.get("total", 0)
+                elif isinstance(result, Exception):
+                    logging.warning(f"Image search source failed: {str(result)}")
         
-        # Interleave results from both sources
-        unsplash_images = [img for img in images if img["source"] == "unsplash"]
-        pexels_images = [img for img in images if img["source"] == "pexels"]
+        # Interleave results from all sources for variety
+        sources_dict = {}
+        for img in images:
+            src = img["source"]
+            if src not in sources_dict:
+                sources_dict[src] = []
+            sources_dict[src].append(img)
         
+        # Interleave images from different sources
         combined = []
-        max_len = max(len(unsplash_images), len(pexels_images))
-        for i in range(max_len):
-            if i < len(unsplash_images):
-                combined.append(unsplash_images[i])
-            if i < len(pexels_images):
-                combined.append(pexels_images[i])
+        source_lists = list(sources_dict.values())
+        if source_lists:
+            max_len = max(len(lst) for lst in source_lists)
+            for i in range(max_len):
+                for lst in source_lists:
+                    if i < len(lst):
+                        combined.append(lst[i])
+        
+        # Calculate pagination info
+        total_pages = (total_available + per_page - 1) // per_page if total_available > 0 else 1
         
         return {
-            "images": combined,
-            "total": len(combined),
+            "images": combined[:per_page],  # Return requested number
+            "total": total_available,
             "page": page,
-            "query": query
+            "per_page": per_page,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+            "has_prev": page > 1,
+            "query": query,
+            "sources": list(sources_dict.keys())
         }
     
     except Exception as e:
         logging.error(f"Error searching images: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+async def search_unsplash_images(client: httpx.AsyncClient, query: str, page: int, per_page: int, api_key: str) -> dict:
+    """Search Unsplash for images"""
+    try:
+        response = await client.get(
+            "https://api.unsplash.com/search/photos",
+            params={
+                "query": query,
+                "page": page,
+                "per_page": min(per_page, 30),  # Unsplash max is 30
+                "orientation": "landscape"
+            },
+            headers={"Authorization": f"Client-ID {api_key}"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            images = []
+            for photo in data.get("results", []):
+                images.append({
+                    "id": f"unsplash_{photo['id']}",
+                    "url": photo["urls"]["regular"],
+                    "thumbnail": photo["urls"]["small"],
+                    "title": photo.get("description") or photo.get("alt_description") or "Untitled",
+                    "photographer": photo["user"]["name"],
+                    "photographer_url": photo["user"]["links"]["html"],
+                    "source": "unsplash",
+                    "source_url": photo["links"]["html"],
+                    "download_url": photo["urls"]["full"],
+                    "width": photo["width"],
+                    "height": photo["height"],
+                    "color": photo.get("color", "#000000"),
+                    "likes": photo.get("likes", 0),
+                    "license": "Unsplash License (Free for commercial use)"
+                })
+            return {"images": images, "total": data.get("total", 0)}
+    except Exception as e:
+        logging.warning(f"Unsplash API error: {str(e)}")
+    return {"images": [], "total": 0}
+
+
+async def search_pexels_images(client: httpx.AsyncClient, query: str, page: int, per_page: int, api_key: str) -> dict:
+    """Search Pexels for images"""
+    try:
+        response = await client.get(
+            "https://api.pexels.com/v1/search",
+            params={
+                "query": query,
+                "page": page,
+                "per_page": min(per_page, 80)  # Pexels max is 80
+            },
+            headers={"Authorization": api_key}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            images = []
+            for photo in data.get("photos", []):
+                images.append({
+                    "id": f"pexels_{photo['id']}",
+                    "url": photo["src"]["large"],
+                    "thumbnail": photo["src"]["medium"],
+                    "title": photo.get("alt") or "Untitled",
+                    "photographer": photo["photographer"],
+                    "photographer_url": photo["photographer_url"],
+                    "source": "pexels",
+                    "source_url": photo["url"],
+                    "download_url": photo["src"]["original"],
+                    "width": photo["width"],
+                    "height": photo["height"],
+                    "color": photo.get("avg_color", "#000000"),
+                    "likes": 0,
+                    "license": "Pexels License (Free for commercial use)"
+                })
+            return {"images": images, "total": data.get("total_results", 0)}
+    except Exception as e:
+        logging.warning(f"Pexels API error: {str(e)}")
+    return {"images": [], "total": 0}
+
+
+async def search_pixabay_images(client: httpx.AsyncClient, query: str, page: int, per_page: int, api_key: str) -> dict:
+    """Search Pixabay for images"""
+    try:
+        response = await client.get(
+            "https://pixabay.com/api/",
+            params={
+                "key": api_key,
+                "q": query,
+                "page": page,
+                "per_page": min(per_page, 200),  # Pixabay allows up to 200
+                "image_type": "photo",
+                "safesearch": "true"
+            }
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            images = []
+            for photo in data.get("hits", []):
+                images.append({
+                    "id": f"pixabay_{photo['id']}",
+                    "url": photo["largeImageURL"],
+                    "thumbnail": photo["previewURL"],
+                    "title": photo.get("tags", "Untitled"),
+                    "photographer": photo.get("user", "Unknown"),
+                    "photographer_url": f"https://pixabay.com/users/{photo.get('user', '')}-{photo.get('user_id', '')}",
+                    "source": "pixabay",
+                    "source_url": photo["pageURL"],
+                    "download_url": photo["largeImageURL"],
+                    "width": photo["imageWidth"],
+                    "height": photo["imageHeight"],
+                    "color": "#000000",
+                    "likes": photo.get("likes", 0),
+                    "license": "Pixabay License (Free for commercial use)"
+                })
+            return {"images": images, "total": data.get("totalHits", 0)}
+    except Exception as e:
+        logging.warning(f"Pixabay API error: {str(e)}")
+    return {"images": [], "total": 0}
 
 @api_router.post("/images/favorites")
 async def add_favorite_image(
