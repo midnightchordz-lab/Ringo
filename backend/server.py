@@ -2363,10 +2363,10 @@ async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit
     return []
 
 
-async def search_storyweaver(client: httpx.AsyncClient, query: str, grade: str, limit: int) -> list:
+async def search_storyweaver(client: httpx.AsyncClient, query: str, grade: str, limit: int, page: int = 1) -> list:
     """Search StoryWeaver (Pratham Books) for free children's books - Creative Commons"""
     try:
-        # StoryWeaver API
+        # StoryWeaver API - supports pagination
         reading_level = "1"  # Default to level 1
         if grade == "preschool":
             reading_level = "1"
@@ -2379,12 +2379,12 @@ async def search_storyweaver(client: httpx.AsyncClient, query: str, grade: str, 
             "https://storyweaver.org.in/api/v1/books/search",
             params={
                 "query": query,
-                "page": 1,
+                "page": page,
                 "per_page": limit,
                 "languages": "English"
             },
             headers={"Accept": "application/json"},
-            timeout=15.0
+            timeout=20.0
         )
         
         if response.status_code == 200:
