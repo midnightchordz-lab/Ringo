@@ -8,14 +8,27 @@
   * {
     @apply border-border;
   }
+  
+  /* Light mode (default) */
   body {
-    @apply bg-neutral-50;
+    @apply bg-neutral-50 text-neutral-900;
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
+  
+  /* Dark mode */
+  .dark body {
+    @apply bg-neutral-950 text-neutral-100;
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif;
     @apply tracking-tight text-neutral-900;
+  }
+  
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-neutral-100;
   }
 }
 
