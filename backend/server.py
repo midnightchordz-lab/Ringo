@@ -2140,12 +2140,14 @@ async def search_content_library(
     query: str = Query(..., description="Search query for educational content"),
     category: str = Query(default="all", description="Category filter"),
     grade: str = Query(default="all", description="Education level filter: preschool, elementary, middle, high, university"),
-    limit: int = Query(default=20, le=50),
+    page: int = Query(default=1, ge=1, description="Page number"),
+    per_page: int = Query(default=50, le=100, description="Results per page"),
     current_user: dict = Depends(get_current_user)
 ):
     """
     Dynamic search for copyright-free educational content across multiple sources.
     Searches: OpenLibrary, Internet Archive, Wikipedia, and uses AI for enhancement.
+    Supports pagination for accessing all available content.
     """
     try:
         # Enhance query with grade level for better results
@@ -2162,14 +2164,15 @@ async def search_content_library(
             enhanced_query = f"{query} {grade_keywords[grade]}"
         
         all_results = []
+        fetch_limit = per_page * 3  # Get enough results for pagination
         
         async with httpx.AsyncClient(timeout=15.0) as client:
-            # Run searches in parallel
+            # Run searches in parallel with higher limits
             tasks = [
-                search_openlibrary(client, enhanced_query, limit // 4),
-                search_internet_archive(client, enhanced_query, limit // 4),
-                search_wikipedia(client, query, limit // 4),  # Wikipedia uses original query
-                search_oer_commons(client, enhanced_query, limit // 4),
+                search_openlibrary(client, enhanced_query, fetch_limit // 4),
+                search_internet_archive(client, enhanced_query, fetch_limit // 4),
+                search_wikipedia(client, query, fetch_limit // 4),  # Wikipedia uses original query
+                search_oer_commons(client, enhanced_query, fetch_limit // 4),
             ]
             
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -2183,20 +2186,26 @@ async def search_content_library(
         # Use AI to enhance and categorize results if we have any
         if all_results and len(all_results) > 0:
             try:
-                enhanced_results = await ai_enhance_results(query, all_results[:limit], grade)
-                return {
-                    "results": enhanced_results,
-                    "total": len(enhanced_results),
-                    "query": query,
-                    "grade": grade,
-                    "sources": ["OpenLibrary", "Internet Archive", "Wikipedia", "OER Commons"]
-                }
+                enhanced_results = await ai_enhance_results(query, all_results, grade)
+                all_results = enhanced_results
             except Exception as ai_error:
                 logging.warning(f"AI enhancement failed, returning raw results: {str(ai_error)}")
         
+        # Pagination
+        total_results = len(all_results)
+        total_pages = (total_results + per_page - 1) // per_page
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_results = all_results[start_idx:end_idx]
+        
         return {
-            "results": all_results[:limit],
-            "total": len(all_results),
+            "results": paginated_results,
+            "total": total_results,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+            "has_prev": page > 1,
             "query": query,
             "grade": grade,
             "sources": ["OpenLibrary", "Internet Archive", "Wikipedia", "OER Commons"]
@@ -3929,10 +3938,11 @@ FREE_EDUCATIONAL_BOOKS = [
 async def get_free_books(
     category: str = Query(default="all", description="Filter by category: stories, poetry, grammar, math, science"),
     grade: str = Query(default="all", description="Filter by grade level"),
-    limit: int = Query(default=20, le=50),
+    page: int = Query(default=1, ge=1, description="Page number"),
+    per_page: int = Query(default=50, le=100, description="Results per page"),
     current_user: dict = Depends(get_current_user)
 ):
-    """Get curated list of free downloadable educational books"""
+    """Get curated list of free downloadable educational books with pagination"""
     try:
         books = FREE_EDUCATIONAL_BOOKS.copy()
         
@@ -3952,9 +3962,21 @@ async def get_free_books(
             target_grade = grade_map.get(grade, grade)
             books = [b for b in books if target_grade in b.get("grade_level", [])]
         
+        # Pagination
+        total_books = len(books)
+        total_pages = (total_books + per_page - 1) // per_page
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_books = books[start_idx:end_idx]
+        
         return {
-            "books": books[:limit],
-            "total": len(books),
+            "books": paginated_books,
+            "total": total_books,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+            "has_prev": page > 1,
             "categories": ["stories", "poetry", "grammar", "math", "science"],
             "grades": ["preschool", "elementary", "middle", "high", "university"]
         }
@@ -3968,10 +3990,11 @@ async def get_free_books(
 async def search_free_books(
     query: str = Query(..., description="Search query"),
     grade: str = Query(default="all", description="Filter by grade level"),
-    limit: int = Query(default=20, le=50),
+    page: int = Query(default=1, ge=1, description="Page number"),
+    per_page: int = Query(default=50, le=100, description="Results per page"),
     current_user: dict = Depends(get_current_user)
 ):
-    """Search free educational books by title, author, or subject"""
+    """Search free educational books by title, author, or subject with pagination"""
     try:
         query_lower = query.lower()
         
@@ -3997,9 +4020,21 @@ async def search_free_books(
             target_grade = grade_map.get(grade, grade)
             matching_books = [b for b in matching_books if target_grade in b.get("grade_level", [])]
         
+        # Pagination
+        total_books = len(matching_books)
+        total_pages = (total_books + per_page - 1) // per_page
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_books = matching_books[start_idx:end_idx]
+        
         return {
-            "books": matching_books[:limit],
-            "total": len(matching_books),
+            "books": paginated_books,
+            "total": total_books,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+            "has_prev": page > 1,
             "query": query
         }
     
