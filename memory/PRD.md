@@ -108,15 +108,32 @@ Created modular architecture for maintainability:
 - **View list details**: See all books in a list with download options
 - Endpoints: `/api/reading-lists`, `/api/reading-lists/{id}`, `/api/reading-lists/{id}/books`, `/api/reading-lists/{id}/copy`
 
-### Core Features - Free Books Section (NEW Jan 20, 2026)
-- **19 curated free books** from Project Gutenberg (public domain)
+### Core Features - Free Books Section (ENHANCED Jan 21, 2026)
+- **62 curated free books** from Project Gutenberg (public domain)
 - **Categories**: Stories, Poetry, Grammar, Math, Science
 - **Book cards** display: Title, Author, Category badge, Public Domain badge, Printable badge, Grade levels
 - **Download options**: PDF, EPUB, Read Online
 - **Category filters**: All Books, Stories, Poetry, Grammar, Math, Science
 - **Grade level filtering**: Pre-school through University
 - **Search within books**: Search by title, author, or subject
+- **PAGINATION**: 50 items per page with navigation controls (Previous/Next, page numbers)
 - Endpoints: `/api/content-library/free-books`, `/api/content-library/free-books/search`
+
+### Core Features - Children's Literature Search (NEW Jan 20, 2026)
+- **Dynamic copyright-free search** across multiple sources:
+  - Project Gutenberg (via Gutendex API)
+  - StoryWeaver (Creative Commons books)
+  - Open Library (public domain)
+- **PAGINATION**: 50 items per page with navigation controls
+- Search and filter by grade level
+- All results are downloadable and printable
+- Endpoints: `/api/content-library/childrens-literature`
+
+### Core Features - Content Library Search (ENHANCED Jan 21, 2026)
+- Searches across OpenLibrary, Internet Archive, Wikipedia, OER Commons
+- AI-powered result enhancement and categorization
+- **PAGINATION**: 50 items per page with navigation controls
+- Endpoints: `/api/content-library/search`
 
 ### UI/UX
 - Vibrant gradient theme (violet, purple, pink accents)
