@@ -2299,18 +2299,19 @@ async def search_childrens_literature(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit: int) -> list:
+async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit: int, page: int = 1) -> list:
     """Search Project Gutenberg for children's literature - all public domain"""
     try:
-        # Use Gutendex API for better search
+        # Use Gutendex API for better search - supports pagination
         response = await client.get(
             "https://gutendex.com/books/",
             params={
                 "search": query,
                 "topic": "children",
-                "languages": "en"
+                "languages": "en",
+                "page": page
             },
-            timeout=15.0
+            timeout=20.0
         )
         
         if response.status_code == 200:
