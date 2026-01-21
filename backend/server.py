@@ -2450,39 +2450,43 @@ async def search_arxiv_articles(client: httpx.AsyncClient, query: str, limit: in
 
 
 async def search_oer_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
-    """Search OER Commons for courses"""
-    try:
-        response = await client.get(
-            "https://www.oercommons.org/api/v2/resources/",
-            params={
-                "q": f"{query} course",
-                "page_size": min(limit, 50),
-                "material_types": "course"
-            },
-            headers={"Accept": "application/json"}
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            results = []
-            for item in data.get("results", []):
-                results.append({
-                    "id": f"oer_course_{item.get('id', '')}",
-                    "title": item.get("title", "Untitled Course"),
-                    "description": item.get("abstract", "")[:200],
-                    "type": "course",
-                    "category": "course",
-                    "source": "OER Commons",
-                    "url": item.get("url", ""),
-                    "thumbnail": item.get("image_url", "🎓"),
-                    "license": item.get("license", "Open License"),
-                    "free": True,
-                    "subjects": item.get("subjects", [])[:3]
-                })
-            return results
-    except Exception as e:
-        logging.warning(f"OER courses search failed: {str(e)}")
-    return []
+    """Search for free online courses from multiple sources"""
+    results = []
+    
+    # Add curated free course platforms
+    course_platforms = [
+        {
+            "name": "Khan Academy",
+            "base_url": "https://www.khanacademy.org/search",
+            "search_param": "referer=search&page_search_query="
+        },
+        {
+            "name": "Coursera (Free)",
+            "base_url": "https://www.coursera.org/search",
+            "search_param": "query="
+        },
+        {
+            "name": "edX (Free)",
+            "base_url": "https://www.edx.org/search",
+            "search_param": "q="
+        }
+    ]
+    
+    for platform in course_platforms:
+        results.append({
+            "id": f"course_{platform['name'].lower().replace(' ', '_')}_{query.replace(' ', '_')}",
+            "title": f"{query} courses on {platform['name']}",
+            "description": f"Find free {query} courses on {platform['name']} - one of the world's leading educational platforms.",
+            "type": "course",
+            "category": "course",
+            "source": platform['name'],
+            "url": f"{platform['base_url']}?{platform['search_param']}{query.replace(' ', '+')}",
+            "thumbnail": "🎓",
+            "license": "Free to access",
+            "free": True
+        })
+    
+    return results[:limit]
 
 
 async def search_mit_ocw(client: httpx.AsyncClient, query: str, limit: int) -> list:
