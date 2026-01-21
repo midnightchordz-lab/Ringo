@@ -797,6 +797,10 @@ export const ContentLibrary = () => {
   const [freeBooks, setFreeBooks] = useState([]);
   const [loadingBooks, setLoadingBooks] = useState(false);
   
+  // Children's Literature State
+  const [childrensLiterature, setChildrensLiterature] = useState([]);
+  const [loadingChildrens, setLoadingChildrens] = useState(false);
+  
   // Reading Lists State
   const [readingLists, setReadingLists] = useState([]);
   const [loadingLists, setLoadingLists] = useState(false);
@@ -811,6 +815,36 @@ export const ContentLibrary = () => {
     fetchFavorites();
     fetchReadingLists();
   }, []);
+  
+  // Fetch children's literature when category changes or on initial load
+  useEffect(() => {
+    if (selectedCategory === 'childrens-literature') {
+      fetchChildrensLiterature();
+    }
+  }, [selectedCategory, selectedLevel]);
+  
+  const fetchChildrensLiterature = async (query = '') => {
+    setLoadingChildrens(true);
+    try {
+      const response = await api.get('/content-library/childrens-literature', {
+        params: {
+          query: query,
+          grade: selectedLevel !== 'all' ? selectedLevel : 'all',
+          limit: 50
+        }
+      });
+      setChildrensLiterature(response.data.results || []);
+      setSearchSources(response.data.sources || []);
+      if (response.data.results?.length > 0) {
+        toast.success(`Found ${response.data.total} copyright-free children's books!`);
+      }
+    } catch (error) {
+      console.error('Error fetching children\'s literature:', error);
+      toast.error('Failed to search children\'s literature');
+    } finally {
+      setLoadingChildrens(false);
+    }
+  };
   
   // Fetch reading lists
   const fetchReadingLists = async () => {
