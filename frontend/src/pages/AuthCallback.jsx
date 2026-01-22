@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -10,6 +11,7 @@ export const AuthCallback = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const hasProcessed = useRef(false);
+  const { login } = useAuth();
 
   useEffect(() => {
     // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
@@ -40,18 +42,15 @@ export const AuthCallback = () => {
           }
         );
 
-        // Store token and user info
-        localStorage.setItem('token', response.data.access_token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        // Use auth context login - this updates state reactively
+        login(response.data.access_token, response.data.user);
 
         // Clear URL fragment
         window.history.replaceState(null, '', '/');
         toast.success(`Welcome, ${response.data.user.full_name}! 🎉`);
         
-        // Small delay to ensure localStorage is synced before navigation
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 100);
+        // Navigate immediately - auth state is already updated
+        navigate('/', { replace: true });
 
       } catch (error) {
         console.error('Auth callback error:', error);
