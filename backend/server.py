@@ -1896,9 +1896,8 @@ async def search_images(
             if source in ["all", "wikimedia"]:
                 tasks.append(search_wikimedia_images(client, query, page, per_page, image_type))
             
-            # Search OpenClipart (Public Domain - vectors and illustrations)
-            if source in ["all", "openclipart"] and (is_illustration_type or is_vector_type):
-                tasks.append(search_openclipart_images(client, query, page, per_page))
+            # Note: OpenClipart requires API authentication - disabled for now
+            # To enable, user must create account at openclipart.org and get API token
             
             # Run all searches in parallel
             results = await asyncio.gather(*tasks, return_exceptions=True)
