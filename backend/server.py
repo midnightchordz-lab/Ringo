@@ -1894,16 +1894,6 @@ async def search_images(
             # Search OpenClipart (Public Domain - vectors and illustrations)
             if source in ["all", "openclipart"] and (is_illustration_type or is_vector_type):
                 tasks.append(search_openclipart_images(client, query, page, per_page))
-                    "page": page,
-                    "per_page": per_page,
-                    "total_pages": 0,
-                    "has_next": False,
-                    "has_prev": False,
-                    "query": query,
-                    "sources": [],
-                    "image_type": image_type,
-                    "error": f"Pixabay API key required to search for {image_type}. Only Pixabay supports illustrations and vectors."
-                }
             
             # Run all searches in parallel
             results = await asyncio.gather(*tasks, return_exceptions=True)
