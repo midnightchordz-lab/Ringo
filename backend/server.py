@@ -4028,8 +4028,7 @@ async def search_library_of_congress(client: httpx.AsyncClient, query: str, limi
                 "c": min(limit, 25),
                 "fa": "access-restricted:false"
             },
-            headers={"User-Agent": "ContentFlow/1.0"},
-            follow_redirects=True
+            headers={"User-Agent": "ContentFlow/1.0"}
         )
         
         if response.status_code == 200:
