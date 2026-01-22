@@ -2740,7 +2740,7 @@ def get_source_default_license(source: str) -> str:
 def get_active_sources_v2(category: str) -> list:
     """Get list of CC-licensed sources used for a category"""
     sources = {
-        "all": ["OpenStax (CC BY)", "CK-12 (CC BY-NC)", "MIT OCW (CC BY-NC-SA)", "Wikiversity (CC BY-SA)", "Wikibooks (CC BY-SA)", "YouTube (CC BY)", "Internet Archive (Public Domain)", "OER Commons (CC BY/SA)", "Wikimedia Commons (CC BY-SA)", "Library of Congress (Public Domain)"],
+        "all": ["OpenStax (CC BY)", "CK-12 (CC BY-NC)", "MIT OCW (CC BY-NC-SA)", "Wikiversity (CC BY-SA)", "Wikibooks (CC BY-SA)", "YouTube (CC BY)", "Internet Archive (Public Domain)", "OER Commons (CC BY/SA)", "Wikimedia Commons (CC BY-SA)"],
         "article": ["OpenAlex", "arXiv (Open Access)", "PubMed Central", "Wikipedia (CC BY-SA)", "DOAJ (Open Access)"],
         "course": ["OpenStax (CC BY 4.0)", "CK-12 FlexBooks (CC BY-NC)", "MIT OpenCourseWare (CC BY-NC-SA)", "Wikiversity (CC BY-SA)", "Wikibooks (CC BY-SA)", "freeCodeCamp (Free)", "YouTube (CC BY)"],
         "video": ["YouTube Creative Commons (CC BY)", "Internet Archive (Public Domain)", "TED Talks (CC BY-NC-ND)"],
