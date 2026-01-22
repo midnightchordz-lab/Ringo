@@ -4016,76 +4016,7 @@ async def search_national_geographic_edu(client: httpx.AsyncClient, query: str, 
         "free": True
     }]
 
-
-async def search_library_of_congress(client: httpx.AsyncClient, query: str, limit: int) -> list:
-    """Search Library of Congress for educational primary sources"""
-    try:
-        response = await client.get(
-            "https://www.loc.gov/search/",
-            params={
-                "q": query,
-                "fo": "json",
-                "c": min(limit, 25),
-                "fa": "access-restricted:false"
-            },
-            headers={"User-Agent": "ContentFlow/1.0"}
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            results = []
-            for item in data.get("results", []):
-                title = item.get("title", "Untitled")
-                if isinstance(title, list):
-                    title = title[0] if title else "Untitled"
-                
-                # Safe access for description - handle empty lists and None
-                description_raw = item.get("description")
-                if isinstance(description_raw, list) and len(description_raw) > 0:
-                    description = description_raw[0]
-                elif isinstance(description_raw, str):
-                    description = description_raw
-                else:
-                    description = ""
-                
-                # Safe access for image_url - handle empty lists and None
-                image_url_raw = item.get("image_url")
-                if isinstance(image_url_raw, list) and len(image_url_raw) > 0:
-                    thumbnail = image_url_raw[0]
-                elif isinstance(image_url_raw, str):
-                    thumbnail = image_url_raw
-                else:
-                    thumbnail = "🏛️"
-                
-                results.append({
-                    "id": f"loc_{item.get('id', '')}",
-                    "title": str(title)[:100] if title else "Untitled",
-                    "description": str(description)[:200] if description else f"Primary source from Library of Congress about {query}",
-                    "type": "resource",
-                    "category": "resource",
-                    "source": "Library of Congress",
-                    "url": item.get("url", f"https://www.loc.gov/search/?q={query}"),
-                    "thumbnail": thumbnail,
-                    "license": "Public Domain",
-                    "free": True
-                })
-            return results[:limit]
-    except Exception as e:
-        logging.warning(f"Library of Congress search failed: {str(e)}")
-    
-    # Fallback to search link
-    return [{
-        "id": f"loc_{query.replace(' ', '_')}",
-        "title": f"{query} - Library of Congress",
-        "description": f"Primary sources and historical materials about {query} from the Library of Congress.",
-        "type": "resource",
-        "category": "resource",
-        "source": "Library of Congress",
-        "url": f"https://www.loc.gov/search/?q={query.replace(' ', '+')}",
-        "thumbnail": "🏛️",
-        "license": "Public Domain",
-        "free": True
-    }]
+# Library of Congress function REMOVED - API was unreliable
 
 
 async def search_pbs_learningmedia(client: httpx.AsyncClient, query: str, limit: int) -> list:
