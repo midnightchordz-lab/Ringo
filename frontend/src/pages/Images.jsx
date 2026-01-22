@@ -341,7 +341,7 @@ export const Images = () => {
               <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <p className="text-xs text-emerald-700 dark:text-emerald-400">
-              All images from <span className="font-bold">Pexels</span>, <span className="font-bold">Unsplash</span>, and <span className="font-bold">Pixabay</span> are free for commercial use. No attribution required!
+              All images are <span className="font-bold">Creative Commons licensed</span> (CC BY, CC BY-SA, CC0). Sources: <span className="font-bold">Pexels</span>, <span className="font-bold">Unsplash</span>, <span className="font-bold">Pixabay</span>, <span className="font-bold">Wikimedia Commons</span>, <span className="font-bold">OpenClipart</span>
             </p>
           </div>
         </div>
