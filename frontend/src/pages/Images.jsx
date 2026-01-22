@@ -378,6 +378,28 @@ export const Images = () => {
             </Button>
           </div>
           
+          {/* Image Type Filter */}
+          <div className="flex items-center gap-2 flex-wrap pb-4 border-b border-neutral-100 dark:border-neutral-800">
+            <span className="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
+              <ImageIcon className="w-4 h-4" /> Type:
+            </span>
+            {IMAGE_TYPES.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => handleTypeFilter(type.id)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
+                  selectedType === type.id
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+                data-testid={`type-filter-${type.id}`}
+              >
+                <span>{type.icon}</span>
+                {type.name}
+              </button>
+            ))}
+          </div>
+          
           {/* Source Filter */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
@@ -410,6 +432,11 @@ export const Images = () => {
         <div className="mb-6 flex items-center justify-between">
           <p className="text-neutral-600 dark:text-neutral-400">
             Found <span className="font-bold text-purple-600 dark:text-purple-400">{totalImages.toLocaleString()}</span> images
+            {selectedType !== 'all' && (
+              <span className="ml-2 text-pink-600 dark:text-pink-400">
+                ({IMAGE_TYPES.find(t => t.id === selectedType)?.name})
+              </span>
+            )}
             {sources.length > 0 && (
               <span className="text-sm text-neutral-500 dark:text-neutral-500 ml-2">
                 from {sources.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}
