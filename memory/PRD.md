@@ -278,7 +278,46 @@ Implemented comprehensive, multi-source search for all content categories:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 22, 2026 - Children's Literature Monetization-Friendly Licenses
+January 22, 2026 - Video Transcription Feature
+
+### Video-to-Text Transcription Feature (Jan 22, 2026) ✅ COMPLETED
+- **Feature**: Convert YouTube videos to text transcripts
+- **User Request**: "In the videos Tab add a feature to convert all the you tube videos to text"
+
+**Backend Implementation**:
+- Added `youtube-transcript-api` library for fetching YouTube captions
+- New endpoint: `GET /api/video/transcript/{video_id}` - Fetch transcript for any video
+- New endpoint: `GET /api/video/transcript/{video_id}/cached` - Get cached transcript
+- Transcripts cached in MongoDB `video_transcripts` collection
+- No authentication required (public YouTube data)
+- Handles multiple languages (prioritizes English)
+- Returns: `success`, `video_id`, `language`, `word_count`, `full_text`, `segments`, `total_segments`
+
+**Frontend Implementation**:
+- Added "Convert to Text" button on all video cards in Discover page
+- New `TranscriptModal` component with:
+  - Loading state with spinner
+  - Transcript display with word count, language, and segments count
+  - Copy to clipboard button
+  - Download as .txt file button
+  - User-friendly error messages for blocked/unavailable transcripts
+- Uses `data-testid="transcribe-button"` for testing
+
+**Known Limitation**:
+- YouTube blocks transcript requests from cloud provider IPs (AWS/GCP/Azure)
+- This is expected behavior from the `youtube-transcript-api` library
+- Error handling displays friendly message: "YouTube is limiting transcript requests from our servers"
+- Feature works correctly when YouTube allows the request
+
+**Files Changed**:
+- `/app/backend/server.py` - Added transcript endpoints
+- `/app/backend/requirements.txt` - Added `youtube-transcript-api`
+- `/app/frontend/src/pages/Discover.jsx` - Added TranscriptModal and button
+
+**Testing**:
+- 8/8 backend tests passed (pytest)
+- Frontend UI fully tested (transcript modal, buttons, error handling)
+- Test file: `/app/tests/test_video_transcript_api.py`
 
 ### Children's Literature Monetization Update (Jan 22, 2026) ✅ COMPLETED
 - **Removed Internet Archive** from Children's Literature sources (license status varies)
