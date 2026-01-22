@@ -1418,11 +1418,18 @@ export const ContentLibrary = () => {
         }
       });
       
-      setSearchResults(response.data.results || []);
+      const results = response.data.results || [];
+      setSearchResults(results);
       setSearchSources(response.data.sources || []);
       setSearchPage(response.data.page || 1);
       setSearchTotalPages(response.data.total_pages || 1);
       setSearchTotalResults(response.data.total || 0);
+      
+      // Extract unique sources for filter dropdown
+      const uniqueSources = [...new Set(results.map(r => r.source).filter(Boolean))];
+      setAvailableFilters(uniqueSources);
+      setResultFilter('all'); // Reset filter on new search
+      
       if (page === 1) {
         toast.success(`Found ${response.data.total} resources!`);
       }
@@ -1430,6 +1437,7 @@ export const ContentLibrary = () => {
       console.error('Error searching content:', error);
       toast.error('Search failed. Please try again.');
       setSearchResults([]);
+      setAvailableFilters([]);
     } finally {
       setIsSearching(false);
     }
