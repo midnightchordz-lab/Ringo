@@ -231,7 +231,8 @@ export const Images = () => {
           query: searchQuery, 
           page: page,
           per_page: perPage,
-          source: selectedSource
+          source: selectedSource,
+          image_type: selectedType !== 'all' ? selectedType : undefined
         }
       });
       setImages(response.data.images || []);
@@ -259,6 +260,14 @@ export const Images = () => {
 
   const handleSourceFilter = (source) => {
     setSelectedSource(source);
+    if (searchQuery.trim()) {
+      setCurrentPage(1);
+      setTimeout(() => handleSearch(1), 100);
+    }
+  };
+
+  const handleTypeFilter = (type) => {
+    setSelectedType(type);
     if (searchQuery.trim()) {
       setCurrentPage(1);
       setTimeout(() => handleSearch(1), 100);
