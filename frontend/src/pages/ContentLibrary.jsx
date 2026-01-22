@@ -310,14 +310,37 @@ const getTypeIcon = (type) => {
 // Get source color
 const getSourceColor = (source) => {
   const colors = {
-    'OpenLibrary': 'bg-blue-500',
-    'Internet Archive': 'bg-amber-600',
-    'Wikipedia': 'bg-zinc-600',
-    'K5 Learning': 'bg-green-500',
+    // CC BY Sources (Green)
+    'OpenStax': 'bg-green-600',
+    'Wikiversity': 'bg-green-600',
+    'Wikibooks': 'bg-green-600',
+    'OER Commons': 'bg-green-600',
+    'Wikimedia Commons': 'bg-green-600',
+    'YouTube (CC)': 'bg-green-600',
+    
+    // CC BY-NC Sources (Amber)
+    'CK-12 Foundation': 'bg-amber-600',
+    'MIT OpenCourseWare': 'bg-amber-600',
+    'TED': 'bg-amber-600',
+    
+    // Public Domain (Emerald)
+    'Internet Archive': 'bg-emerald-600',
+    'Library of Congress': 'bg-emerald-600',
+    'OpenLibrary': 'bg-emerald-600',
+    
+    // Other Educational (Blue/Purple)
+    'Wikipedia': 'bg-blue-600',
+    'freeCodeCamp': 'bg-purple-600',
+    'Codecademy': 'bg-indigo-600',
+    'YouTube': 'bg-red-600',
+    'Smithsonian Learning Lab': 'bg-rose-600',
+    'PBS LearningMedia': 'bg-blue-500',
+    
+    // Worksheet Sites
+    'K5 Learning': 'bg-lime-500',
     'Math-Drills': 'bg-purple-500',
     'Common Core Sheets': 'bg-cyan-500',
     'Live Worksheets': 'bg-pink-500',
-    'Superstar Worksheets': 'bg-orange-500',
   };
   return colors[source] || 'bg-violet-500';
 };
