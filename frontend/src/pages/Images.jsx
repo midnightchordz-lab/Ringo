@@ -408,9 +408,6 @@ export const Images = () => {
               >
                 <span>{type.icon}</span>
                 {type.name}
-                {(type.id === 'illustration' || type.id === 'vector') && (
-                  <span className="text-xs opacity-70">(Pixabay)</span>
-                )}
               </button>
             ))}
           </div>
@@ -422,13 +419,16 @@ export const Images = () => {
             </span>
             {[
               { id: 'all', name: 'All Sources', color: 'bg-purple-500' },
-              { id: 'pexels', name: 'Pexels', color: 'bg-teal-500' },
-              { id: 'unsplash', name: 'Unsplash', color: 'bg-neutral-700' },
-              { id: 'pixabay', name: 'Pixabay', color: 'bg-green-500' }
+              { id: 'pexels', name: 'Pexels', color: 'bg-teal-500', hint: 'Photos' },
+              { id: 'unsplash', name: 'Unsplash', color: 'bg-neutral-700', hint: 'Photos' },
+              { id: 'pixabay', name: 'Pixabay', color: 'bg-green-500', hint: 'All Types' },
+              { id: 'wikimedia', name: 'Wikimedia', color: 'bg-blue-500', hint: 'CC BY' },
+              { id: 'openclipart', name: 'OpenClipart', color: 'bg-orange-500', hint: 'Vectors' }
             ].map((source) => (
               <button
                 key={source.id}
                 onClick={() => handleSourceFilter(source.id)}
+                title={source.hint}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                   selectedSource === source.id
                     ? `${source.color} text-white shadow-md`
