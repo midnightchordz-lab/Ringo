@@ -112,19 +112,19 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
       </div>
       
       <div className="p-4">
-        <p className="text-neutral-900 font-medium text-sm line-clamp-1 mb-2">{image.title || 'Untitled'}</p>
+        <p className="text-neutral-900 dark:text-neutral-100 font-medium text-sm line-clamp-1 mb-2">{image.title || 'Untitled'}</p>
         <div className="flex items-center justify-between">
           <a 
             href={image.photographer_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-700 text-xs font-medium flex items-center gap-1"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium flex items-center gap-1"
           >
             by {image.photographer}
             <ExternalLink className="w-3 h-3" />
           </a>
           {image.likes > 0 && (
-            <span className="text-xs text-neutral-500 flex items-center gap-1">
+            <span className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
               <Heart className="w-3 h-3" /> {image.likes}
             </span>
           )}
