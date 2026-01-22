@@ -37,7 +37,9 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
       case 'unsplash': return 'bg-neutral-800';
       case 'pexels': return 'bg-teal-600';
       case 'pixabay': return 'bg-green-600';
-      default: return 'bg-blue-600';
+      case 'wikimedia': return 'bg-blue-600';
+      case 'openclipart': return 'bg-orange-500';
+      default: return 'bg-purple-600';
     }
   };
 
@@ -46,6 +48,8 @@ const ImageCard = ({ image, onFavorite, onCopyUrl, isFavorited }) => {
       case 'unsplash': return 'Unsplash';
       case 'pexels': return 'Pexels';
       case 'pixabay': return 'Pixabay';
+      case 'wikimedia': return 'Wikimedia';
+      case 'openclipart': return 'OpenClipart';
       default: return source;
     }
   };
