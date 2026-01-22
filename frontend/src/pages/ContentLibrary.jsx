@@ -2072,16 +2072,78 @@ export const ContentLibrary = () => {
       {/* Search Results */}
       {!isSearching && hasSearched && displayResults.length > 0 && !showFavorites && selectedCategory !== 'free-books' && selectedCategory !== 'reading-lists' && selectedCategory !== 'childrens-literature' && (
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-neutral-600">
-              Found <span className="text-emerald-600 font-bold">{searchTotalResults}</span> resources
-              {searchSources.length > 0 && (
-                <span className="text-xs text-neutral-500 ml-2">
-                  from {searchSources.join(', ')}
+          {/* Results Header with Filter Dropdown */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <p className="text-neutral-600 dark:text-neutral-400">
+              Showing <span className="text-emerald-600 dark:text-emerald-400 font-bold">{displayResults.length}</span> of{' '}
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">{searchTotalResults}</span> resources
+              {resultFilter !== 'all' && (
+                <span className="ml-2 text-blue-600 dark:text-blue-400">
+                  (filtered by: {resultFilter})
                 </span>
               )}
             </p>
+            
+            {/* Source Filter Dropdown */}
+            {availableFilters.length > 1 && (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
+                  <Filter className="w-4 h-4" />
+                  <span>Filter by source:</span>
+                </div>
+                <select
+                  value={resultFilter}
+                  onChange={(e) => setResultFilter(e.target.value)}
+                  className="px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer min-w-[180px]"
+                  data-testid="source-filter-dropdown"
+                >
+                  <option value="all">All Sources ({searchResults.length})</option>
+                  {availableFilters.map((source) => {
+                    const count = searchResults.filter(r => r.source === source).length;
+                    return (
+                      <option key={source} value={source}>
+                        {source} ({count})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
           </div>
+          
+          {/* Source Badges - Quick Filter Pills */}
+          {availableFilters.length > 1 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              <button
+                onClick={() => setResultFilter('all')}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  resultFilter === 'all'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                }`}
+              >
+                All ({searchResults.length})
+              </button>
+              {availableFilters.map((source) => {
+                const count = searchResults.filter(r => r.source === source).length;
+                return (
+                  <button
+                    key={source}
+                    onClick={() => setResultFilter(source)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                      resultFilter === source
+                        ? `${getSourceColor(source)} text-white shadow-md`
+                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    {source} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          
+          {/* Results Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <AnimatePresence>
               {displayResults.map((result) => (
