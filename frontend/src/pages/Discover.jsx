@@ -76,11 +76,14 @@ export const Discover = () => {
   const [totalAvailable, setTotalAvailable] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const handleSearch = async (pageToken = null, skipCache = false) => {
-    if (!searchQuery.trim() && videos.length > 0 && !pageToken && !skipCache) return;
+  const handleSearch = async (pageToken = null, isInitialLoad = false) => {
+    if (!searchQuery.trim() && videos.length > 0 && !pageToken && !isInitialLoad) return;
     
     setLoading(true);
     try {
+      // Always skip cache for user-initiated searches, only use cache on initial page load
+      const skipCache = !isInitialLoad;
+      
       const response = await api.get('/discover', {
         params: {
           query: searchQuery,
@@ -109,13 +112,12 @@ export const Discover = () => {
         hasMore: response.data.has_more
       });
       
-      if (response.data.cached && !skipCache) {
-        toast.info(response.data.message || 'Showing cached results');
-      } else if (response.data.optimized) {
-        const moreMsg = response.data.has_more ? ` (${response.data.total_available?.toLocaleString()}+ available)` : '';
+      // Show success message with total available
+      if (response.data.total > 0) {
+        const moreMsg = response.data.total_available > response.data.total 
+          ? ` (${response.data.total_available?.toLocaleString()}+ available)` 
+          : '';
         toast.success(`Found ${response.data.total} videos${moreMsg}`);
-      } else {
-        toast.success(`Found ${response.data.total} videos!`);
       }
     } catch (error) {
       console.error('Error discovering videos:', error);
