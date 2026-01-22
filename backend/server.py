@@ -2085,6 +2085,157 @@ async def search_pixabay_images(client: httpx.AsyncClient, query: str, page: int
         logging.warning(f"Pixabay API error: {str(e)}")
     return {"images": [], "total": 0}
 
+
+async def search_wikimedia_images(client: httpx.AsyncClient, query: str, page: int, per_page: int, image_type: str = None) -> dict:
+    """Search Wikimedia Commons for CC-licensed images (CC BY, CC BY-SA)
+    Supports photos, illustrations, and SVG vectors"""
+    try:
+        # Build search query based on image type
+        search_query = query
+        if image_type == "vector":
+            search_query = f"{query} filetype:svg"
+        elif image_type == "illustration":
+            search_query = f"{query} illustration OR drawing OR artwork"
+        
+        # Calculate offset for pagination
+        offset = (page - 1) * per_page
+        
+        response = await client.get(
+            "https://commons.wikimedia.org/w/api.php",
+            params={
+                "action": "query",
+                "generator": "search",
+                "gsrsearch": search_query,
+                "gsrlimit": min(per_page, 50),  # Wikimedia max is 50
+                "gsroffset": offset,
+                "gsrnamespace": 6,  # File namespace
+                "prop": "imageinfo|categories",
+                "iiprop": "url|size|mime|extmetadata",
+                "iiurlwidth": 400,  # Thumbnail width
+                "format": "json",
+                "origin": "*"
+            },
+            timeout=15.0
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            images = []
+            pages = data.get("query", {}).get("pages", {})
+            
+            for page_id, page_data in pages.items():
+                if page_id == "-1":
+                    continue
+                    
+                imageinfo = page_data.get("imageinfo", [{}])[0]
+                extmeta = imageinfo.get("extmetadata", {})
+                
+                # Get license info
+                license_short = extmeta.get("LicenseShortName", {}).get("value", "")
+                license_url = extmeta.get("LicenseUrl", {}).get("value", "")
+                
+                # Only include CC BY, CC BY-SA, CC BY-ND, or Public Domain
+                is_cc_license = any(cc in license_short.upper() for cc in ["CC BY", "CC-BY", "PUBLIC DOMAIN", "CC0", "PD"])
+                if not is_cc_license and license_short:
+                    continue
+                
+                # Determine image type based on mime type
+                mime = imageinfo.get("mime", "")
+                if "svg" in mime:
+                    img_type = "vector"
+                elif any(ext in page_data.get("title", "").lower() for ext in [".svg"]):
+                    img_type = "vector"
+                else:
+                    # Check categories for illustration hints
+                    categories = [c.get("title", "") for c in page_data.get("categories", [])]
+                    is_illustration = any("illustration" in cat.lower() or "drawing" in cat.lower() or "artwork" in cat.lower() for cat in categories)
+                    img_type = "illustration" if is_illustration else "photo"
+                
+                # Filter by requested type
+                if image_type and image_type != img_type:
+                    continue
+                
+                # Get artist/author
+                artist = extmeta.get("Artist", {}).get("value", "Unknown")
+                # Clean HTML from artist field
+                artist = re.sub(r'<[^>]+>', '', artist).strip()[:100]
+                
+                title = page_data.get("title", "").replace("File:", "")
+                
+                images.append({
+                    "id": f"wikimedia_{page_id}",
+                    "url": imageinfo.get("url", ""),
+                    "thumbnail": imageinfo.get("thumburl", imageinfo.get("url", "")),
+                    "title": title,
+                    "photographer": artist or "Wikimedia Commons",
+                    "photographer_url": f"https://commons.wikimedia.org/wiki/File:{title.replace(' ', '_')}",
+                    "source": "wikimedia",
+                    "source_url": imageinfo.get("descriptionurl", ""),
+                    "download_url": imageinfo.get("url", ""),
+                    "width": imageinfo.get("width", 0),
+                    "height": imageinfo.get("height", 0),
+                    "color": "#3366cc",
+                    "likes": 0,
+                    "license": f"Creative Commons ({license_short})" if license_short else "CC BY-SA",
+                    "license_url": license_url,
+                    "image_type": img_type
+                })
+            
+            return {"images": images, "total": len(images) * 10}  # Estimate total
+    except Exception as e:
+        logging.warning(f"Wikimedia API error: {str(e)}")
+    return {"images": [], "total": 0}
+
+
+async def search_openclipart_images(client: httpx.AsyncClient, query: str, page: int, per_page: int) -> dict:
+    """Search OpenClipart for public domain vector clipart (CC0/Public Domain)"""
+    try:
+        response = await client.get(
+            "https://openclipart.org/search/json/",
+            params={
+                "query": query,
+                "page": page,
+                "amount": min(per_page, 50)
+            },
+            timeout=15.0
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            images = []
+            
+            for item in data.get("payload", []):
+                # OpenClipart returns SVG vectors
+                svg_url = item.get("svg", {}).get("url", "")
+                png_url = item.get("svg", {}).get("png_thumb", "") or item.get("svg", {}).get("png_full_lossy", "")
+                
+                if not svg_url and not png_url:
+                    continue
+                
+                images.append({
+                    "id": f"openclipart_{item.get('id', '')}",
+                    "url": png_url or svg_url,
+                    "thumbnail": png_url or svg_url,
+                    "title": item.get("title", "Untitled"),
+                    "photographer": item.get("uploader", "OpenClipart"),
+                    "photographer_url": f"https://openclipart.org/artist/{item.get('uploader', '')}",
+                    "source": "openclipart",
+                    "source_url": f"https://openclipart.org/detail/{item.get('id', '')}",
+                    "download_url": svg_url or png_url,
+                    "width": item.get("svg", {}).get("width", 0),
+                    "height": item.get("svg", {}).get("height", 0),
+                    "color": "#4CAF50",
+                    "likes": item.get("downloads", 0),
+                    "license": "Public Domain (CC0)",
+                    "image_type": "vector"
+                })
+            
+            return {"images": images, "total": data.get("info", {}).get("results", len(images))}
+    except Exception as e:
+        logging.warning(f"OpenClipart API error: {str(e)}")
+    return {"images": [], "total": 0}
+
+
 @api_router.post("/images/favorites")
 async def add_favorite_image(
     image: FavoriteImageModel,
