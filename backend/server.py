@@ -495,7 +495,7 @@ async def google_oauth_callback(session_id: str = Form(...)):
     """Process Google OAuth via Emergent Auth"""
     try:
         # Call Emergent Auth API to get user data
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             response = await client.get(
                 "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
                 headers={"X-Session-ID": session_id},
