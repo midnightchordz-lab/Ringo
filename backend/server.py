@@ -1962,7 +1962,7 @@ async def search_unsplash_images(client: httpx.AsyncClient, query: str, page: in
 
 
 async def search_pexels_images(client: httpx.AsyncClient, query: str, page: int, per_page: int, api_key: str) -> dict:
-    """Search Pexels for images"""
+    """Search Pexels for images (photos only)"""
     try:
         response = await client.get(
             "https://api.pexels.com/v1/search",
@@ -1992,7 +1992,8 @@ async def search_pexels_images(client: httpx.AsyncClient, query: str, page: int,
                     "height": photo["height"],
                     "color": photo.get("avg_color", "#000000"),
                     "likes": 0,
-                    "license": "Pexels License (Free for commercial use)"
+                    "license": "Pexels License (Free for commercial use)",
+                    "image_type": "photo"
                 })
             return {"images": images, "total": data.get("total_results", 0)}
     except Exception as e:
