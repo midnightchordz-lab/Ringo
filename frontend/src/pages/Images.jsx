@@ -142,10 +142,10 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, perPage, onPa
   const endItem = Math.min(currentPage * perPage, totalItems);
   
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-4 bg-white rounded-xl shadow-sm border border-neutral-100">
-      <div className="text-sm text-neutral-600">
-        Showing <span className="font-semibold text-neutral-900">{startItem}-{endItem}</span> of{' '}
-        <span className="font-semibold text-neutral-900">{totalItems.toLocaleString()}</span> images
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-4 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-800">
+      <div className="text-sm text-neutral-600 dark:text-neutral-400">
+        Showing <span className="font-semibold text-neutral-900 dark:text-neutral-100">{startItem}-{endItem}</span> of{' '}
+        <span className="font-semibold text-neutral-900 dark:text-neutral-100">{totalItems.toLocaleString()}</span> images
       </div>
       
       <div className="flex items-center gap-2">
@@ -154,8 +154,8 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, perPage, onPa
           disabled={currentPage === 1 || isLoading}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
             currentPage === 1 || isLoading
-              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-600 cursor-not-allowed'
+              : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700'
           }`}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -171,8 +171,8 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, perPage, onPa
           disabled={currentPage === totalPages || isLoading}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
             currentPage === totalPages || isLoading
-              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-600 cursor-not-allowed'
+              : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700'
           }`}
         >
           Next
