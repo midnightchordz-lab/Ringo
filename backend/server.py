@@ -353,7 +353,7 @@ class YouTubePersistentCache:
 # ==================== END YOUTUBE API OPTIMIZATION ====================
 
 # ==================== VIDEO TRANSCRIPTION ====================
-from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
+# (Endpoints moved after get_current_user definition - see below)
 
 @api_router.get("/video/transcript/{video_id}")
 async def get_video_transcript(
