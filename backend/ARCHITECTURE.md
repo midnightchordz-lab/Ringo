@@ -4,7 +4,7 @@
 
 ```
 /app/backend/
-├── server.py           # Main FastAPI application (entry point)
+├── server.py           # Main FastAPI application (entry point) - NEEDS REFACTORING
 ├── config.py           # Environment variables and configuration ✓
 ├── database.py         # MongoDB connection ✓
 ├── requirements.txt    # Python dependencies
@@ -18,11 +18,16 @@
 │   ├── __init__.py
 │   ├── auth.py         # Authentication routes (ready)
 │   ├── images.py       # Image search routes (ready)
-│   └── dashboard.py    # Stats/settings routes (ready)
+│   ├── dashboard.py    # Stats/settings routes (ready)
+│   ├── youtube.py      # YouTube/video routes (NEW - Jan 22)
+│   └── content.py      # Content library routes (NEW - Jan 22)
 │
 ├── services/           # Business logic and external integrations ✓
 │   ├── __init__.py
 │   └── youtube_optimizer.py  # YouTube API optimization
+│
+├── tests/              # Test files
+│   └── test_video_transcript_api.py
 │
 └── utils/              # Utility functions ✓
     ├── __init__.py
@@ -40,9 +45,42 @@
 | `services/youtube_optimizer.py` | ✅ Complete | YouTube caching |
 | `utils/auth.py` | ✅ Complete | Auth utilities |
 | `utils/helpers.py` | ✅ Complete | Helper functions |
-| `routes/auth.py` | ✅ Ready | Auth endpoints template |
-| `routes/images.py` | ✅ Ready | Image endpoints template |
-| `routes/dashboard.py` | ✅ Ready | Dashboard endpoints template |
+| `routes/auth.py` | ✅ Ready | Auth endpoints |
+| `routes/images.py` | ✅ Ready | Image endpoints |
+| `routes/dashboard.py` | ✅ Ready | Dashboard endpoints |
+| `routes/youtube.py` | ✅ NEW | Video discovery, transcript, clips |
+| `routes/content.py` | ✅ NEW | Content library, favorites, reading lists |
+
+## Refactoring Plan (Jan 22, 2026)
+
+### Current State
+- `server.py` is 6500+ lines - technical debt
+- New modular routes created but not yet integrated
+
+### New Route Modules Created
+
+#### routes/youtube.py
+Contains:
+- `/api/video/transcript/{video_id}` - Get transcript
+- `/api/video/transcript/{video_id}/cached` - Cached transcript
+- `/api/youtube/cache-stats` - Cache statistics
+- `/api/youtube/clear-cache` - Clear cache
+- `/api/discover` - Video discovery
+- `/api/clear-videos` - Clear discovered videos
+- `/api/videos/{video_id}` - Video details
+- `/api/clips/*` - Clip generation endpoints
+
+#### routes/content.py
+Contains:
+- `/api/content-library/favorites` - CRUD operations
+- `/api/reading-lists/*` - Reading list management
+- License filtering utilities
+
+### Integration Steps (TODO)
+1. Test new route modules independently
+2. Add routes to api_router in server.py
+3. Remove duplicate endpoints from server.py
+4. Move remaining search functions to content.py
 
 ## Modules
 
