@@ -11,6 +11,7 @@ from fastapi import APIRouter, HTTPException, Depends, Form
 from pydantic import EmailStr
 import httpx
 import resend
+import bcrypt
 
 import sys
 sys.path.insert(0, '/app/backend')
@@ -19,13 +20,9 @@ from database import db
 from config import RESEND_API_KEY, SENDER_EMAIL, FRONTEND_URL, SECRET_KEY, ALGORITHM
 from models.schemas import UserRegister, UserLogin, Token, UserResponse
 
-from passlib.context import CryptContext
 from jose import jwt
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Initialize Resend
 if RESEND_API_KEY:
@@ -33,11 +30,17 @@ if RESEND_API_KEY:
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify password using bcrypt directly"""
+    try:
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except Exception:
+        return False
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    """Hash password using bcrypt directly"""
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
