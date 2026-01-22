@@ -278,20 +278,34 @@ Implemented comprehensive, multi-source search for all content categories:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 22, 2026 - Fixed Image Type Filter
+January 22, 2026 - Added Wikimedia Commons for CC-licensed illustrations and vectors
 
-### Image Type Filter Fix (Jan 22, 2026) ✅ NEW
-- **Fixed conditional logic** in `/api/images/search` endpoint:
-  - Photos: Searches Unsplash and Pexels (both work)
-  - Illustrations/Vectors: ONLY queries Pixabay (the only source that supports these types)
-- **Clear error messaging** when Pixabay API key is not configured for illustration/vector searches
-- **UI Enhancement**: Added "(Pixabay)" label to Illustrations and Vectors filter buttons to indicate they require Pixabay
-- **Configuration**: Added `PIXABAY_API_KEY` placeholder to `/app/backend/.env`
+### Multi-Source CC-Licensed Image Search (Jan 22, 2026) ✅ COMPLETED
+- **Added Wikimedia Commons** as a new image source with full Creative Commons license support
+- **Image sources by type**:
+  | Source | Photos | Illustrations | Vectors | License |
+  |--------|--------|---------------|---------|---------|
+  | Unsplash | ✅ | ❌ | ❌ | Unsplash License |
+  | Pexels | ✅ | ❌ | ❌ | Pexels License |
+  | Pixabay | ✅ | ✅ | ✅ | Pixabay License (requires API key) |
+  | Wikimedia | ✅ | ✅ | ✅ | CC BY, CC BY-SA, CC0 |
 
-**Note**: To enable illustration and vector search, users must:
-1. Create a free Pixabay account at https://pixabay.com
-2. Get their API key from the API documentation page
-3. Add `PIXABAY_API_KEY=your_key_here` to `/app/backend/.env`
+- **Backend changes**:
+  - Added `search_wikimedia_images()` function with proper User-Agent header
+  - Updated image search logic to include Wikimedia for all image types
+  - Proper CC license filtering (only CC BY, CC BY-SA, CC BY-ND, CC0)
+  
+- **Frontend changes**:
+  - Added Wikimedia source filter button
+  - Updated license info banner to include all sources
+  - All filters tested and working (19/19 tests passed)
+
+- **API endpoints**:
+  - GET `/api/images/search?query=&image_type=&source=`
+    - `image_type`: photo, illustration, vector (or none for all)
+    - `source`: all, unsplash, pexels, pixabay, wikimedia
+
+**Note**: Pixabay requires `PIXABAY_API_KEY` in `/app/backend/.env` for full functionality.
 
 
 ## Recent Changes (Jan 21, 2026)
