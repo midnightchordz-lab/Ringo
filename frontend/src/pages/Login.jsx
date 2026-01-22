@@ -134,7 +134,7 @@ export const Login = () => {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-neutral-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white dark:bg-neutral-900">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
@@ -149,8 +149,8 @@ export const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold text-neutral-800 dark:text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Welcome back! 👋
+            <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif', color: 'inherit' }}>
+              <span className="text-neutral-800 dark:text-white">Welcome back! 👋</span>
             </h1>
             <p className="text-neutral-600 dark:text-neutral-300">Sign in to your account to continue</p>
           </motion.div>
