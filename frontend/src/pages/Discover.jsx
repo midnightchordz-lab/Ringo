@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, Play, TrendingUp, ShieldCheck, Info, CheckCircle2, Database, Zap, Star, Video, Filter } from 'lucide-react';
+import { Search, Play, TrendingUp, ShieldCheck, Info, CheckCircle2, Database, Zap, Star, Video, Filter, RefreshCw, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ const VideoCard = ({ video }) => (
       whileHover={{ y: -8 }}
       className="studio-card studio-card-hover overflow-hidden group"
     >
-      <div className="relative aspect-video bg-neutral-100">
+      <div className="relative aspect-video bg-neutral-100 dark:bg-neutral-800">
         <img
           src={video.thumbnail}
           alt={video.title}
@@ -23,8 +23,8 @@ const VideoCard = ({ video }) => (
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-xl">
-            <Play className="w-6 h-6 text-blue-600 ml-1" fill="currentColor" />
+          <div className="w-14 h-14 bg-white dark:bg-neutral-800 rounded-full flex items-center justify-center shadow-xl">
+            <Play className="w-6 h-6 text-blue-600 dark:text-blue-400 ml-1" fill="currentColor" />
           </div>
         </div>
         <div className="absolute top-3 left-3">
@@ -40,14 +40,14 @@ const VideoCard = ({ video }) => (
         </div>
       </div>
       <div className="p-4">
-        <h3 className="text-neutral-900 font-semibold line-clamp-2 mb-2 text-sm leading-tight">{video.title}</h3>
-        <p className="text-blue-600 text-xs font-medium mb-3">{video.channel}</p>
-        <div className="flex items-center justify-between text-xs text-neutral-500">
+        <h3 className="text-neutral-900 dark:text-neutral-100 font-semibold line-clamp-2 mb-2 text-sm leading-tight">{video.title}</h3>
+        <p className="text-blue-600 dark:text-blue-400 text-xs font-medium mb-3">{video.channel}</p>
+        <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
           <div className="flex items-center gap-3">
             <span>{(video.views || 0).toLocaleString()} views</span>
             <span>{(video.likes || 0).toLocaleString()} likes</span>
           </div>
-          <span className="bg-neutral-100 px-2 py-1 rounded-full font-medium">
+          <span className="bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded-full font-medium">
             {Math.floor((video.duration || 0) / 60)}:{String((video.duration || 0) % 60).padStart(2, '0')}
           </span>
         </div>
@@ -56,6 +56,13 @@ const VideoCard = ({ video }) => (
   </Link>
 );
 
+const SORT_OPTIONS = [
+  { value: 'viewCount', label: 'Most Views' },
+  { value: 'date', label: 'Most Recent' },
+  { value: 'rating', label: 'Top Rated' },
+  { value: 'relevance', label: 'Most Relevant' },
+];
+
 export const Discover = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -63,9 +70,14 @@ export const Discover = () => {
   const [minViews, setMinViews] = useState(1000);
   const [maxResults, setMaxResults] = useState(50);
   const [cacheInfo, setCacheInfo] = useState(null);
+  const [sortBy, setSortBy] = useState('viewCount');
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [prevPageToken, setPrevPageToken] = useState(null);
+  const [totalAvailable, setTotalAvailable] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim() && videos.length > 0) return;
+  const handleSearch = async (pageToken = null, skipCache = false) => {
+    if (!searchQuery.trim() && videos.length > 0 && !pageToken && !skipCache) return;
     
     setLoading(true);
     try {
@@ -73,23 +85,35 @@ export const Discover = () => {
         params: {
           query: searchQuery,
           max_results: maxResults,
-          min_views: minViews
+          min_views: minViews,
+          sort_by: sortBy,
+          page_token: pageToken,
+          skip_cache: skipCache
         }
       });
       setVideos(response.data.videos);
+      setNextPageToken(response.data.next_page_token);
+      setPrevPageToken(response.data.prev_page_token);
+      setTotalAvailable(response.data.total_available || response.data.total);
+      
+      if (!pageToken) {
+        setCurrentPage(1);
+      }
       
       setCacheInfo({
         cached: response.data.cached || false,
         cacheType: response.data.cache_type,
         optimized: response.data.optimized,
         quotaUser: response.data.quota_user,
-        message: response.data.message
+        message: response.data.message,
+        hasMore: response.data.has_more
       });
       
-      if (response.data.cached) {
+      if (response.data.cached && !skipCache) {
         toast.info(response.data.message || 'Showing cached results');
       } else if (response.data.optimized) {
-        toast.success(`Found ${response.data.total} videos (optimized API usage)`);
+        const moreMsg = response.data.has_more ? ` (${response.data.total_available?.toLocaleString()}+ available)` : '';
+        toast.success(`Found ${response.data.total} videos${moreMsg}`);
       } else {
         toast.success(`Found ${response.data.total} videos!`);
       }
@@ -107,12 +131,30 @@ export const Discover = () => {
     }
   };
 
+  const handleNextPage = () => {
+    if (nextPageToken) {
+      setCurrentPage(prev => prev + 1);
+      handleSearch(nextPageToken);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (prevPageToken) {
+      setCurrentPage(prev => prev - 1);
+      handleSearch(prevPageToken);
+    }
+  };
+
+  const handleRefresh = () => {
+    handleSearch(null, true);
+  };
+
   useEffect(() => {
     handleSearch();
   }, []);
 
   return (
-    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 min-h-screen">
+    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 dark:bg-neutral-950 min-h-screen transition-colors duration-300">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -120,10 +162,10 @@ export const Discover = () => {
             <Video className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100" style={{ fontFamily: 'Outfit, sans-serif' }}>
               Discover Videos
             </h1>
-            <p className="text-neutral-500">Find viral CC BY licensed YouTube content</p>
+            <p className="text-neutral-500 dark:text-neutral-400">Find viral CC BY licensed YouTube content</p>
           </div>
         </div>
       </div>
