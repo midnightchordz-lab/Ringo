@@ -261,6 +261,7 @@ Implemented comprehensive, multi-source search for all content categories:
 - `user_sessions` - Emergent OAuth session tokens
 - `discovered_videos` - Cached video data from YouTube
 - `youtube_api_cache` - Persistent cache for YouTube API responses (NEW)
+- `video_transcripts` - Cached video transcripts (NEW Jan 22)
 - `favorite_images` - User's saved images
 - `content_library_favorites` - User's saved content resources (NEW)
 - `clips` - Generated clips metadata
