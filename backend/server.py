@@ -2744,7 +2744,7 @@ def get_active_sources_v2(category: str) -> list:
         "article": ["OpenAlex", "arXiv (Open Access)", "PubMed Central", "Wikipedia (CC BY-SA)", "DOAJ (Open Access)"],
         "course": ["OpenStax (CC BY 4.0)", "CK-12 FlexBooks (CC BY-NC)", "MIT OpenCourseWare (CC BY-NC-SA)", "Wikiversity (CC BY-SA)", "Wikibooks (CC BY-SA)", "freeCodeCamp (Free)", "YouTube (CC BY)"],
         "video": ["YouTube Creative Commons (CC BY)", "Internet Archive (Public Domain)", "TED Talks (CC BY-NC-ND)"],
-        "resource": ["OER Commons (CC BY/CC BY-SA)", "Wikimedia Commons (CC BY-SA)", "MERLOT", "Internet Archive (Public Domain)", "Smithsonian (Open Access)", "Library of Congress (Public Domain)", "PBS LearningMedia"],
+        "resource": ["OER Commons (CC BY/CC BY-SA)", "Wikimedia Commons (CC BY-SA)", "MERLOT", "Internet Archive (Public Domain)", "Smithsonian (Open Access)", "PBS LearningMedia"],
         "worksheet": ["OER Commons (CC BY/SA)", "Internet Archive", "PBS LearningMedia"],
         "book": ["OpenLibrary", "Internet Archive (Public Domain)"]
     }
