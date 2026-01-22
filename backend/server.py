@@ -2000,9 +2000,15 @@ async def search_pexels_images(client: httpx.AsyncClient, query: str, page: int,
     return {"images": [], "total": 0}
 
 
-async def search_pixabay_images(client: httpx.AsyncClient, query: str, page: int, per_page: int, api_key: str) -> dict:
-    """Search Pixabay for images"""
+async def search_pixabay_images(client: httpx.AsyncClient, query: str, page: int, per_page: int, api_key: str, image_type: str = None) -> dict:
+    """Search Pixabay for images - supports photos, illustrations, and vectors"""
     try:
+        # Pixabay image_type: all, photo, illustration, vector
+        pixabay_type = "all"
+        if image_type:
+            if image_type in ["photo", "illustration", "vector"]:
+                pixabay_type = image_type
+        
         response = await client.get(
             "https://pixabay.com/api/",
             params={
@@ -2010,7 +2016,7 @@ async def search_pixabay_images(client: httpx.AsyncClient, query: str, page: int
                 "q": query,
                 "page": page,
                 "per_page": min(per_page, 200),  # Pixabay allows up to 200
-                "image_type": "photo",
+                "image_type": pixabay_type,
                 "safesearch": "true"
             }
         )
@@ -2019,21 +2025,31 @@ async def search_pixabay_images(client: httpx.AsyncClient, query: str, page: int
             data = response.json()
             images = []
             for photo in data.get("hits", []):
+                # Get the actual type from Pixabay response
+                img_type = photo.get("type", "photo")
+                if img_type == "vector/svg":
+                    img_type = "vector"
+                elif "illustration" in img_type.lower():
+                    img_type = "illustration"
+                else:
+                    img_type = "photo"
+                
                 images.append({
                     "id": f"pixabay_{photo['id']}",
-                    "url": photo["largeImageURL"],
-                    "thumbnail": photo["previewURL"],
+                    "url": photo.get("largeImageURL") or photo.get("webformatURL"),
+                    "thumbnail": photo.get("previewURL") or photo.get("webformatURL"),
                     "title": photo.get("tags", "Untitled"),
                     "photographer": photo.get("user", "Unknown"),
                     "photographer_url": f"https://pixabay.com/users/{photo.get('user', '')}-{photo.get('user_id', '')}",
                     "source": "pixabay",
-                    "source_url": photo["pageURL"],
-                    "download_url": photo["largeImageURL"],
-                    "width": photo["imageWidth"],
-                    "height": photo["imageHeight"],
+                    "source_url": photo.get("pageURL", ""),
+                    "download_url": photo.get("largeImageURL") or photo.get("fullHDURL") or photo.get("webformatURL"),
+                    "width": photo.get("imageWidth", 0),
+                    "height": photo.get("imageHeight", 0),
                     "color": "#000000",
                     "likes": photo.get("likes", 0),
-                    "license": "Pixabay License (Free for commercial use)"
+                    "license": "Pixabay License (Free for commercial use)",
+                    "image_type": img_type
                 })
             return {"images": images, "total": data.get("totalHits", 0)}
     except Exception as e:
