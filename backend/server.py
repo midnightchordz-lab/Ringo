@@ -1839,17 +1839,24 @@ async def search_images(
     query: str = Query(..., description="Search query for images"),
     page: int = Query(default=1, ge=1),
     per_page: int = Query(default=50, le=100),
-    source: str = Query(default="all", description="Filter by source: all, unsplash, pexels, pixabay"),
+    source: str = Query(default="all", description="Filter by source: all, unsplash, pexels, pixabay, wikimedia, openclipart"),
     image_type: str = Query(default=None, description="Filter by type: photo, illustration, vector"),
     current_user: dict = Depends(get_current_user)
 ):
-    """Search for copyright-free images from Unsplash, Pexels, and Pixabay
+    """Search for copyright-free images from multiple CC-licensed sources
+    
+    Sources and their capabilities:
+    - Unsplash: Photos only (Unsplash License - free for commercial use)
+    - Pexels: Photos only (Pexels License - free for commercial use)
+    - Pixabay: Photos, Illustrations, Vectors (Pixabay License - similar to CC0)
+    - Wikimedia Commons: Photos, Illustrations, SVG Vectors (CC BY, CC BY-SA)
+    - OpenClipart: Vector Clipart, SVG (Public Domain/CC0)
     
     Image Type Filtering:
-    - photo: Search Unsplash, Pexels, and Pixabay (all support photos)
-    - illustration: Search ONLY Pixabay (only source with illustrations)
-    - vector: Search ONLY Pixabay (only source with vectors)
-    - None/all: Search all sources for all types
+    - photo: Search Unsplash, Pexels, Pixabay, Wikimedia
+    - illustration: Search Pixabay, Wikimedia, OpenClipart
+    - vector: Search Pixabay, Wikimedia, OpenClipart
+    - None/all: Search all sources
     """
     try:
         images = []
@@ -1860,34 +1867,33 @@ async def search_images(
         pexels_key = os.environ.get('PEXELS_API_KEY', 'QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq')
         pixabay_key = os.environ.get('PIXABAY_API_KEY', '')
         
-        # Determine which sources to query based on image_type
-        # Only Pixabay supports illustrations and vectors
-        is_pixabay_only_type = image_type in ["illustration", "vector"]
+        # Determine which sources support the requested image type
+        is_photo_type = image_type in [None, "photo"]
+        is_illustration_type = image_type in [None, "illustration"]
+        is_vector_type = image_type in [None, "vector"]
         
         async with httpx.AsyncClient(timeout=15.0) as client:
             tasks = []
             
-            # Search Unsplash (only for photos - Unsplash doesn't have illustrations/vectors)
-            # Skip if user specifically wants illustrations or vectors
-            if unsplash_key and source in ["all", "unsplash"] and not is_pixabay_only_type:
+            # Search Unsplash (only for photos)
+            if unsplash_key and source in ["all", "unsplash"] and is_photo_type:
                 tasks.append(search_unsplash_images(client, query, page, per_page, unsplash_key))
             
-            # Search Pexels (only for photos - Pexels doesn't have illustrations/vectors)
-            # Skip if user specifically wants illustrations or vectors
-            if source in ["all", "pexels"] and not is_pixabay_only_type:
+            # Search Pexels (only for photos)
+            if source in ["all", "pexels"] and is_photo_type:
                 tasks.append(search_pexels_images(client, query, page, per_page, pexels_key))
             
             # Search Pixabay (supports photos, illustrations, and vectors)
-            # Always search if source allows, with proper image_type filtering
             if pixabay_key and source in ["all", "pixabay"]:
                 tasks.append(search_pixabay_images(client, query, page, per_page, pixabay_key, image_type))
             
-            # Handle case where user wants illustrations/vectors but Pixabay is not configured
-            if is_pixabay_only_type and not pixabay_key:
-                logging.warning(f"Pixabay API key not configured - cannot search for {image_type}")
-                return {
-                    "images": [],
-                    "total": 0,
+            # Search Wikimedia Commons (CC BY/CC BY-SA - photos, illustrations, vectors)
+            if source in ["all", "wikimedia"]:
+                tasks.append(search_wikimedia_images(client, query, page, per_page, image_type))
+            
+            # Search OpenClipart (Public Domain - vectors and illustrations)
+            if source in ["all", "openclipart"] and (is_illustration_type or is_vector_type):
+                tasks.append(search_openclipart_images(client, query, page, per_page))
                     "page": page,
                     "per_page": per_page,
                     "total_pages": 0,
