@@ -6373,10 +6373,11 @@ async def copy_reading_list(
 
 
 # Include modular routers
-# Note: These routes currently duplicate some endpoints in api_router
-# TODO: Remove duplicate endpoints from api_router after testing
-# api_router.include_router(youtube_router)  # Uncomment after removing duplicates
-# api_router.include_router(content_router)  # Uncomment after removing duplicates
+# YouTube router: transcript endpoints only (discover/cache remain in server.py)
+api_router.include_router(youtube_router, prefix="", tags=["YouTube"])
+
+# Content router disabled - endpoints still in server.py
+# api_router.include_router(content_router)
 
 app.include_router(api_router)
 
