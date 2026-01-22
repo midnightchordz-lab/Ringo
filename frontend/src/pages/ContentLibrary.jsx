@@ -1724,17 +1724,38 @@ export const ContentLibrary = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-xl font-bold text-neutral-800 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
                   <BookOpenCheck className="w-6 h-6 text-pink-500" />
                   Copyright-Free Children's Literature
                 </h2>
-                <p className="text-sm text-neutral-500 mt-1">
-                  Public domain & Creative Commons books from Project Gutenberg, StoryWeaver & Open Library
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                  Monetization-friendly books from Project Gutenberg, StoryWeaver & Open Library
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>All books are free to download, print & share</span>
+              <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-full">
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="font-semibold">Monetization OK</span>
+              </div>
+            </div>
+            
+            {/* Monetization-Friendly License Banner */}
+            <div className="studio-card p-4 mb-4 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Monetization-Friendly Licenses Only</span>
+                  </div>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400">
+                    All content uses licenses that <span className="font-bold">permit commercial use & monetization</span>:
+                    <span className="ml-1 px-1.5 py-0.5 bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 rounded font-semibold">CC BY</span>
+                    <span className="ml-1 px-1.5 py-0.5 bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 rounded font-semibold">CC BY-SA</span>
+                    <span className="ml-1 px-1.5 py-0.5 bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 rounded font-semibold">CC BY-ND</span>
+                    <span className="ml-1 px-1.5 py-0.5 bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200 rounded font-semibold">Public Domain</span>
+                  </p>
+                </div>
               </div>
             </div>
             
@@ -1742,7 +1763,7 @@ export const ContentLibrary = () => {
             {searchSources.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {searchSources.map((source) => (
-                  <span key={source} className="px-3 py-1 bg-pink-100 text-pink-700 text-xs rounded-full font-medium">
+                  <span key={source} className="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 text-xs rounded-full font-medium">
                     {source}
                   </span>
                 ))}
