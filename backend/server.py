@@ -23,15 +23,7 @@ from googleapiclient.errors import HttpError
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json
 import re
-
-# Fix bcrypt/passlib compatibility issue BEFORE importing passlib
 import bcrypt
-if not hasattr(bcrypt, '__about__'):
-    class About:
-        __version__ = getattr(bcrypt, '__version__', '4.0.1')
-    bcrypt.__about__ = About()
-
-from passlib.context import CryptContext
 from jose import JWTError, jwt
 import resend
 import secrets
