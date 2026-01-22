@@ -281,7 +281,33 @@ Implemented comprehensive, multi-source search for all content categories:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 22, 2026 - Backend Refactoring Complete
+January 22, 2026 - Automatic Logout Bug Fix
+
+### Automatic Logout Bug Fix (Jan 22, 2026) ✅ COMPLETED
+- **Issue**: Users were being logged out immediately after login or when navigating between pages
+- **Root Cause**: `ProtectedRoute` only checked localStorage synchronously during render, causing race conditions with React state updates
+- **Solution**: Created `AuthContext` with reactive state management
+
+**Implementation**:
+- Created `/app/frontend/src/context/AuthContext.jsx` with:
+  - Reactive auth state (`user`, `token`, `isAuthenticated`)
+  - `login()` function that updates both localStorage and React state
+  - `logout()` function that clears both localStorage and React state
+  - Storage event listener for cross-tab synchronization
+- Updated `ProtectedRoute` to use `useAuth()` hook instead of direct localStorage checks
+- Updated all auth-related components: Login, Register, AuthCallback, MicrosoftCallback, VerifyEmail, Layout
+
+**Files Changed**:
+- `/app/frontend/src/context/AuthContext.jsx` (NEW)
+- `/app/frontend/src/App.js`
+- `/app/frontend/src/pages/Login.jsx`
+- `/app/frontend/src/pages/Register.jsx`
+- `/app/frontend/src/pages/AuthCallback.jsx`
+- `/app/frontend/src/pages/MicrosoftCallback.jsx`
+- `/app/frontend/src/pages/VerifyEmail.jsx`
+- `/app/frontend/src/components/Layout.jsx`
+
+**Testing**: 100% pass rate - All 6 authentication tests passed
 
 ### Backend Refactoring (Jan 22, 2026) ✅ COMPLETED
 - **Goal**: Break down the monolithic 6500+ line `server.py` into modular route files
