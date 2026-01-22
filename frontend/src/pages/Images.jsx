@@ -426,8 +426,7 @@ export const Images = () => {
               { id: 'pexels', name: 'Pexels', color: 'bg-teal-500', hint: 'Photos' },
               { id: 'unsplash', name: 'Unsplash', color: 'bg-neutral-700', hint: 'Photos' },
               { id: 'pixabay', name: 'Pixabay', color: 'bg-green-500', hint: 'All Types' },
-              { id: 'wikimedia', name: 'Wikimedia', color: 'bg-blue-500', hint: 'CC BY' },
-              { id: 'openclipart', name: 'OpenClipart', color: 'bg-orange-500', hint: 'Vectors' }
+              { id: 'wikimedia', name: 'Wikimedia', color: 'bg-blue-500', hint: 'CC BY/SA - All Types' }
             ].map((source) => (
               <button
                 key={source.id}
