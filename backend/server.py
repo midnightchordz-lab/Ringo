@@ -1843,7 +1843,14 @@ async def search_images(
     image_type: str = Query(default=None, description="Filter by type: photo, illustration, vector"),
     current_user: dict = Depends(get_current_user)
 ):
-    """Search for copyright-free images from Unsplash, Pexels, and Pixabay"""
+    """Search for copyright-free images from Unsplash, Pexels, and Pixabay
+    
+    Image Type Filtering:
+    - photo: Search Unsplash, Pexels, and Pixabay (all support photos)
+    - illustration: Search ONLY Pixabay (only source with illustrations)
+    - vector: Search ONLY Pixabay (only source with vectors)
+    - None/all: Search all sources for all types
+    """
     try:
         images = []
         total_available = 0
@@ -1851,20 +1858,27 @@ async def search_images(
         # Get API keys from environment
         unsplash_key = os.environ.get('UNSPLASH_API_KEY', '')
         pexels_key = os.environ.get('PEXELS_API_KEY', 'QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq')
-        pixabay_key = os.environ.get('PIXABAY_API_KEY', '48085067-d9156e13058fcef0a68ac7cf4')  # Free Pixabay key
+        pixabay_key = os.environ.get('PIXABAY_API_KEY', '')
+        
+        # Determine which sources to query based on image_type
+        # Only Pixabay supports illustrations and vectors
+        is_pixabay_only_type = image_type in ["illustration", "vector"]
         
         async with httpx.AsyncClient(timeout=15.0) as client:
             tasks = []
             
             # Search Unsplash (only for photos - Unsplash doesn't have illustrations/vectors)
-            if unsplash_key and source in ["all", "unsplash"] and image_type in [None, "photo"]:
+            # Skip if user specifically wants illustrations or vectors
+            if unsplash_key and source in ["all", "unsplash"] and not is_pixabay_only_type:
                 tasks.append(search_unsplash_images(client, query, page, per_page, unsplash_key))
             
             # Search Pexels (only for photos - Pexels doesn't have illustrations/vectors)
-            if source in ["all", "pexels"] and image_type in [None, "photo"]:
+            # Skip if user specifically wants illustrations or vectors
+            if source in ["all", "pexels"] and not is_pixabay_only_type:
                 tasks.append(search_pexels_images(client, query, page, per_page, pexels_key))
             
             # Search Pixabay (supports photos, illustrations, and vectors)
+            # Always search if source allows, with proper image_type filtering
             if pixabay_key and source in ["all", "pixabay"]:
                 tasks.append(search_pixabay_images(client, query, page, per_page, pixabay_key, image_type))
             
