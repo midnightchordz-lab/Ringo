@@ -194,7 +194,16 @@ export const Images = () => {
   const [totalImages, setTotalImages] = useState(0);
   const [selectedSource, setSelectedSource] = useState('all');
   const [sources, setSources] = useState([]);
+  const [selectedType, setSelectedType] = useState('all');
   const perPage = 50;
+
+  // Image Type Filters
+  const IMAGE_TYPES = [
+    { id: 'all', name: 'All Images', icon: '🖼️' },
+    { id: 'photo', name: 'Photos', icon: '📷' },
+    { id: 'illustration', name: 'Illustrations', icon: '🎨' },
+    { id: 'vector', name: 'Vectors', icon: '📐' },
+  ];
 
   useEffect(() => {
     fetchFavorites();
