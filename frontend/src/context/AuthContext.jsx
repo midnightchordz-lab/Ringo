@@ -11,26 +11,25 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Initialize auth state from localStorage
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+  // Initialize auth state from localStorage synchronously
+  const getInitialToken = () => localStorage.getItem('token');
+  const getInitialUser = () => {
     const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
-      setToken(storedToken);
+    if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        return JSON.parse(storedUser);
       } catch (e) {
         console.error('Error parsing stored user:', e);
         localStorage.removeItem('user');
+        return null;
       }
     }
-    setIsLoading(false);
-  }, []);
+    return null;
+  };
+
+  const [user, setUser] = useState(getInitialUser);
+  const [token, setToken] = useState(getInitialToken);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Login function - updates both localStorage and state
   const login = useCallback((accessToken, userData) => {
