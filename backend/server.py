@@ -50,9 +50,8 @@ async def health_check():
 
 api_router = APIRouter(prefix="/api")
 
-# Import modular routes
+# Import modular routes (transcript endpoints moved to routes/youtube.py)
 from routes.youtube import router as youtube_router, set_auth_dependency as set_youtube_auth
-from routes.content import router as content_router, set_auth_dependency as set_content_auth
 
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
