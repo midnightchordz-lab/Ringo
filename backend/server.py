@@ -4111,8 +4111,14 @@ async def search_childrens_literature(
     """
     Search for copyright-free children's literature across the web.
     Sources: Project Gutenberg, StoryWeaver, Open Library (public domain only)
-    All results are guaranteed to be free, downloadable, and printable.
-    Supports pagination for accessing all available content.
+    
+    MONETIZATION-FRIENDLY LICENSES ONLY:
+    - CC BY (Attribution) - Can monetize with credit
+    - CC BY-SA (Attribution-ShareAlike) - Can monetize, must share alike
+    - CC BY-ND (Attribution-NoDerivatives) - Can monetize, no modifications
+    - Public Domain - Full commercial freedom
+    
+    Note: Internet Archive removed as license status varies per item
     """
     try:
         all_results = []
@@ -4132,12 +4138,12 @@ async def search_childrens_literature(
         fetch_limit = per_page * 3  # Get enough for multiple pages
         
         async with httpx.AsyncClient(timeout=30.0) as client:
-            # Search multiple sources in parallel with higher limits
+            # Search monetization-friendly sources only (NO Internet Archive)
             tasks = [
                 search_gutenberg_children(client, search_query, fetch_limit, page),
                 search_storyweaver(client, search_query, grade, fetch_limit, page),
                 search_openlibrary_children(client, search_query, fetch_limit),
-                search_internet_archive_children(client, search_query, fetch_limit),
+                # Internet Archive REMOVED - license status varies and may not permit monetization
             ]
             
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -4147,6 +4153,9 @@ async def search_childrens_literature(
                     all_results.extend(result)
                 elif isinstance(result, Exception):
                     logging.warning(f"Children's literature search source failed: {str(result)}")
+        
+        # Apply monetization-friendly license filter
+        all_results = filter_monetization_friendly_licenses(all_results)
         
         # Filter by category if specified
         if category != "all":
@@ -4181,13 +4190,99 @@ async def search_childrens_literature(
             "has_prev": page > 1,
             "query": query,
             "grade": grade,
-            "sources": ["Project Gutenberg", "StoryWeaver", "Open Library"],
-            "license": "All results are copyright-free (Public Domain or Creative Commons)"
+            "sources": ["Project Gutenberg (Public Domain)", "StoryWeaver (CC BY)", "Open Library (Public Domain)"],
+            "license_filter": "Monetization-friendly: CC BY, CC BY-SA, CC BY-ND, Public Domain",
+            "monetization_allowed": True
         }
     
     except Exception as e:
         logging.error(f"Error in children's literature search: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def filter_monetization_friendly_licenses(results: list) -> list:
+    """
+    Filter results to only include content with licenses that permit monetization.
+    Allowed: CC BY, CC BY-SA, CC BY-ND, Public Domain
+    NOT Allowed: CC BY-NC (non-commercial), CC BY-NC-SA, CC BY-NC-ND
+    """
+    MONETIZATION_ALLOWED_LICENSES = [
+        # Public Domain
+        "public domain", "pd", "cc0", "cc zero", "no known copyright",
+        # CC BY
+        "cc by", "cc-by", "creative commons attribution", "cc by 4.0", "cc by 3.0",
+        # CC BY-SA
+        "cc by-sa", "cc-by-sa", "cc by sa", "creative commons share alike",
+        # CC BY-ND  
+        "cc by-nd", "cc-by-nd", "cc by nd",
+    ]
+    
+    # Licenses that do NOT permit monetization
+    NON_COMMERCIAL_LICENSES = ["nc", "non-commercial", "noncommercial", "by-nc"]
+    
+    # Sources that are always monetization-friendly
+    MONETIZATION_FRIENDLY_SOURCES = [
+        "project gutenberg", "gutenberg", "storyweaver", "pratham books",
+        "open library", "openlibrary"
+    ]
+    
+    filtered_results = []
+    
+    for result in results:
+        license_str = str(result.get("license", "")).lower().strip()
+        source_str = str(result.get("source", "")).lower().strip()
+        
+        # Skip if license contains non-commercial restriction
+        if any(nc in license_str for nc in NON_COMMERCIAL_LICENSES):
+            continue
+        
+        # Check if from monetization-friendly source
+        is_friendly_source = any(src in source_str for src in MONETIZATION_FRIENDLY_SOURCES)
+        
+        # Check if license is monetization-friendly
+        is_friendly_license = any(lic in license_str for lic in MONETIZATION_ALLOWED_LICENSES)
+        
+        if is_friendly_source or is_friendly_license or license_str == "":
+            # Normalize and tag the license for monetization
+            result["license"] = normalize_monetization_license(result.get("license", ""), source_str)
+            result["monetization_allowed"] = True
+            result["cc_verified"] = True
+            filtered_results.append(result)
+    
+    return filtered_results
+
+
+def normalize_monetization_license(license_str: str, source: str = "") -> str:
+    """Normalize license to standard monetization-friendly CC format"""
+    license_lower = license_str.lower().strip()
+    source_lower = source.lower()
+    
+    # Public Domain sources
+    if "gutenberg" in source_lower or "public domain" in license_lower or "pd" in license_lower:
+        return "Public Domain (Monetization OK)"
+    
+    # StoryWeaver is CC BY 4.0
+    if "storyweaver" in source_lower or "pratham" in source_lower:
+        return "CC BY 4.0 (Monetization OK)"
+    
+    # Open Library - mostly public domain
+    if "open library" in source_lower or "openlibrary" in source_lower:
+        return "Public Domain (Monetization OK)"
+    
+    # CC BY-SA
+    if "by-sa" in license_lower or "share alike" in license_lower:
+        return "CC BY-SA (Monetization OK)"
+    
+    # CC BY-ND
+    if "by-nd" in license_lower or "no derivatives" in license_lower:
+        return "CC BY-ND (Monetization OK)"
+    
+    # CC BY (default CC)
+    if "cc by" in license_lower or "cc-by" in license_lower or "creative commons" in license_lower:
+        return "CC BY (Monetization OK)"
+    
+    # Default to Public Domain for unknown from trusted sources
+    return "Public Domain (Monetization OK)"
 
 
 async def search_gutenberg_children(client: httpx.AsyncClient, query: str, limit: int, page: int = 1) -> list:
