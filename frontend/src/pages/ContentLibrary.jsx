@@ -419,9 +419,15 @@ const SearchResultCard = ({ result, onFavorite, isFavorited }) => {
         </div>
       </div>
       
-      {/* License Badge */}
-      <div className="mb-3">
-        <LicenseBadge license={result.license} />
+      {/* License Badge - More Prominent */}
+      <div className="mb-3 flex items-center gap-2">
+        <LicenseBadge license={result.license} showFull={true} showDetails={true} />
+        {result.cc_verified && (
+          <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+            <CheckCircle2 className="w-3 h-3" />
+            CC Verified
+          </span>
+        )}
       </div>
       
       {/* Description */}
