@@ -1119,8 +1119,8 @@ async def discover_videos(
                 videos.sort(key=lambda x: x['viral_score'], reverse=True)
                 videos = videos[:max_results]
                 
-                # 4. Store in MongoDB for persistence
-                if videos:
+                # 4. Store in MongoDB for persistence (only for first page)
+                if videos and not page_token:
                     await db.discovered_videos.delete_many({})
                     await db.discovered_videos.insert_many(videos)
                     videos = await db.discovered_videos.find({}, {"_id": 0}).to_list(length=max_results)
@@ -1131,6 +1131,11 @@ async def discover_videos(
                 return {
                     "videos": videos, 
                     "total": len(videos),
+                    "total_available": total_results,
+                    "next_page_token": next_page_token,
+                    "prev_page_token": prev_page_token,
+                    "has_more": next_page_token is not None,
+                    "sort_by": sort_by,
                     "optimized": True,
                     "quota_user": hashlib.md5(user_id.encode()).hexdigest()[:8]
                 }
@@ -1147,6 +1152,7 @@ async def discover_videos(
                             "videos": cached_videos, 
                             "total": len(cached_videos),
                             "cached": True,
+                            "next_page_token": None,
                             "message": "Showing cached results. YouTube API quota exceeded - results will refresh tomorrow."
                         }
                     raise HTTPException(status_code=429, detail="YouTube API quota exceeded. Please try again later or use a different API key.")
