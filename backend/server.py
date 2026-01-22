@@ -957,8 +957,11 @@ async def clear_youtube_cache(current_user: dict = Depends(get_current_user)):
 @api_router.get("/discover")
 async def discover_videos(
     query: str = Query(default="", description="Search query"),
-    max_results: int = Query(default=50, le=100),
+    max_results: int = Query(default=50, le=50),
     min_views: int = Query(default=1000, description="Minimum view count"),
+    page_token: str = Query(default=None, description="Page token for pagination"),
+    sort_by: str = Query(default="viewCount", description="Sort order: viewCount, date, rating, relevance"),
+    skip_cache: bool = Query(default=False, description="Skip cache and fetch fresh results"),
     current_user: dict = Depends(get_current_user)
 ):
     """
@@ -967,22 +970,31 @@ async def discover_videos(
     - Uses minimal fields to reduce quota
     - Supports ETags for conditional requests
     - Tracks quotaUser per user
+    - Supports pagination with page tokens
+    - Multiple sort options: viewCount, date, rating, relevance
     """
     try:
         # Get user ID for quota tracking
         user_id = str(current_user.get("_id", current_user.get("email", "anonymous")))
         search_query = query.strip() if query else "tutorial"
         
-        # 1. Check persistent cache first (reduces API calls significantly)
-        cached_videos = await YouTubePersistentCache.get_cached_search(search_query, min_views)
-        if cached_videos:
-            return {
-                "videos": cached_videos[:max_results],
-                "total": len(cached_videos[:max_results]),
-                "cached": True,
-                "cache_type": "persistent",
-                "message": "Showing cached results for faster loading"
-            }
+        # Validate sort option
+        valid_sorts = ["viewCount", "date", "rating", "relevance"]
+        if sort_by not in valid_sorts:
+            sort_by = "viewCount"
+        
+        # 1. Check persistent cache first (only for first page and if not skipping cache)
+        if not page_token and not skip_cache:
+            cached_videos = await YouTubePersistentCache.get_cached_search(search_query, min_views)
+            if cached_videos:
+                return {
+                    "videos": cached_videos[:max_results],
+                    "total": len(cached_videos[:max_results]),
+                    "cached": True,
+                    "cache_type": "persistent",
+                    "next_page_token": None,
+                    "message": "Showing cached results. Use skip_cache=true for fresh results."
+                }
         
         youtube_api_key = os.environ.get('YOUTUBE_API_KEY')
         
