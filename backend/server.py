@@ -2288,39 +2288,38 @@ async def search_content_library(
                 tasks.append(search_wikipedia_articles(client, query, fetch_limit // 3))  # Encyclopedia
                 tasks.append(search_doaj_articles(client, query, fetch_limit // 2))  # Open access journals
             
-            # COURSES - Search course aggregators and platforms (ENHANCED)
+            # COURSES - Search course aggregators and platforms (CC-BY LICENSED)
             if category in ["all", "course"]:
-                tasks.append(search_openstax_courses(client, query, fetch_limit))  # Free textbooks
-                tasks.append(search_mit_ocw_real(client, query, fetch_limit))  # MIT courses
-                tasks.append(search_youtube_courses(client, query, fetch_limit))  # Video courses
-                tasks.append(search_wikiversity_courses(client, query, fetch_limit))  # Wikiversity
-                tasks.append(search_wikibooks_courses(client, query, fetch_limit // 2))  # Wikibooks
-                tasks.append(search_freecodecamp_courses(client, query, fetch_limit // 2))  # freeCodeCamp
-                tasks.append(search_codecademy_courses(client, query, fetch_limit // 3))  # Codecademy
+                tasks.append(search_openstax_cc(client, query, fetch_limit))  # CC BY 4.0 textbooks
+                tasks.append(search_ck12_flexbooks(client, query, fetch_limit))  # CC BY-NC FlexBooks
+                tasks.append(search_mit_ocw_real(client, query, fetch_limit))  # CC BY-NC-SA courses
+                tasks.append(search_wikiversity_courses(client, query, fetch_limit))  # CC BY-SA
+                tasks.append(search_wikibooks_courses(client, query, fetch_limit // 2))  # CC BY-SA
+                tasks.append(search_youtube_courses(client, query, fetch_limit))  # CC BY videos
+                tasks.append(search_freecodecamp_courses(client, query, fetch_limit // 2))  # Free
             
-            # VIDEOS - Search video platforms for educational content (ENHANCED)
+            # VIDEOS - Search for CC-licensed video content
             if category in ["all", "video"]:
-                tasks.append(search_youtube_videos_comprehensive(client, query, fetch_limit))
-                tasks.append(search_youtube_educational(client, query, fetch_limit // 2))
-                tasks.append(search_internet_archive_videos_enhanced(client, query, fetch_limit))
-                tasks.append(search_internet_archive_videos(client, query, fetch_limit // 2))
-                tasks.append(search_ted_talks(client, query, fetch_limit // 2))
+                tasks.append(search_youtube_videos_comprehensive(client, query, fetch_limit))  # CC BY
+                tasks.append(search_youtube_educational(client, query, fetch_limit // 2))  # CC BY
+                tasks.append(search_internet_archive_videos_enhanced(client, query, fetch_limit))  # Public Domain
+                tasks.append(search_internet_archive_videos(client, query, fetch_limit // 2))  # Public Domain
+                tasks.append(search_ted_talks(client, query, fetch_limit // 2))  # CC BY-NC-ND
             
-            # RESOURCES - Search educational resource repositories (ENHANCED)
+            # RESOURCES - Search CC-licensed educational resources
             if category in ["all", "resource", "worksheet"]:
-                tasks.append(search_oer_commons_real(client, query, fetch_limit))
+                tasks.append(search_oer_commons_cc(client, query, fetch_limit))  # CC BY / CC BY-SA
+                tasks.append(search_wikimedia_commons(client, query, fetch_limit // 2))  # CC BY-SA
                 tasks.append(search_merlot_resources(client, query, fetch_limit // 2))
-                tasks.append(search_internet_archive_texts(client, query, fetch_limit // 2))
-                tasks.append(search_smithsonian_resources(client, query, fetch_limit // 3))
-                tasks.append(search_national_geographic_edu(client, query, fetch_limit // 3))
-                tasks.append(search_library_of_congress(client, query, fetch_limit // 2))
-                tasks.append(search_pbs_learningmedia(client, query, fetch_limit // 3))
-                tasks.append(search_bbc_bitesize(client, query, fetch_limit // 3))
+                tasks.append(search_internet_archive_texts(client, query, fetch_limit // 2))  # Public Domain
+                tasks.append(search_smithsonian_resources(client, query, fetch_limit // 3))  # Open Access
+                tasks.append(search_library_of_congress(client, query, fetch_limit // 2))  # Public Domain
+                tasks.append(search_pbs_learningmedia(client, query, fetch_limit // 3))  # Educational
             
-            # BOOKS
+            # BOOKS - Public Domain and CC-licensed books
             if category in ["all", "book"]:
-                tasks.append(search_openlibrary(client, query, fetch_limit // 2))
-                tasks.append(search_internet_archive(client, query, fetch_limit // 2))
+                tasks.append(search_openlibrary(client, query, fetch_limit // 2))  # Various (check per book)
+                tasks.append(search_internet_archive(client, query, fetch_limit // 2))  # Public Domain
             
             # Run all searches in parallel
             results = await asyncio.gather(*tasks, return_exceptions=True)
