@@ -7,115 +7,115 @@
 6.  The application should have a user registration and login system (JWT, Google, and Apple ID).
 7.  Email verification is required for new user registrations.
 8.  The UI should be professional, vibrant, and attractive.
-9.  A button to clear the discovered videos from the dashboard is required.
-10. The Made with Emergent branding must be removed.
 
 **PRODUCT REQUIREMENTS added this session:**
-1.  Rename Discover tab to Video.
-2.  Add a Go or Find button to all search bars.
-3.  Enhance the Content Library to be a dynamic, AI-powered search engine for copyright-free educational content across the web, instead of a static list.
-4.  Fix the Failed to discover videos error by implementing a robust caching and API optimization strategy for the YouTube Data API.
-5.  Overhaul the entire app's design to be more modern, bright, and user-welcoming (Creative Studio theme).
-6.  Fix overlapping characters on the search bars.
-7.  Add a new section in the Content Library for free, downloadable, and printable books (stories, poetry, literature, grammar, math) from sources like Project Gutenberg.
+1.  Implement a dark/light theme toggle for the application.
+2.  Expand YouTube search to bypass the 50-video limit by implementing pagination.
+3.  Fix an issue where the Cached Results banner was showing incorrectly on the Discover page.
+4.  Fix inconsistent dark mode styling on the Images page.
+5.  Enforce strict  and  license filtering for all content in the library, clearly labeling each item, and adding CK-12 and OER Commons as sources.
+6.  Add a dropdown filter in the Content Library to allow users to filter search results by content type (e.g., show only Books or only Videos).
+7.  Add image type filters (e.g., Photos, Illustrations, Vectors) to the Images page.
+8.  Fix a bug where book titles were not visible on the content cards.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application with a React frontend and FastAPI backend. It features a full authentication system (JWT & Google OAuth), a Videos tab with an optimized and cached YouTube search, an Images search tab (Pexels/Unsplash), and a Content Library with dynamic, AI-powered search for educational resources. A major UI overhaul to a bright and modern Creative Studio theme has been implemented. The backend has been partially refactored into a modular structure. A login bug ( serialization) was also fixed.
+A full-stack application (React/FastAPI/MongoDB) with a comprehensive authentication system (JWT, Google, Microsoft). The application now features a full dark/light mode theme.
+
+-   **Content Library**: Performs comprehensive, multi-source web searches for categories like Articles, Courses, and Videos. It strictly filters for content licensed under  and  from sources like OpenStax, CK-12, OER Commons, YouTube, and Wikiversity. Each result is clearly labeled with its license. A source filter dropdown allows users to narrow results by provider (e.g., show only OpenStax content).
+-   **Discover Page**: Fetches videos from YouTube with full pagination support, allowing users to browse through hundreds of thousands of results instead of being limited to 50. It includes controls for sorting and refreshing results.
+-   **Images Page**: Searches for copyright-free images across multiple sources (Pexels, Unsplash, Pixabay) with pagination. UI has been added for filtering by image type (Photos, Illustrations, Vectors), but the backend logic is incomplete.
 
 **Last working item**:
--   **Last item agent was working**: The agent was working on two user requests simultaneously:
-    1.  Fixing an issue where icons overlapped text in search bars.
-    2.  Adding a new Free Books section to the Content Library for downloadable, printable content.
-    The agent fixed the CSS for the search bars and added the backend endpoint () and initial frontend structure for the new Free Books feature. It was in the process of adding the rendering logic for the fetched books to the  component.
+-   **Last item agent was working**: The user requested image type filters (Photos, Illustrations, Vectors) on the Images page. The agent implemented the frontend UI and updated the backend to accept an  parameter. However, the implementation is flawed: selecting a filter like Illustrations still returns photos from sources like Unsplash and Pexels, which do not support that image type. The agent was debugging why the backend doesn't exclusively query Pixabay (the only source that supports these filters) when a specific type is selected.
 -   **Status**: IN PROGRESS
 -   **Agent Testing Done**: N
 -   **Which testing method agent to use?**: both
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: Overlapping characters in search bars (P0)
+-   Issue 1: Image type filter is not working correctly (P0)
 -   Issue 2: YouTube video download for clip generation is blocked (P0)
--   Issue 3: Automatic user logout after login (P0)
--   Issue 4: Email verification system not working (P1)
--   Issue 5:  for Google OAuth users (P2)
+-   Issue 3: Microsoft OAuth login requires user configuration (P0)
+-   Issue 4: Automatic user logout after login requires verification (P0)
+-   Issue 5: Email verification system is not functional (workaround in place) (P1)
 
 **Issues Detail**:
--   **Issue 1**: Overlapping characters in search bars
-    -   **Attempted fixes**: The agent identified the CSS issue in  (insufficient padding for an icon) and created a fix. It then applied the corrected styles to the search inputs in , , and .
-    -   **Next debug checklist**: Verify the fix by taking a screenshot of a page with a search bar (e.g., ) to confirm the text and icon no longer overlap.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a minor but noticeable UI bug that affects usability on multiple pages.
+-   **Issue 1**: Image type filter is not working correctly
+    -   **Attempted fixes**: The agent added UI filter buttons and updated the backend to accept an  parameter. The agent also found and modified two separate  endpoints (one in  and one in ), which is a source of bugs. The core problem is that the API logic still queries all image sources (Unsplash, Pexels) even when a type like 'illustration' is selected, which only Pixabay provides.
+    -   **Next debug checklist**:
+        1.  **Consolidate Endpoints**: Remove the duplicate  endpoint from . All image search logic must reside only in .
+        2.  **Add Conditional Logic**: In the single, consolidated  function, if  is 'illustration' or 'vector', the code must *only* call the  function.
+        3.  **Test**: Verify that selecting Illustrations or Vectors on the frontend queries only Pixabay and returns the correct type of images.
+    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills a direct user request to filter images by type, making the search more powerful and relevant.
     -   **Status**: IN PROGRESS
     -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Frontend
+    -   **Should Test frontend/backend/both after fix?**: both
     -   **Blocked on other issue**: None
 
 -   **Issue 2**: YouTube download for clip generation is blocked
-    -   **Attempted fixes**: A workaround was implemented in the previous session to show a Preview Clip button using the YouTube embed player instead of generating a downloadable clip. This remains the current state.
-    -   **Next debug checklist**: The workaround needs user validation. A full fix would require researching third-party download services.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a core feature of the application.
+    -   **Attempted fixes**: A workaround using an embedded YouTube player is still in place.
+    -   **Next debug checklist**: Research and test third-party download services that are not blocked by YouTube.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a core P0 feature of the application.
+    -   **Status**: BLOCKED
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Both
+    -   **Blocked on other issue**: None
+
+-   **Issue 3**: Microsoft OAuth login requires user configuration
+    -   **Attempted fixes**: The agent correctly identified that the user needs to add the preview URL as a Redirect URI in their Azure AD App Registration. Detailed instructions were provided to the user.
+    -   **Next debug checklist**: The user must perform the configuration step in their Azure Portal. No further code changes are needed until the user confirms this is done.
+    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills a user requirement for an additional social login option.
     -   **Status**: BLOCKED
     -   **Is recurring issue?**: Y
     -   **Should Test frontend/backend/both after fix?**: Frontend
     -   **Blocked on other issue**: None
 
--   **Issue 3**: Automatic user logout after login
-    -   **Attempted fixes**: Fixes were applied in the previous session, but user verification is still pending.
-    -   **Next debug checklist**: User needs to test the login flow (both email and Google) to confirm resolution.
-    -   **Why fix this issue and what will be achieved with the fix?**: Critical bug that makes the app unusable.
+-   **Issue 4**: Automatic user logout after login requires verification
+    -   **Attempted fixes**: Previous session fixes. This session, the agent fixed a related testing bug caused by incorrect routing ( vs ).
+    -   **Next debug checklist**: Perform a full manual test: log in, navigate between pages, refresh the browser, and confirm the session persists.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a critical bug that impacts user experience.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: Y
     -   **Should Test frontend/backend/both after fix?**: Both
     -   **Blocked on other issue**: None
 
--   **Issue 4**: Email verification system not working
-    -   **Attempted fixes**: A bug was fixed by the testing agent in the previous session.
-    -   **Next debug checklist**: User needs to test the registration flow.
-    -   **Why fix this issue and what will be achieved with the fix?**: Critical for new user onboarding.
+-   **Issue 5**: Email verification system is not functional
+    -   **Attempted fixes**: An auto-verify workaround is in place.
+    -   **Next debug checklist**: Awaiting a valid  from the user for a full fix.
+    -   **Why fix this issue and what will be achieved with the fix?**: A proper email verification flow is crucial for production.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: N
     -   **Should Test frontend/backend/both after fix?**: Both
-    -   **Blocked on other issue**: None
-
--   **Issue 5**: Google OAuth  bug
-    -   **Attempted fixes**: Resolved in the previous session as part of a larger auth fix.
-    -   **Next debug checklist**: User needs to confirm they can log in via Google.
-    -   **Why fix this issue and what will be achieved with the fix?**: Ensures social login works correctly.
-    -   **Status**: USER VERIFICATION PENDING
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Backend
     -   **Blocked on other issue**: None
 
 **In progress Task List**:
--   **Task 1**: Add Free Books section to the Content Library (P0)
-    -   **Where to resume**: The agent needs to add the JSX to render the fetched free books within . The logic should be placed inside the main  statement, likely within the conditional block that checks .
-    -   **What will be achieved with this?**: Fulfills the user's request for a dedicated section for downloadable, printable books.
-    -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: Both
-    -   **Blocked on something**: None
-
--   **Task 2**: Complete  refactoring (P2)
-    -   **Where to resume**: The agent has created the modular structure and migrated the , , and  routes. The next step is to migrate the large and complex routes for  (videos), , and  from  into their own respective files in the  directory.
-    -   **What will be achieved with this?**: Improves backend code maintainability, scalability, and organization.
+-   **Task 1**: Complete  refactoring (P2)
+    -   **Where to resume**: The  file has become extremely large and is now causing bugs due to duplicate endpoints. All content library search functions should be migrated to a new  file. The image search endpoint must be consolidated into .
+    -   **What will be achieved with this?**: Improves backend code maintainability, scalability, and organization. Prevents bugs from duplicate endpoints.
     -   **Status**: IN PROGRESS
     -   **Should Test frontend/backend/both after fix?**: Backend
     -   **Blocked on something**: None
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
+    -   **(P1)** Extend dark mode styling to the remaining pages (e.g., History).
     -   **(P1)** Implement Apple OAuth for user sign-in.
 -   **Future Tasks**:
     -   **(P0)** Implement functionality to post generated clips to YouTube and Instagram (currently blocked).
     -   **(P2)** Add more animations and micro-interactions to the UI.
 
 **Completed work in this session**
--   **BUG FIX**: Fixed an  error in the JWT login flow in .
--   **BUG FIX**: Resolved the Failed to discover videos error by implementing a comprehensive caching system and multiple API optimization strategies (GZIP, ETags, field filtering, etc.) for the YouTube API. The frontend now displays a clear message when showing cached results due to quota limits.
--   **NEW FEATURE**: Converted the Content Library from a static list to a dynamic, AI-powered search engine that queries multiple educational sources across the web in real-time.
--   **UI/UX Overhaul**: Implemented a complete design overhaul to the Creative Studio theme, creating a bright, modern, and welcoming UI across the entire application (Login, Register, Dashboard, and all content pages).
--   **UI UPDATE**: Renamed Discover to Videos in the sidebar and added a Find button to all search bars.
--   **REFACTORING**: Initiated a major backend refactoring by creating a modular structure (, , , ) and migrating several API endpoints out of the monolithic .
+-   **FEATURE**: Implemented a full dark/light theme toggle across the application.
+-   **FEATURE**: Completed the comprehensive, web-wide search for Courses, Videos, and Resources with strict  license filtering and labeling.
+-   **FEATURE**: Implemented pagination for YouTube search on the Discover page, allowing users to browse through hundreds of thousands of videos.
+-   **FEATURE**: Added a source filter dropdown in the Content Library to filter results by provider (e.g., OpenStax, YouTube).
+-   **FEATURE**: Added the UI for image type filters (Photos, Illustrations, Vectors) to the Images page.
+-   **BUG FIX**: Fixed a bug causing invisible titles on content cards.
+-   **BUG FIX**: Corrected inconsistent dark mode styling on the Images page.
+-   **BUG FIX**: Removed the intrusive Cached Results banner on the Discover page.
+-   **BUG FIX**: Cleaned HTML tags from content descriptions.
 
 **Earlier issues found/mentioned but not fixed**
 -   The core issue of YouTube blocking server-side downloads (/usage: pytubefix [-h] [-V] [--itag ITAG] [-r RESOLUTION] [-l] [--oauth] [-v]
@@ -155,7 +155,7 @@ options:
                         Downloads the audio and video stream for resolution
                         provided. If no resolution is provided, downloads the
                         best resolution. Runs the command line program ffmpeg
-                        to combine the audio and video) remains unresolved. A workaround is in place, but a full solution has not been found.
+                        to combine the audio and video) remains unresolved.
 
 **Known issue recurrence from previous fork**
 -   None.
@@ -164,85 +164,82 @@ options:
 
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, MongoDB, JWT, , .
--   **Frontend**: React, React Router, Axios, Tailwind CSS, Framer Motion, .
--   **Authentication**: JWT local auth, Emergent-managed Google OAuth.
--   **API Optimization**: Implemented caching (in-memory and database), ETags, GZIP compression,  parameter, field filtering, and batch requests for YouTube API calls.
--   **UI/UX**: Creative Studio design theme with a focus on bright colors, gradients, soft shadows, and a welcoming aesthetic.
--   **Code Architecture**: Migrating from a monolithic  to a modular structure with routers, services, and models.
+-   **Conditional API Logic**: The need to conditionally call different external APIs based on user filter selections (e.g., calling only Pixabay for illustrations).
+-   **UI State Management**: Using React hooks (, ) to manage complex filter states for search queries, pagination, sources, and content types.
+-   **CSS Theming**: Using CSS variables and Tailwind's  variant with a class-based strategy to implement a site-wide dark mode.
+-   **API Pagination**: Implemented  for the YouTube API to fetch results beyond the initial 50-item limit.
 
 **key DB schema**
--   No changes this session. , , , , . A new  collection is implicitly used by the optimization service.
+-   No new schemas were added in this session.
 
 **changes in tech stack**
--   No new dependencies were added.
+-   No new libraries were added.
 
 **All files of reference**
--   **/app/backend/server.py**: Heavily modified to fix login, add dynamic content search, implement YouTube API optimizations, and add a new endpoint for free books.
--   **/app/frontend/src/pages/ContentLibrary.jsx**: Rewritten and heavily modified to support dynamic search, the new Creative Studio theme, and the upcoming Free Books section.
--   **/app/frontend/src/index.css**: Overwritten to implement the new application-wide Creative Studio design theme.
--   **/app/frontend/src/components/Layout.jsx**: Overwritten to apply the new theme to the main navigation and layout.
--   **/app/frontend/src/pages/Login.jsx**, **Register.jsx**, **Dashboard.jsx**: Overwritten with new designs.
--   **/app/frontend/src/pages/Discover.jsx**, **Images.jsx**: Edited for UI updates (Find button, new theme).
--   **/app/backend/routes/**, **/app/backend/services/**, **/app/backend/models/**, etc.: New directories and files created for the backend refactoring.
--   **/app/design_guidelines.json**: New file provided by the design agent, contains the Creative Studio theme specification.
--   **/app/backend/ARCHITECTURE.md**: New documentation for the refactored backend structure.
+-   **/app/backend/server.py**: Heavily modified. New search functions added, YouTube Discover endpoint updated for pagination, image search endpoint updated (conflicts with ).
+-   **/app/backend/routes/images.py**: Updated to support , but the logic is incomplete and conflicts with .
+-   **/app/frontend/src/pages/ContentLibrary.jsx**: Heavily modified to add source filtering, improved license badges, and fixed UI bugs.
+-   **/app/frontend/src/pages/Images.jsx**: Heavily modified to add UI for image type filters and fix dark mode styling.
+-   **/app/frontend/src/pages/Discover.jsx**: Rewritten to support full pagination for YouTube search results.
+-   **/app/frontend/src/context/ThemeContext.jsx**: New file to manage the application's theme.
+-   **/app/frontend/src/index.css**: Heavily modified with dark mode variables and styles.
+-   **/app/frontend/src/components/Layout.jsx**: Updated to include the theme toggle.
+-   **/app/frontend/src/App.js**: Updated to wrap the app with the .
+-   **/app/memory/PRD.md**: Updated to reflect newly completed features.
 
 **Areas that need refactoring**:
--   The refactoring of  is incomplete. The largest and most complex endpoints (video discovery, content library search) still reside in the main file and need to be migrated to their respective modules in the  directory.
+-   **CRITICAL**: . This file is the primary source of technical debt.
+    1.  The duplicate image search endpoint () must be removed, and all logic must be consolidated into .
+    2.  All content library search functions should be extracted into a new module, e.g., .
 
 **key api endpoints**
--   : (NEW) Dynamic, AI-powered search for educational content.
--   : (NEW) Endpoint to check the status of the YouTube API cache.
--   : (NEW) Fetches free downloadable books from Project Gutenberg.
+-    (GET): Enhanced with , , and  for paginated YouTube search.
+-    (GET): **BUGGY**. This endpoint exists in both  and . It was updated to accept  but is not filtering correctly. It must be consolidated and fixed.
+-    (GET): Enhanced to use new backend sources (CK-12, OER Commons) and return detailed CC license information.
 
 **Critical Info for New Agent**
--   **YouTube API quota is exceeded.** The application is currently serving cached video results. All optimizations are in place, but new, live video searches will fail until the quota resets (daily at midnight PT).
--   The agent was in the middle of implementing the Free Books feature. The backend endpoint and UI tab exist, but the frontend rendering logic in  is incomplete. You need to add the JSX to display the book results.
--   Verify the search bar UI fix. The agent has applied a CSS change but has not visually confirmed the fix with a screenshot.
+-   **Fix the Image Filter First**: The top priority is to fix the buggy image type filter. This requires consolidating the duplicate image search endpoints from  into  and implementing the correct conditional logic to query only Pixabay for illustrations/vectors.
+-   **Refactor **: Immediately after fixing the image filter, you must address the technical debt in . The file is unmanageable and is actively causing bugs. Move the content search functions to a new route file.
+-   **User Blockers**: Microsoft Login and Email Verification are blocked pending user action. Do not work on them.
+-   **License Filtering is Non-Negotiable**: The user is very firm on displaying only  and  content. All content-related work must respect this constraint.
 
 **documents and test reports created in this job**
--   
--   
--    (updated multiple times)
+-   No new test reports were generated. The PRD at  was updated.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Refactor  into smaller modules. (In Progress)
-2.  **Agent**: Confirms plan to refactor. (Handled)
-3.  **User**: Make the design theme for the entire app more user-welcoming with bright colors. (Completed)
-4.  **Agent**: Calls design agent and gets guidelines. (Handled)
-5.  **Agent**: Finishes design overhaul and summarizes. (Handled)
-6.  **User**: Reports search bars have overlapping characters. Requests fix. Also requests a new Free Books section in the Content Library with downloadable, printable content. (In Progress)
-7.  **Agent**: Confirms plan to fix search bars and add Free Books feature. (Handled)
-8.  **Agent**: Implements backend and frontend changes for both requests. (In Progress)
-9.  **... (Agent's internal work on the fix) ...**
-10. **... (Agent was about to add rendering logic for free books) ...**
+1.  **User**: it seems dark them is not working well on image page (COMPLETED)
+2.  **User**: make sure that you use the license for CC-BY and CC-BYSA... add CK12 and OER Common as reference (COMPLETED)
+3.  **User**: give me a dropdown option where if I select Books, it should only reflect all the books available and not the YouTube videos (COMPLETED)
+4.  **User**: In the images tab... give, uh, the user an option to go ahead and choose which one he wants to see... illustrations... vectors (IN PROGRESS)
 
 **Project Health Check:**
 -   **Broken**:
-    -   Clip Generation (server-side download is blocked by YouTube). UI workaround is in place.
+    -   Clip Generation (server-side download is blocked by YouTube).
+    -   Image Type Filtering (UI is present, but backend logic is buggy).
+    -   Email Verification (service not configured, workaround is active).
 -   **Mocked**:
     -   None.
 
 **3rd Party Integrations**
--   **YouTube Data API v3**: For video search.
+-   **YouTube Data API v3**: For video search (now with pagination).
 -   **Emergent-managed Google Auth**: For Google Sign-In.
--   **Resend**: For sending verification emails.
--   **Emergent LLM Key**: Used via  and  for AI analysis.
--   **Pexels API**: For copyright-free image search.
--   **Unsplash API**: For copyright-free image search.
--   **Web Scraping/APIs**: For dynamic content library (OpenLibrary, Internet Archive, Wikipedia, etc.).
+-   **Microsoft OAuth (Azure AD)**: Requires User API Key & user configuration.
+-   **Resend**: For emails (misconfigured).
+-   **Pexels, Unsplash, Pixabay APIs**: For image search.
+-   **Gutendex, StoryWeaver, Open Library, Internet Archive APIs**: For book/media search.
+-   **Wikipedia, arXiv, OpenAlex, CORE, Class Central APIs**: For article/course search.
+-   **OER Commons & CK-12**: For CC-licensed educational content.
 
 **Testing status**
 -   **Testing agent used after significant changes**: NO
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: None.
--   **Known regressions**: None identified, but the Content Library search logic might benefit from better keyword handling (e.g., math vs mathematics).
+-   **Test files created**: []
+-   **Known regressions**: The image search functionality is partially broken due to the incomplete implementation of the type filter and duplicate endpoints.
 
 **Credentials to test flow:**
-User registration is required. You can register a new user or use the Google Sign-In flow. API keys are in .
+New user registration is open and auto-verified. Google and Microsoft OAuth flows are implemented. All necessary API keys are located in .
 
 **What agent forgot to execute**
--   The agent did not complete the rendering logic for the new Free Books feature in .
--   The agent did not test the new  backend endpoint via  after creating it.
--   The agent did not visually verify the search bar fix with a screenshot.</analysis>
+-   The agent did not wait for the testing agent report it initiated.
+-   The agent created a buggy implementation for the image type filter by modifying a duplicate endpoint in  instead of consolidating the logic into , which introduced a regression.
+-   The crucial refactoring of  was identified in the previous handoff but was not completed, leading to new bugs in this session.</analysis>
