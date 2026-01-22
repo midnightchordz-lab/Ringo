@@ -131,3 +131,4 @@ wrapt==2.0.1
 yarl==1.22.0
 yt-dlp==2025.12.8
 zipp==3.23.0
+youtube-transcript-api==1.2.3
