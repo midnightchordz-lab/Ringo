@@ -128,18 +128,21 @@ class YouTubeAPIOptimizer:
         youtube, 
         query: str, 
         max_results: int = 50,
-        user_id: str = None
+        user_id: str = None,
+        page_token: str = None,
+        order: str = "viewCount"
     ) -> dict:
         """
-        Optimized video search with caching and field filtering
+        Optimized video search with caching, pagination and field filtering
         """
-        params = {"q": query, "max": max_results}
+        params = {"q": query, "max": max_results, "page": page_token or "first", "order": order}
         cache_key = cls.get_cache_key("search", params)
         
-        # Check cache first
-        cached = cls.get_cached_data(cache_key)
-        if cached:
-            return cached
+        # Check cache first (skip cache if requesting different page)
+        if not page_token:
+            cached = cls.get_cached_data(cache_key)
+            if cached:
+                return cached
         
         # Build request with optimizations
         request_params = {
@@ -148,10 +151,14 @@ class YouTubeAPIOptimizer:
             "type": "video",
             "videoLicense": "creativeCommon",
             "maxResults": min(max_results, 50),
-            "order": "viewCount",
+            "order": order,
             "videoDuration": "medium",
-            "fields": cls.SEARCH_FIELDS,  # Request only necessary fields
+            "fields": cls.SEARCH_FIELDS + ",nextPageToken,prevPageToken,pageInfo",  # Include pagination info
         }
+        
+        # Add page token for pagination
+        if page_token:
+            request_params["pageToken"] = page_token
         
         # Add quotaUser for per-user tracking
         if user_id:
@@ -160,16 +167,18 @@ class YouTubeAPIOptimizer:
         try:
             search_request = youtube.search().list(**request_params)
             
-            # Add ETag header for conditional request
-            etag = cls.get_etag(cache_key)
-            if etag:
-                search_request.headers["If-None-Match"] = etag
+            # Add ETag header for conditional request (only for first page)
+            if not page_token:
+                etag = cls.get_etag(cache_key)
+                if etag:
+                    search_request.headers["If-None-Match"] = etag
             
             response = search_request.execute()
             
-            # Cache the response with ETag
-            response_etag = response.get("etag")
-            cls.set_cache(cache_key, response, response_etag)
+            # Cache the response with ETag (only first page)
+            if not page_token:
+                response_etag = response.get("etag")
+                cls.set_cache(cache_key, response, response_etag)
             
             return response
             
