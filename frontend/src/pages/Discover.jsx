@@ -519,11 +519,21 @@ export const Discover = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <VideoCard video={video} />
+              <VideoCard video={video} onTranscribe={handleTranscribe} />
             </motion.div>
           ))}
         </div>
       )}
+
+      {/* Transcript Modal */}
+      <AnimatePresence>
+        {transcriptVideo && (
+          <TranscriptModal
+            video={transcriptVideo}
+            onClose={() => setTranscriptVideo(null)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Empty State */}
       {!loading && videos.length === 0 && (
