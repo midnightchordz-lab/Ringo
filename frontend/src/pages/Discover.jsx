@@ -103,8 +103,14 @@ const TranscriptModal = ({ video, onClose }) => {
               <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <X className="w-8 h-8 text-red-500" />
               </div>
-              <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">This video may not have captions available.</p>
+              <p className="text-red-600 dark:text-red-400 font-medium mb-2">
+                {error.includes('blocking') ? 'Transcript Temporarily Unavailable' : 'Transcript Not Available'}
+              </p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
+                {error.includes('blocking') 
+                  ? "YouTube is limiting transcript requests from our servers. Try again later or watch the video directly on YouTube with captions enabled."
+                  : "This video may not have captions available, or captions are disabled by the creator."}
+              </p>
             </div>
           ) : transcript ? (
             <div>
