@@ -1824,14 +1824,19 @@ export const ContentLibrary = () => {
                         <p className="text-sm text-blue-600 font-medium mb-2">{book.author}</p>
                         
                         <div className="flex flex-wrap gap-1.5 mb-3">
-                          <span className="px-2 py-0.5 bg-pink-100 text-pink-700 text-xs rounded-full font-medium">
+                          <span className="px-2 py-0.5 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 text-xs rounded-full font-medium">
                             {book.source}
                           </span>
-                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" /> {book.license}
+                          <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs rounded-full font-medium flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> {book.license || 'Public Domain'}
                           </span>
+                          {book.monetization_allowed && (
+                            <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded-full font-medium flex items-center gap-1">
+                              💰 Monetize OK
+                            </span>
+                          )}
                           {book.printable && (
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium flex items-center gap-1">
+                            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded-full font-medium flex items-center gap-1">
                               <Printer className="w-3 h-3" /> Printable
                             </span>
                           )}
