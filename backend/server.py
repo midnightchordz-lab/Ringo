@@ -372,12 +372,9 @@ class UserResponse(BaseModel):
     full_name: str
     created_at: str
 
-# Authentication helper functions
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
+# Authentication helper functions (using bcrypt directly)
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    return hash_password(password)
 
 async def send_verification_email(email: str, token: str, full_name: str):
     """Send email verification link"""
