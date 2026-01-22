@@ -390,10 +390,10 @@ export const Images = () => {
       {/* Results Count */}
       {!showFavorites && totalImages > 0 && (
         <div className="mb-6 flex items-center justify-between">
-          <p className="text-neutral-600">
-            Found <span className="font-bold text-purple-600">{totalImages.toLocaleString()}</span> images
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Found <span className="font-bold text-purple-600 dark:text-purple-400">{totalImages.toLocaleString()}</span> images
             {sources.length > 0 && (
-              <span className="text-sm text-neutral-500 ml-2">
+              <span className="text-sm text-neutral-500 dark:text-neutral-500 ml-2">
                 from {sources.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}
               </span>
             )}
@@ -403,8 +403,8 @@ export const Images = () => {
       
       {showFavorites && (
         <div className="mb-6">
-          <p className="text-neutral-600">
-            Showing <span className="font-bold text-red-500">{favorites.length}</span> favorite images
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Showing <span className="font-bold text-red-500 dark:text-red-400">{favorites.length}</span> favorite images
           </p>
         </div>
       )}
@@ -414,7 +414,7 @@ export const Images = () => {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-neutral-600 font-medium">Searching for images...</p>
+            <p className="text-neutral-600 dark:text-neutral-400 font-medium">Searching for images...</p>
           </div>
         </div>
       )}
@@ -453,17 +453,17 @@ export const Images = () => {
       {/* Empty State */}
       {!loading && displayImages.length === 0 && (
         <div className="studio-card p-16 text-center">
-          <div className="w-20 h-20 mx-auto mb-6 bg-purple-100 rounded-2xl flex items-center justify-center">
+          <div className="w-20 h-20 mx-auto mb-6 bg-purple-100 dark:bg-purple-900/40 rounded-2xl flex items-center justify-center">
             {showFavorites ? (
-              <Heart className="w-10 h-10 text-purple-600" />
+              <Heart className="w-10 h-10 text-purple-600 dark:text-purple-400" />
             ) : (
-              <ImageIcon className="w-10 h-10 text-purple-600" />
+              <ImageIcon className="w-10 h-10 text-purple-600 dark:text-purple-400" />
             )}
           </div>
-          <h3 className="text-xl font-bold text-neutral-900 mb-2">
+          <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
             {showFavorites ? 'No favorites yet' : 'Start searching'}
           </h3>
-          <p className="text-neutral-500 mb-6">
+          <p className="text-neutral-500 dark:text-neutral-400 mb-6">
             {showFavorites 
               ? 'Search for images and click the heart icon to save them here'
               : 'Enter a search term to find stunning free images'
