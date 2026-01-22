@@ -1883,7 +1883,7 @@ async def search_images(
             "User-Agent": "ContentFlow/1.0 (https://freedomvid.preview.emergentagent.com; support@contentflow.app)"
         }
         
-        async with httpx.AsyncClient(timeout=15.0, headers=headers) as client:
+        async with httpx.AsyncClient(timeout=15.0, headers=headers, follow_redirects=True) as client:
             tasks = []
             
             # Search Unsplash (only for photos)
