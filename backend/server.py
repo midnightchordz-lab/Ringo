@@ -2831,6 +2831,11 @@ async def search_openstax_cc(client: httpx.AsyncClient, query: str, limit: int) 
                 title = item.get("title", "")
                 desc = item.get("description", "")
                 
+                # Clean HTML from description
+                import re
+                desc = re.sub(r'<[^>]+>', '', desc) if desc else ""
+                desc = desc.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+                
                 # Filter by query relevance
                 if query_lower in title.lower() or query_lower in desc.lower() or not query.strip():
                     results.append({
