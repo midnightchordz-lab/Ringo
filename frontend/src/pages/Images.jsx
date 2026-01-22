@@ -241,8 +241,15 @@ export const Images = () => {
       setCurrentPage(response.data.page || 1);
       setSources(response.data.sources || []);
       
-      if (page === 1) {
-        toast.success(`Found ${response.data.total.toLocaleString()} images!`);
+      // Check if there's an error message from the backend (e.g., Pixabay not configured)
+      if (response.data.error) {
+        toast.warning(response.data.error);
+      } else if (page === 1) {
+        if (response.data.total === 0) {
+          toast.info('No images found. Try different search terms or filters.');
+        } else {
+          toast.success(`Found ${response.data.total.toLocaleString()} images!`);
+        }
       }
     } catch (error) {
       console.error('Error searching images:', error);
