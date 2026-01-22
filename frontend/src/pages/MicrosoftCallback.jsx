@@ -3,11 +3,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const MicrosoftCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const { login } = useAuth();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -47,9 +49,8 @@ const MicrosoftCallback = () => {
         );
 
         if (response.data.access_token) {
-          // Store token and user data
-          localStorage.setItem('token', response.data.access_token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+          // Use auth context login - this updates state reactively
+          login(response.data.access_token, response.data.user);
           
           toast.success(`Welcome, ${response.data.user.full_name || response.data.user.email}!`);
           navigate('/');
@@ -66,7 +67,7 @@ const MicrosoftCallback = () => {
     };
 
     handleCallback();
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, login]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
