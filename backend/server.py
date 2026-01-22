@@ -2489,7 +2489,7 @@ async def search_content_library(
         all_results = []
         fetch_limit = per_page * 2  # Get enough results
         
-        async with httpx.AsyncClient(timeout=20.0) as client:
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
             tasks = []
             
             # ARTICLES - Search multiple open-access sources
