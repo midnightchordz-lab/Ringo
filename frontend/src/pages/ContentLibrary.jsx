@@ -1494,8 +1494,10 @@ export const ContentLibrary = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Results are already filtered by category from the backend
-  const displayResults = searchResults;
+  // Filter results based on selected source filter
+  const displayResults = resultFilter === 'all' 
+    ? searchResults 
+    : searchResults.filter(r => r.source === resultFilter);
 
   const selectedLevelInfo = EDUCATION_LEVELS.find(l => l.id === selectedLevel);
 
