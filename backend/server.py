@@ -2525,8 +2525,8 @@ async def search_content_library(
                 tasks.append(search_merlot_resources(client, query, fetch_limit // 2))
                 tasks.append(search_internet_archive_texts(client, query, fetch_limit // 2))  # Public Domain
                 tasks.append(search_smithsonian_resources(client, query, fetch_limit // 3))  # Open Access
-                tasks.append(search_library_of_congress(client, query, fetch_limit // 2))  # Public Domain
                 tasks.append(search_pbs_learningmedia(client, query, fetch_limit // 3))  # Educational
+                # Library of Congress removed due to unreliable API responses
             
             # BOOKS - Public Domain and CC-licensed books
             if category in ["all", "book"]:
