@@ -79,7 +79,7 @@ if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
 # Frontend URL for email links
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://freedomvid.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://reel-crafter-1.preview.emergentagent.com")
 
 
 # ==================== YOUTUBE API OPTIMIZATION ====================
@@ -2025,7 +2025,7 @@ async def search_images(
         
         # Create HTTP client with proper User-Agent for Wikimedia API
         headers = {
-            "User-Agent": "ContentFlow/1.0 (https://freedomvid.preview.emergentagent.com; support@contentflow.app)"
+            "User-Agent": "ContentFlow/1.0 (https://reel-crafter-1.preview.emergentagent.com; support@contentflow.app)"
         }
         
         async with httpx.AsyncClient(timeout=15.0, headers=headers, follow_redirects=True) as client:
