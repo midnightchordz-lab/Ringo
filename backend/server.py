@@ -3008,9 +3008,10 @@ async def search_arxiv_articles(client: httpx.AsyncClient, query: str, limit: in
                     })
             return results
         else:
-            logging.warning(f"arXiv API returned status {response.status_code}")
+            # Silently return empty on non-200 status (arXiv sometimes has intermittent issues)
+            logging.debug(f"arXiv API returned status {response.status_code}")
     except Exception as e:
-        logging.warning(f"arXiv search failed: {str(e)}")
+        logging.debug(f"arXiv search failed: {str(e)}")
     return []
 
 
