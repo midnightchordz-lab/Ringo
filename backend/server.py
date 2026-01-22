@@ -2966,8 +2966,9 @@ async def search_wikipedia_articles(client: httpx.AsyncClient, query: str, limit
 async def search_arxiv_articles(client: httpx.AsyncClient, query: str, limit: int) -> list:
     """Search arXiv for academic articles (all free/open access)"""
     try:
+        # Use HTTPS to avoid redirect, client should have follow_redirects=True
         response = await client.get(
-            "https://export.arxiv.org/api/query",  # Use HTTPS to avoid 301 redirect
+            "https://export.arxiv.org/api/query",
             params={
                 "search_query": f"all:{query}",
                 "start": 0,
@@ -2976,8 +2977,7 @@ async def search_arxiv_articles(client: httpx.AsyncClient, query: str, limit: in
             },
             headers={
                 "User-Agent": "ContentFlow/1.0 (Educational Content Search)"
-            },
-            follow_redirects=True  # Follow any redirects
+            }
         )
         
         if response.status_code == 200:
