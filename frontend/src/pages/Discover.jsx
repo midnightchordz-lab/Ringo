@@ -269,7 +269,8 @@ export const Discover = () => {
                 value={sortBy}
                 onChange={(e) => {
                   setSortBy(e.target.value);
-                  handleSearch(null, true);
+                  // Fetch fresh results with new sort order
+                  setTimeout(() => handleSearch(null, false), 100);
                 }}
                 className="text-sm bg-neutral-100 dark:bg-neutral-800 border-0 rounded-lg px-3 py-1.5 text-neutral-700 dark:text-neutral-200 focus:ring-2 focus:ring-blue-500"
               >
