@@ -509,7 +509,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 # Inject auth dependency into modular routes
 set_youtube_auth(get_current_user)
-set_content_auth(get_current_user)
 
 # Authentication endpoints
 @api_router.post("/auth/google-oauth")
