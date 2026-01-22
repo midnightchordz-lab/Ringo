@@ -284,7 +284,7 @@ export const Images = () => {
   const displayImages = showFavorites ? favorites : images;
 
   return (
-    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 min-h-screen">
+    <div className="p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-50 dark:bg-neutral-950 min-h-screen transition-colors duration-300">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -292,26 +292,26 @@ export const Images = () => {
             <ImageIcon className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100" style={{ fontFamily: 'Outfit, sans-serif' }}>
               Image Search
             </h1>
-            <p className="text-neutral-500">Find stunning copyright-free images from across the web</p>
+            <p className="text-neutral-500 dark:text-neutral-400">Find stunning copyright-free images from across the web</p>
           </div>
         </div>
       </div>
 
       {/* License Info */}
-      <div className="studio-card p-4 mb-6 border-l-4 border-emerald-500 bg-emerald-50">
+      <div className="studio-card p-4 mb-6 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+          <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm font-semibold text-emerald-800">100% Free to Use</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">100% Free to Use</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <p className="text-xs text-emerald-700">
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
               All images from <span className="font-bold">Pexels</span>, <span className="font-bold">Unsplash</span>, and <span className="font-bold">Pixabay</span> are free for commercial use. No attribution required!
             </p>
           </div>
@@ -323,7 +323,7 @@ export const Images = () => {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-neutral-500" />
               <Input
                 data-testid="image-search-input"
                 type="text"
@@ -351,7 +351,7 @@ export const Images = () => {
               className={`rounded-xl px-6 py-3 flex items-center gap-2 font-semibold transition-all ${
                 showFavorites 
                   ? 'bg-red-500 hover:bg-red-600 text-white' 
-                  : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
+                  : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200'
               }`}
               data-testid="favorites-toggle"
             >
@@ -362,7 +362,7 @@ export const Images = () => {
           
           {/* Source Filter */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-neutral-500 flex items-center gap-1">
+            <span className="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
               <Filter className="w-4 h-4" /> Source:
             </span>
             {[
@@ -377,7 +377,7 @@ export const Images = () => {
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                   selectedSource === source.id
                     ? `${source.color} text-white shadow-md`
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                 }`}
               >
                 {source.name}
