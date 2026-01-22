@@ -1525,7 +1525,7 @@ export const ContentLibrary = () => {
       </div>
 
       {/* AI-Powered Badge */}
-      <div className="studio-card p-4 mb-6 border-l-4 border-purple-500 bg-purple-50 dark:bg-purple-900/20">
+      <div className="studio-card p-4 mb-4 border-l-4 border-purple-500 bg-purple-50 dark:bg-purple-900/20">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -1541,6 +1541,29 @@ export const ContentLibrary = () => {
               <span className="text-neutral-700 dark:text-neutral-300 font-semibold"> Wikipedia</span>, and 
               <span className="text-emerald-600 dark:text-emerald-400 font-semibold"> educational worksheet sites</span> 
               {' '}for free content. AI categorizes and ranks results.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* CC License Info Banner */}
+      <div className="studio-card p-4 mb-6 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">100% Copyright-Free Content</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
+              All content is strictly filtered for <span className="font-bold">Creative Commons</span> licenses: 
+              <span className="ml-1 px-1.5 py-0.5 bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 rounded font-semibold">CC BY</span>
+              <span className="ml-1 px-1.5 py-0.5 bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 rounded font-semibold">CC BY-SA</span>
+              <span className="ml-1 px-1.5 py-0.5 bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 rounded font-semibold">CC BY-ND</span>
+              <span className="ml-1 px-1.5 py-0.5 bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200 rounded font-semibold">CC0</span>
+              <span className="ml-1 px-1.5 py-0.5 bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200 rounded font-semibold">Public Domain</span>
             </p>
           </div>
         </div>
