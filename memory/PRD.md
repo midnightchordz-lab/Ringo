@@ -222,7 +222,9 @@ Implemented comprehensive, multi-source search for all content categories:
 - POST `/api/youtube/clear-cache` - Clear caches (NEW)
 
 ### Images
-- GET `/api/images/search?query=&per_page=` - Search copyright-free images
+- GET `/api/images/search?query=&per_page=&image_type=&source=` - Search copyright-free images
+  - `image_type`: photo (Unsplash/Pexels/Pixabay), illustration (Pixabay only), vector (Pixabay only)
+  - `source`: all, unsplash, pexels, pixabay
 - GET `/api/images/favorites` - Get user's favorite images
 - POST `/api/images/favorites` - Add image to favorites
 - DELETE `/api/images/favorites/{image_id}` - Remove from favorites
