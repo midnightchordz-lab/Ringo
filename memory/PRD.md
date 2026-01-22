@@ -220,6 +220,8 @@ Implemented comprehensive, multi-source search for all content categories:
 - POST `/api/clear-videos` - Clear all discovered videos
 - GET `/api/youtube/cache-stats` - Cache statistics (NEW)
 - POST `/api/youtube/clear-cache` - Clear caches (NEW)
+- GET `/api/video/transcript/{video_id}` - Get video transcript (NEW Jan 22)
+- GET `/api/video/transcript/{video_id}/cached` - Get cached transcript (NEW Jan 22)
 
 ### Images
 - GET `/api/images/search?query=&per_page=&image_type=&source=` - Search copyright-free images
