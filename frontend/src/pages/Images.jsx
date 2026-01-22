@@ -400,9 +400,17 @@ export const Images = () => {
                     : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                 }`}
                 data-testid={`type-filter-${type.id}`}
+                title={
+                  type.id === 'illustration' || type.id === 'vector' 
+                    ? 'Requires Pixabay (only source with illustrations/vectors)' 
+                    : ''
+                }
               >
                 <span>{type.icon}</span>
                 {type.name}
+                {(type.id === 'illustration' || type.id === 'vector') && (
+                  <span className="text-xs opacity-70">(Pixabay)</span>
+                )}
               </button>
             ))}
           </div>
