@@ -278,7 +278,28 @@ Implemented comprehensive, multi-source search for all content categories:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 22, 2026 - Strict CC License Filtering for Content Library
+January 22, 2026 - Children's Literature Monetization-Friendly Licenses
+
+### Children's Literature Monetization Update (Jan 22, 2026) ✅ COMPLETED
+- **Removed Internet Archive** from Children's Literature sources (license status varies)
+- **Monetization-friendly licenses only**:
+  - CC BY (Attribution) - Can monetize with credit
+  - CC BY-SA (Attribution-ShareAlike) - Can monetize, share alike
+  - CC BY-ND (Attribution-NoDerivatives) - Can monetize, no mods
+  - Public Domain - Full commercial freedom
+  
+- **Sources now**:
+  | Source | License | Monetization |
+  |--------|---------|--------------|
+  | Project Gutenberg | Public Domain | ✅ OK |
+  | StoryWeaver | CC BY 4.0 | ✅ OK |
+  | Open Library | Public Domain | ✅ OK |
+
+- **Frontend Enhancements**:
+  - "Monetization-Friendly Licenses Only" banner
+  - "Monetization OK" badge on top right
+  - Each book shows "💰 Monetize OK" badge
+  - License displayed as "Public Domain (Monetization OK)" or "CC BY 4.0 (Monetization OK)"
 
 ### Content Library CC License Enforcement (Jan 22, 2026) ✅ COMPLETED
 - **Strict CC License Filter**: All content is now filtered to only show:
