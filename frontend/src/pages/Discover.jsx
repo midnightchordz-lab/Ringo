@@ -172,22 +172,22 @@ export const Discover = () => {
 
       {/* Cache Status Banner */}
       {cacheInfo && (cacheInfo.cached || cacheInfo.optimized) && (
-        <div className={`studio-card p-4 mb-6 border-l-4 ${cacheInfo.cached ? 'border-amber-500 bg-amber-50' : 'border-emerald-500 bg-emerald-50'}`}>
+        <div className={`studio-card p-4 mb-6 border-l-4 ${cacheInfo.cached ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'}`}>
           <div className="flex items-center gap-3">
             {cacheInfo.cached ? (
               <>
-                <Database className="w-5 h-5 text-amber-600" />
+                <Database className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 <div className="flex-1">
-                  <span className="text-sm font-semibold text-amber-700">Cached Results</span>
-                  <p className="text-xs text-amber-600">{cacheInfo.message || 'Showing previously cached videos to save API quota'}</p>
+                  <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">Cached Results</span>
+                  <p className="text-xs text-amber-600 dark:text-amber-400">{cacheInfo.message || 'Showing previously cached videos to save API quota'}</p>
                 </div>
               </>
             ) : (
               <>
-                <Zap className="w-5 h-5 text-emerald-600" />
+                <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 <div className="flex-1">
-                  <span className="text-sm font-semibold text-emerald-700">Optimized API Usage</span>
-                  <p className="text-xs text-emerald-600">Using field filtering, ETags, and caching to minimize API calls</p>
+                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Optimized API Usage</span>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">Using field filtering, ETags, and caching to minimize API calls</p>
                 </div>
               </>
             )}
@@ -196,32 +196,32 @@ export const Discover = () => {
       )}
 
       {/* License Info Banner */}
-      <div className="studio-card p-4 mb-6 border-l-4 border-emerald-500 bg-emerald-50">
+      <div className="studio-card p-4 mb-6 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+          <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm font-semibold text-emerald-800">All Videos Are Commercial-Safe</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">All Videos Are Commercial-Safe</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <p className="text-xs text-emerald-700">
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
               Videos shown are licensed under <span className="font-bold">CC BY (Creative Commons Attribution)</span>. 
               You can use them commercially with proper attribution.
             </p>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-emerald-200 flex flex-wrap gap-4 text-xs">
-          <div className="flex items-center gap-1.5 text-emerald-700">
+        <div className="mt-3 pt-3 border-t border-emerald-200 dark:border-emerald-800 flex flex-wrap gap-4 text-xs">
+          <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Commercial Use
           </div>
-          <div className="flex items-center gap-1.5 text-emerald-700">
+          <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Modifications Allowed
           </div>
-          <div className="flex items-center gap-1.5 text-amber-600">
+          <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
             <Info className="w-3.5 h-3.5" />
             Attribution Required
           </div>
