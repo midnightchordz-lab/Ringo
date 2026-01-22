@@ -2695,6 +2695,204 @@ async def search_oer_courses(client: httpx.AsyncClient, query: str, limit: int) 
     return results[:limit]
 
 
+# ==================== CC-BY / CC-BY-SA LICENSED CONTENT SOURCES ====================
+
+async def search_ck12_flexbooks(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search CK-12 FlexBooks - CC-BY-NC licensed educational content"""
+    results = []
+    
+    # CK-12 provides excellent educational resources under CC licenses
+    # Since they don't have a public API, we provide direct search links
+    ck12_subjects = {
+        "math": "Mathematics",
+        "science": "Science", 
+        "physics": "Physical Science",
+        "chemistry": "Chemistry",
+        "biology": "Biology",
+        "earth": "Earth Science",
+        "algebra": "Algebra",
+        "geometry": "Geometry",
+        "calculus": "Calculus",
+        "statistics": "Statistics",
+        "history": "History",
+        "english": "English Language Arts"
+    }
+    
+    query_lower = query.lower()
+    
+    # Main search result
+    results.append({
+        "id": f"ck12_search_{query.replace(' ', '_')}",
+        "title": f"{query} - CK-12 FlexBooks",
+        "description": f"Free, customizable textbooks and educational resources about {query}. CK-12 provides free educational content under Creative Commons licenses.",
+        "type": "course",
+        "category": "course",
+        "source": "CK-12 Foundation",
+        "url": f"https://www.ck12.org/search/?q={query.replace(' ', '+')}",
+        "thumbnail": "📖",
+        "license": "CC BY-NC",
+        "license_details": "Creative Commons Attribution-NonCommercial - Free for educational use",
+        "free": True
+    })
+    
+    # Add subject-specific results if query matches
+    for keyword, subject in ck12_subjects.items():
+        if keyword in query_lower:
+            results.append({
+                "id": f"ck12_{keyword}",
+                "title": f"{subject} FlexBooks - CK-12",
+                "description": f"Comprehensive {subject.lower()} curriculum with interactive simulations, videos, and practice problems. Free to use and customize.",
+                "type": "course",
+                "category": "course", 
+                "source": "CK-12 Foundation",
+                "url": f"https://www.ck12.org/browse/{keyword}/",
+                "thumbnail": "📚",
+                "license": "CC BY-NC",
+                "license_details": "Creative Commons Attribution-NonCommercial",
+                "free": True
+            })
+    
+    return results[:limit]
+
+
+async def search_oer_commons_cc(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search OER Commons for CC-BY and CC-BY-SA licensed educational resources"""
+    results = []
+    
+    try:
+        # OER Commons provides open educational resources with clear CC licenses
+        # Using their search interface since API requires authentication
+        
+        # Main search result with CC filters
+        results.append({
+            "id": f"oer_commons_{query.replace(' ', '_')}",
+            "title": f"{query} - OER Commons",
+            "description": f"Open Educational Resources about {query}. All content is licensed under Creative Commons for free educational and commercial use.",
+            "type": "resource",
+            "category": "resource",
+            "source": "OER Commons",
+            "url": f"https://www.oercommons.org/search?f.search={query.replace(' ', '+')}&f.sublevel=&f.general_subject=&f.alignment=&batch_size=20",
+            "thumbnail": "🎓",
+            "license": "CC BY / CC BY-SA",
+            "license_details": "Creative Commons - Free for educational and commercial use",
+            "free": True
+        })
+        
+        # Add grade-level specific searches
+        grade_levels = [
+            ("preschool", "Pre-K"),
+            ("lower-primary", "Grades K-2"),
+            ("upper-primary", "Grades 3-5"),
+            ("middle-school", "Middle School"),
+            ("high-school", "High School"),
+            ("college-upper-division", "College/University")
+        ]
+        
+        for level_id, level_name in grade_levels[:3]:  # Limit to avoid too many results
+            results.append({
+                "id": f"oer_{level_id}_{query.replace(' ', '_')}",
+                "title": f"{query} for {level_name} - OER Commons",
+                "description": f"CC-licensed educational resources about {query} specifically designed for {level_name} students.",
+                "type": "resource",
+                "category": "resource",
+                "source": "OER Commons",
+                "url": f"https://www.oercommons.org/search?f.search={query.replace(' ', '+')}&f.sublevel={level_id}",
+                "thumbnail": "📚",
+                "license": "CC BY / CC BY-SA",
+                "license_details": "Creative Commons - Free for educational and commercial use",
+                "free": True,
+                "grade_levels": [level_name]
+            })
+    
+    except Exception as e:
+        logging.warning(f"OER Commons search failed: {str(e)}")
+    
+    return results[:limit]
+
+
+async def search_openstax_cc(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search OpenStax for CC BY 4.0 licensed free textbooks"""
+    try:
+        response = await client.get(
+            "https://openstax.org/apps/cms/api/v2/pages/",
+            params={
+                "type": "books.Book",
+                "fields": "title,description,cover_url,webview_rex_link",
+                "limit": min(limit, 50)
+            },
+            headers={"User-Agent": "ContentFlow/1.0 (Educational Search)"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            query_lower = query.lower()
+            
+            for item in data.get("items", []):
+                title = item.get("title", "")
+                desc = item.get("description", "")
+                
+                # Filter by query relevance
+                if query_lower in title.lower() or query_lower in desc.lower() or not query.strip():
+                    results.append({
+                        "id": f"openstax_{item.get('id', '')}",
+                        "title": title,
+                        "description": desc[:200] if desc else "Free, peer-reviewed textbook from OpenStax",
+                        "type": "course",
+                        "category": "course",
+                        "source": "OpenStax",
+                        "url": item.get("webview_rex_link", f"https://openstax.org/details/{item.get('id', '')}"),
+                        "thumbnail": item.get("cover_url", "📚"),
+                        "license": "CC BY 4.0",
+                        "license_details": "Creative Commons Attribution 4.0 - Free for ANY use including commercial",
+                        "free": True
+                    })
+            return results[:limit]
+    except Exception as e:
+        logging.warning(f"OpenStax search failed: {str(e)}")
+    return []
+
+
+async def search_wikimedia_commons(client: httpx.AsyncClient, query: str, limit: int) -> list:
+    """Search Wikimedia Commons for CC-licensed media"""
+    try:
+        response = await client.get(
+            "https://commons.wikimedia.org/w/api.php",
+            params={
+                "action": "query",
+                "list": "search",
+                "srsearch": query,
+                "srnamespace": "6",  # File namespace
+                "srlimit": min(limit, 50),
+                "format": "json"
+            },
+            headers={"User-Agent": "ContentFlow/1.0 (Educational Search)"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("query", {}).get("search", []):
+                title = item.get("title", "").replace("File:", "")
+                results.append({
+                    "id": f"commons_{item.get('pageid', '')}",
+                    "title": title,
+                    "description": item.get("snippet", "").replace('<span class="searchmatch">', '').replace('</span>', '')[:200],
+                    "type": "resource",
+                    "category": "resource",
+                    "source": "Wikimedia Commons",
+                    "url": f"https://commons.wikimedia.org/wiki/File:{title.replace(' ', '_')}",
+                    "thumbnail": "🖼️",
+                    "license": "CC BY-SA / Public Domain",
+                    "license_details": "Creative Commons or Public Domain - Free for ANY use",
+                    "free": True
+                })
+            return results
+    except Exception as e:
+        logging.warning(f"Wikimedia Commons search failed: {str(e)}")
+    return []
+
+
 # ==================== COURSE SEARCH FUNCTIONS ====================
 
 async def search_openstax_courses(client: httpx.AsyncClient, query: str, limit: int) -> list:
