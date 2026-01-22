@@ -275,20 +275,26 @@ const SEARCH_SUGGESTIONS = [
   'Art activities'
 ];
 
-// License Badge Component
-const LicenseBadge = ({ license, showFull = false }) => {
+// License Badge Component - Shows CC license clearly
+const LicenseBadge = ({ license, showFull = false, showDetails = false }) => {
   const licenseInfo = LICENSE_TYPES[license] || LICENSE_TYPES['varies'];
   
   return (
-    <div className="flex items-center gap-1.5" title={licenseInfo.description}>
+    <div className="flex items-center gap-1.5 flex-wrap" title={licenseInfo.description}>
       <span className={`px-2 py-0.5 rounded text-xs font-bold ${licenseInfo.color} text-white`}>
         {showFull ? licenseInfo.name : licenseInfo.shortName}
       </span>
       {licenseInfo.commercial === true && (
-        <ShieldCheck className="w-3.5 h-3.5 text-green-400" title="Commercial use allowed" />
+        <span className="flex items-center gap-0.5 text-xs text-green-600 dark:text-green-400 font-medium">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          {showDetails && "Commercial OK"}
+        </span>
       )}
       {licenseInfo.commercial === false && (
-        <ShieldAlert className="w-3.5 h-3.5 text-amber-400" title="Non-commercial only" />
+        <span className="flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400 font-medium">
+          <ShieldAlert className="w-3.5 h-3.5" />
+          {showDetails && "Non-commercial"}
+        </span>
       )}
     </div>
   );
