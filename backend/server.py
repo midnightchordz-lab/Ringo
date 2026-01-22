@@ -6517,6 +6517,12 @@ async def copy_reading_list(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Include modular routers
+# Note: These routes currently duplicate some endpoints in api_router
+# TODO: Remove duplicate endpoints from api_router after testing
+# api_router.include_router(youtube_router)  # Uncomment after removing duplicates
+# api_router.include_router(content_router)  # Uncomment after removing duplicates
+
 app.include_router(api_router)
 
 app.add_middleware(
