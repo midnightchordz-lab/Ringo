@@ -1,20 +1,175 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, Play, TrendingUp, ShieldCheck, Info, CheckCircle2, Database, Zap, Star, Video, Filter, RefreshCw, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, Play, TrendingUp, ShieldCheck, Info, CheckCircle2, Database, Zap, Star, Video, Filter, RefreshCw, ChevronLeft, ChevronRight, ArrowUpDown, FileText, Loader2, Copy, Download, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
-const VideoCard = ({ video }) => (
-  <Link to={`/video/${video.id}`} data-testid="video-card">
+// Transcript Modal Component
+const TranscriptModal = ({ video, onClose }) => {
+  const [transcript, setTranscript] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTranscript = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await api.get(`/video/transcript/${video.id}`);
+        if (response.data.success) {
+          setTranscript(response.data);
+          toast.success(`Transcript loaded! ${response.data.word_count} words`);
+        } else {
+          setError(response.data.error || 'Failed to get transcript');
+          toast.error(response.data.error || 'No transcript available');
+        }
+      } catch (err) {
+        setError(err.response?.data?.error || 'Failed to fetch transcript');
+        toast.error('Failed to fetch transcript');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTranscript();
+  }, [video.id]);
+
+  const copyToClipboard = () => {
+    if (transcript?.full_text) {
+      navigator.clipboard.writeText(transcript.full_text);
+      toast.success('Transcript copied to clipboard!');
+    }
+  };
+
+  const downloadTranscript = () => {
+    if (transcript?.full_text) {
+      const blob = new Blob([transcript.full_text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${video.title.replace(/[^a-z0-9]/gi, '_')}_transcript.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Transcript downloaded!');
+    }
+  };
+
+  return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -8 }}
-      className="studio-card studio-card-hover overflow-hidden group"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
     >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-4 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <FileText className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-neutral-800 dark:text-white">Video Transcript</h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-1">{video.title}</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          >
+            <X className="w-4 h-4 text-neutral-500" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 overflow-y-auto max-h-[60vh]">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="w-10 h-10 text-purple-500 animate-spin mb-4" />
+              <p className="text-neutral-600 dark:text-neutral-400">Fetching transcript...</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-1">This may take a few seconds</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <X className="w-8 h-8 text-red-500" />
+              </div>
+              <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">This video may not have captions available.</p>
+            </div>
+          ) : transcript ? (
+            <div>
+              {/* Stats */}
+              <div className="flex items-center gap-4 mb-4 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">Language:</span>
+                  <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded">{transcript.language}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">Words:</span>
+                  <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">{transcript.word_count?.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">Segments:</span>
+                  <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">{transcript.total_segments}</span>
+                </div>
+              </div>
+
+              {/* Transcript Text */}
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap text-sm">
+                  {transcript.full_text}
+                </p>
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        {/* Footer with actions */}
+        {transcript && !loading && !error && (
+          <div className="p-4 border-t border-neutral-200 dark:border-neutral-700 flex items-center justify-end gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyToClipboard}
+              className="flex items-center gap-2"
+            >
+              <Copy className="w-4 h-4" />
+              Copy Text
+            </Button>
+            <Button
+              size="sm"
+              onClick={downloadTranscript}
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              <Download className="w-4 h-4" />
+              Download
+            </Button>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const VideoCard = ({ video, onTranscribe }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    whileHover={{ y: -8 }}
+    className="studio-card studio-card-hover overflow-hidden group"
+    data-testid="video-card"
+  >
+    <Link to={`/video/${video.id}`}>
       <div className="relative aspect-video bg-neutral-100 dark:bg-neutral-800">
         <img
           src={video.thumbnail}
@@ -39,21 +194,36 @@ const VideoCard = ({ video }) => (
           </span>
         </div>
       </div>
-      <div className="p-4">
-        <h3 className="text-neutral-900 dark:text-neutral-100 font-semibold line-clamp-2 mb-2 text-sm leading-tight">{video.title}</h3>
-        <p className="text-blue-600 dark:text-blue-400 text-xs font-medium mb-3">{video.channel}</p>
-        <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-          <div className="flex items-center gap-3">
-            <span>{(video.views || 0).toLocaleString()} views</span>
-            <span>{(video.likes || 0).toLocaleString()} likes</span>
-          </div>
-          <span className="bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded-full font-medium">
-            {Math.floor((video.duration || 0) / 60)}:{String((video.duration || 0) % 60).padStart(2, '0')}
-          </span>
+    </Link>
+    <div className="p-4">
+      <Link to={`/video/${video.id}`}>
+        <h3 className="text-neutral-900 dark:text-neutral-100 font-semibold line-clamp-2 mb-2 text-sm leading-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{video.title}</h3>
+      </Link>
+      <p className="text-blue-600 dark:text-blue-400 text-xs font-medium mb-3">{video.channel}</p>
+      <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 mb-3">
+        <div className="flex items-center gap-3">
+          <span>{(video.views || 0).toLocaleString()} views</span>
+          <span>{(video.likes || 0).toLocaleString()} likes</span>
         </div>
+        <span className="bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded-full font-medium">
+          {Math.floor((video.duration || 0) / 60)}:{String((video.duration || 0) % 60).padStart(2, '0')}
+        </span>
       </div>
-    </motion.div>
-  </Link>
+      {/* Transcribe Button */}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onTranscribe(video);
+        }}
+        className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 hover:from-purple-200 hover:to-pink-200 dark:hover:from-purple-900/50 dark:hover:to-pink-900/50 text-purple-700 dark:text-purple-300 rounded-xl text-xs font-semibold transition-all"
+        data-testid="transcribe-button"
+      >
+        <FileText className="w-3.5 h-3.5" />
+        Convert to Text
+      </button>
+    </div>
+  </motion.div>
 );
 
 const SORT_OPTIONS = [
