@@ -230,10 +230,11 @@ export const Discover = () => {
 
       {/* Search Bar */}
       <div className="studio-card p-6 mb-8">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1 relative flex gap-3">
+        <div className="flex flex-col gap-4">
+          {/* Main search row */}
+          <div className="flex flex-col lg:flex-row gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-neutral-500" />
               <Input
                 data-testid="search-input"
                 type="text"
@@ -244,28 +245,90 @@ export const Discover = () => {
                 className="studio-input-icon w-full"
               />
             </div>
-            <Button
-              data-testid="find-button"
-              onClick={handleSearch}
-              disabled={loading}
-              className="btn-primary min-w-[100px]"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                'Find'
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                data-testid="find-button"
+                onClick={() => handleSearch()}
+                disabled={loading}
+                className="btn-primary min-w-[100px]"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  'Find'
+                )}
+              </Button>
+              <Button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-xl px-4"
+                title="Get fresh results (skip cache)"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          
+          {/* Sort and filter row */}
+          <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+              <span className="text-sm text-neutral-600 dark:text-neutral-400">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  handleSearch(null, true);
+                }}
+                className="text-sm bg-neutral-100 dark:bg-neutral-800 border-0 rounded-lg px-3 py-1.5 text-neutral-700 dark:text-neutral-200 focus:ring-2 focus:ring-blue-500"
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+            
+            {totalAvailable > 0 && (
+              <div className="text-sm text-neutral-500 dark:text-neutral-400 ml-auto">
+                {totalAvailable.toLocaleString()}+ videos available
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Results Count */}
+      {/* Results Count and Pagination */}
       {videos.length > 0 && (
         <div className="flex items-center justify-between mb-6">
-          <p className="text-neutral-600">
-            Found <span className="font-bold text-blue-600">{videos.length}</span> CC BY licensed videos
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Found <span className="font-bold text-blue-600 dark:text-blue-400">{videos.length}</span> CC BY licensed videos
+            {currentPage > 1 && <span className="text-neutral-400"> (Page {currentPage})</span>}
           </p>
+          
+          {/* Pagination Controls */}
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handlePrevPage}
+              disabled={!prevPageToken || loading}
+              className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg px-3 py-2 disabled:opacity-50"
+              size="sm"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium">
+              Page {currentPage}
+            </span>
+            <Button
+              onClick={handleNextPage}
+              disabled={!nextPageToken || loading}
+              className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg px-3 py-2 disabled:opacity-50"
+              size="sm"
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
         </div>
       )}
 
@@ -274,7 +337,7 @@ export const Discover = () => {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-neutral-600 font-medium">Searching for videos...</p>
+            <p className="text-neutral-600 dark:text-neutral-400 font-medium">Searching for videos...</p>
           </div>
         </div>
       )}
