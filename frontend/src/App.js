@@ -72,14 +72,16 @@ function AppRouter() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <div className="App min-h-screen">
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
-        <Toaster position="bottom-right" />
-      </div>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <div className="App min-h-screen">
+          <BrowserRouter>
+            <AppRouter />
+          </BrowserRouter>
+          <Toaster position="bottom-right" />
+        </div>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
