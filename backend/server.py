@@ -1882,6 +1882,23 @@ async def search_images(
             if pixabay_key and source in ["all", "pixabay"]:
                 tasks.append(search_pixabay_images(client, query, page, per_page, pixabay_key, image_type))
             
+            # Handle case where user wants illustrations/vectors but Pixabay is not configured
+            if is_pixabay_only_type and not pixabay_key:
+                logging.warning(f"Pixabay API key not configured - cannot search for {image_type}")
+                return {
+                    "images": [],
+                    "total": 0,
+                    "page": page,
+                    "per_page": per_page,
+                    "total_pages": 0,
+                    "has_next": False,
+                    "has_prev": False,
+                    "query": query,
+                    "sources": [],
+                    "image_type": image_type,
+                    "error": f"Pixabay API key required to search for {image_type}. Only Pixabay supports illustrations and vectors."
+                }
+            
             # Run all searches in parallel
             results = await asyncio.gather(*tasks, return_exceptions=True)
             
