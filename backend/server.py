@@ -1005,27 +1005,33 @@ async def discover_videos(
                 
                 youtube = build('youtube', 'v3', developerKey=youtube_api_key, cache_discovery=False)
                 
-                # 2. Use optimized search with caching and field filtering
+                # 2. Use optimized search with caching, pagination and field filtering
                 search_response = await YouTubeAPIOptimizer.search_videos(
                     youtube, 
                     search_query,
                     max_results=50,
-                    user_id=user_id
+                    user_id=user_id,
+                    page_token=page_token,
+                    order=sort_by
                 )
                 
                 video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+                next_page_token = search_response.get('nextPageToken')
+                prev_page_token = search_response.get('prevPageToken')
+                total_results = search_response.get('pageInfo', {}).get('totalResults', 0)
                 
-                # Try alternative queries if no results
-                if not video_ids:
+                # Try alternative queries if no results (only on first page)
+                if not video_ids and not page_token:
                     alt_queries = [
                         f"{search_query} creative commons",
                         "creative commons tutorial" if not query else search_query,
                     ]
                     for alt_query in alt_queries:
                         alt_response = await YouTubeAPIOptimizer.search_videos(
-                            youtube, alt_query, max_results=50, user_id=user_id
+                            youtube, alt_query, max_results=50, user_id=user_id, order=sort_by
                         )
                         video_ids = [item['id']['videoId'] for item in alt_response.get('items', [])]
+                        next_page_token = alt_response.get('nextPageToken')
                         if video_ids:
                             break
                 
