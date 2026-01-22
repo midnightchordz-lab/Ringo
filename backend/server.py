@@ -2435,7 +2435,7 @@ async def search_gutenberg(
 ):
     """Search Project Gutenberg for books"""
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             response = await client.get(
                 "https://gutendex.com/books/",
                 params={"search": query, "page": 1},
