@@ -1953,7 +1953,8 @@ async def search_unsplash_images(client: httpx.AsyncClient, query: str, page: in
                     "height": photo["height"],
                     "color": photo.get("color", "#000000"),
                     "likes": photo.get("likes", 0),
-                    "license": "Unsplash License (Free for commercial use)"
+                    "license": "Unsplash License (Free for commercial use)",
+                    "image_type": "photo"
                 })
             return {"images": images, "total": data.get("total", 0)}
     except Exception as e:
