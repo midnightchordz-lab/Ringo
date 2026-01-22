@@ -1113,6 +1113,10 @@ export const ContentLibrary = () => {
   const [freeBooks, setFreeBooks] = useState([]);
   const [loadingBooks, setLoadingBooks] = useState(false);
   
+  // Result Filter State - for filtering after search
+  const [resultFilter, setResultFilter] = useState('all');
+  const [availableFilters, setAvailableFilters] = useState([]);
+  
   // Children's Literature State
   const [childrensLiterature, setChildrensLiterature] = useState([]);
   const [loadingChildrens, setLoadingChildrens] = useState(false);
