@@ -8,7 +8,7 @@ import {
   ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, Info,
   Loader2, Zap, BookOpenCheck, FileQuestion, Video, Newspaper,
   Download, Printer, Book, Plus, List, Users, Lock, Unlock,
-  Trash2, Edit2, Copy, X, FolderPlus, ChevronLeft, ChevronRight
+  Trash2, Edit2, Copy, X, FolderPlus, ChevronLeft, ChevronRight, Filter
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
