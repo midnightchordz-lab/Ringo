@@ -351,6 +351,142 @@ class YouTubePersistentCache:
 
 # ==================== END YOUTUBE API OPTIMIZATION ====================
 
+# ==================== VIDEO TRANSCRIPTION ====================
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
+
+@api_router.get("/video/transcript/{video_id}")
+async def get_video_transcript(
+    video_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Get transcript/captions for a YouTube video.
+    Uses YouTube's built-in captions - completely free.
+    """
+    try:
+        # Try to get transcript in preferred languages
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        
+        transcript = None
+        language_used = None
+        
+        # Try to get English transcript first
+        try:
+            transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
+            language_used = 'en'
+        except NoTranscriptFound:
+            # Try auto-generated English
+            try:
+                transcript = transcript_list.find_generated_transcript(['en'])
+                language_used = 'en (auto-generated)'
+            except NoTranscriptFound:
+                # Get any available transcript
+                try:
+                    available = list(transcript_list)
+                    if available:
+                        transcript = available[0]
+                        language_used = transcript.language
+                except Exception:
+                    pass
+        
+        if not transcript:
+            return {
+                "success": False,
+                "error": "No transcript available for this video",
+                "video_id": video_id
+            }
+        
+        # Fetch the transcript data
+        transcript_data = transcript.fetch()
+        
+        # Format the transcript
+        full_text = ""
+        segments = []
+        
+        for entry in transcript_data:
+            text = entry.get('text', '').strip()
+            start = entry.get('start', 0)
+            duration = entry.get('duration', 0)
+            
+            # Clean up text (remove [Music], [Applause], etc. markers)
+            if text and not text.startswith('[') and not text.endswith(']'):
+                full_text += text + " "
+                segments.append({
+                    "text": text,
+                    "start": round(start, 2),
+                    "duration": round(duration, 2),
+                    "start_formatted": f"{int(start // 60)}:{int(start % 60):02d}"
+                })
+        
+        # Clean up full text
+        full_text = ' '.join(full_text.split())
+        
+        # Calculate word count
+        word_count = len(full_text.split())
+        
+        # Store in database for caching
+        await db.video_transcripts.update_one(
+            {"video_id": video_id},
+            {
+                "$set": {
+                    "video_id": video_id,
+                    "full_text": full_text,
+                    "segments": segments,
+                    "language": language_used,
+                    "word_count": word_count,
+                    "user_id": str(current_user.get("_id", current_user.get("user_id", ""))),
+                    "created_at": datetime.now(timezone.utc),
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            },
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "video_id": video_id,
+            "language": language_used,
+            "word_count": word_count,
+            "full_text": full_text,
+            "segments": segments[:100],  # Limit segments in response
+            "total_segments": len(segments)
+        }
+        
+    except TranscriptsDisabled:
+        return {
+            "success": False,
+            "error": "Transcripts are disabled for this video",
+            "video_id": video_id
+        }
+    except Exception as e:
+        logging.error(f"Error getting transcript for {video_id}: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "video_id": video_id
+        }
+
+
+@api_router.get("/video/transcript/{video_id}/cached")
+async def get_cached_transcript(
+    video_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get cached transcript if available"""
+    try:
+        transcript = await db.video_transcripts.find_one(
+            {"video_id": video_id},
+            {"_id": 0}
+        )
+        if transcript:
+            return {"success": True, "cached": True, **transcript}
+        return {"success": False, "cached": False, "error": "No cached transcript"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ==================== END VIDEO TRANSCRIPTION ====================
+
 # Pydantic models
 class UserRegister(BaseModel):
     email: EmailStr
