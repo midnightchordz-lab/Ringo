@@ -136,23 +136,24 @@ export const Discover = () => {
   const handleNextPage = () => {
     if (nextPageToken) {
       setCurrentPage(prev => prev + 1);
-      handleSearch(nextPageToken);
+      handleSearch(nextPageToken, false);
     }
   };
 
   const handlePrevPage = () => {
     if (prevPageToken) {
       setCurrentPage(prev => prev - 1);
-      handleSearch(prevPageToken);
+      handleSearch(prevPageToken, false);
     }
   };
 
   const handleRefresh = () => {
-    handleSearch(null, true);
+    handleSearch(null, false);
   };
 
   useEffect(() => {
-    handleSearch();
+    // Use cache only on initial load for faster startup
+    handleSearch(null, true);
   }, []);
 
   return (
