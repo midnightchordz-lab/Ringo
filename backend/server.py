@@ -362,58 +362,70 @@ async def get_video_transcript(video_id: str):
     Uses YouTube's built-in captions - completely free.
     """
     try:
-        # Try to get transcript in preferred languages
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        # Create API instance (new API format for youtube_transcript_api 1.x)
+        api = YouTubeTranscriptApi()
         
-        transcript = None
-        language_used = None
-        
-        # Try to get English transcript first
+        # First check what transcripts are available
         try:
-            transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
-            language_used = 'en'
-        except NoTranscriptFound:
-            # Try auto-generated English
-            try:
-                transcript = transcript_list.find_generated_transcript(['en'])
-                language_used = 'en (auto-generated)'
-            except NoTranscriptFound:
-                # Get any available transcript
-                try:
-                    available = list(transcript_list)
-                    if available:
-                        transcript = available[0]
-                        language_used = transcript.language
-                except Exception:
-                    pass
-        
-        if not transcript:
-            return {
-                "success": False,
-                "error": "No transcript available for this video",
-                "video_id": video_id
-            }
-        
-        # Fetch the transcript data
-        transcript_data = transcript.fetch()
+            transcript_list = api.list(video_id)
+            available_transcripts = list(transcript_list)
+            
+            if not available_transcripts:
+                return {
+                    "success": False,
+                    "error": "No transcript available for this video",
+                    "video_id": video_id
+                }
+            
+            # Find the best transcript (prefer manually created English)
+            selected_transcript = None
+            language_used = None
+            
+            # Try to find English transcript first
+            for t in available_transcripts:
+                lang_code = t.language_code if hasattr(t, 'language_code') else str(t)
+                if lang_code.startswith('en'):
+                    selected_transcript = t
+                    language_used = t.language if hasattr(t, 'language') else lang_code
+                    break
+            
+            # If no English, use first available
+            if not selected_transcript:
+                selected_transcript = available_transcripts[0]
+                language_used = selected_transcript.language if hasattr(selected_transcript, 'language') else 'unknown'
+            
+            # Fetch the transcript - use the fetch method on the transcript object
+            if hasattr(selected_transcript, 'fetch'):
+                transcript_data = selected_transcript.fetch()
+            else:
+                # Fallback to direct API fetch with language
+                transcript_data = api.fetch(video_id, languages=[language_used.split()[0] if language_used else 'en'])
+                
+        except Exception as list_error:
+            logging.warning(f"Could not list transcripts, trying direct fetch: {list_error}")
+            # Fallback: try direct fetch
+            transcript_data = api.fetch(video_id)
+            language_used = 'en (auto-detected)'
         
         # Format the transcript
         full_text = ""
         segments = []
         
+        # Handle FetchedTranscript object (iterate over it)
         for entry in transcript_data:
-            text = entry.get('text', '').strip()
-            start = entry.get('start', 0)
-            duration = entry.get('duration', 0)
+            # Entry is a Snippet object with text, start, duration attributes
+            text = entry.text.strip() if hasattr(entry, 'text') else entry.get('text', '').strip()
+            start = entry.start if hasattr(entry, 'start') else entry.get('start', 0)
+            duration = entry.duration if hasattr(entry, 'duration') else entry.get('duration', 0)
             
             # Clean up text (remove [Music], [Applause], etc. markers)
             if text and not text.startswith('[') and not text.endswith(']'):
                 full_text += text + " "
                 segments.append({
                     "text": text,
-                    "start": round(start, 2),
-                    "duration": round(duration, 2),
-                    "start_formatted": f"{int(start // 60)}:{int(start % 60):02d}"
+                    "start": round(float(start), 2),
+                    "duration": round(float(duration), 2),
+                    "start_formatted": f"{int(float(start) // 60)}:{int(float(start) % 60):02d}"
                 })
         
         # Clean up full text
@@ -453,6 +465,12 @@ async def get_video_transcript(video_id: str):
         return {
             "success": False,
             "error": "Transcripts are disabled for this video",
+            "video_id": video_id
+        }
+    except NoTranscriptFound:
+        return {
+            "success": False,
+            "error": "No transcript found for this video",
             "video_id": video_id
         }
     except Exception as e:
