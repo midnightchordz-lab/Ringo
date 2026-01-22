@@ -1872,7 +1872,12 @@ async def search_images(
         is_illustration_type = image_type in [None, "illustration"]
         is_vector_type = image_type in [None, "vector"]
         
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        # Create HTTP client with proper User-Agent for Wikimedia API
+        headers = {
+            "User-Agent": "ContentFlow/1.0 (https://freedomvid.preview.emergentagent.com; support@contentflow.app)"
+        }
+        
+        async with httpx.AsyncClient(timeout=15.0, headers=headers) as client:
             tasks = []
             
             # Search Unsplash (only for photos)
