@@ -4895,7 +4895,7 @@ async def search_worksheets(
     try:
         all_results = []
         
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
             # Search worksheet-specific sources
             oer_results = await search_oer_commons(client, query, limit)
             all_results.extend(oer_results)
