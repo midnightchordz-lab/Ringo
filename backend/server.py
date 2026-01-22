@@ -603,7 +603,7 @@ async def microsoft_callback(code: str = Form(...), redirect_uri: str = Form(...
         # Exchange code for tokens
         token_url = f"https://login.microsoftonline.com/{MICROSOFT_TENANT}/oauth2/v2.0/token"
         
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             token_response = await client.post(
                 token_url,
                 data={
