@@ -4,12 +4,14 @@ import api from '../utils/api';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '../context/AuthContext';
 
 export const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState('verifying'); // verifying, success, error
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const verifyEmail = useCallback(async (token) => {
     try {
@@ -21,10 +23,9 @@ export const VerifyEmail = () => {
         setStatus('success');
         setMessage(response.data.message);
 
-        // Store token and user if provided
+        // Use auth context login if token provided
         if (response.data.access_token) {
-          localStorage.setItem('token', response.data.access_token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+          login(response.data.access_token, response.data.user);
         }
 
         // Redirect after 2 seconds
@@ -37,7 +38,7 @@ export const VerifyEmail = () => {
       setStatus('error');
       setMessage(error.response?.data?.detail || 'Verification failed');
     }
-  }, [navigate]);
+  }, [navigate, login]);
 
   useEffect(() => {
     const token = searchParams.get('token');
