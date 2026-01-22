@@ -173,27 +173,15 @@ export const Discover = () => {
         </div>
       </div>
 
-      {/* Cache Status Banner */}
-      {cacheInfo && (cacheInfo.cached || cacheInfo.optimized) && (
-        <div className={`studio-card p-4 mb-6 border-l-4 ${cacheInfo.cached ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'}`}>
+      {/* API Status Banner - only show when optimized */}
+      {cacheInfo && cacheInfo.optimized && (
+        <div className="studio-card p-4 mb-6 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20">
           <div className="flex items-center gap-3">
-            {cacheInfo.cached ? (
-              <>
-                <Database className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                <div className="flex-1">
-                  <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">Cached Results</span>
-                  <p className="text-xs text-amber-600 dark:text-amber-400">{cacheInfo.message || 'Showing previously cached videos to save API quota'}</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                <div className="flex-1">
-                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Optimized API Usage</span>
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400">Using field filtering, ETags, and caching to minimize API calls</p>
-                </div>
-              </>
-            )}
+            <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex-1">
+              <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Fresh Results</span>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">Searching YouTube for CC BY licensed videos</p>
+            </div>
           </div>
         </div>
       )}
