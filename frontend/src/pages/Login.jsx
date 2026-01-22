@@ -149,10 +149,10 @@ export const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <h1 className="text-3xl font-bold text-neutral-800 dark:text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
               Welcome back! 👋
             </h1>
-            <p className="text-neutral-500">Sign in to your account to continue</p>
+            <p className="text-neutral-600 dark:text-neutral-300">Sign in to your account to continue</p>
           </motion.div>
 
           <motion.div
