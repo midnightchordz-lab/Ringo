@@ -23,10 +23,32 @@ const LICENSE_TYPES = {
     commercial: true,
     derivatives: true,
     attribution: false,
-    color: 'bg-green-500',
+    color: 'bg-emerald-600',
+    textColor: 'text-emerald-400',
+    borderColor: 'border-emerald-500/50',
+    description: 'No restrictions. Free to use for any purpose.'
+  },
+  'CC BY': {
+    name: 'CC BY',
+    shortName: 'CC BY',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-green-600',
     textColor: 'text-green-400',
     borderColor: 'border-green-500/50',
-    description: 'No restrictions. Free to use for any purpose.'
+    description: '✓ Commercial use allowed. Attribution required.'
+  },
+  'CC BY 4.0': {
+    name: 'CC BY 4.0',
+    shortName: 'CC BY',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-green-600',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: '✓ Commercial use allowed. Attribution required. (Version 4.0)'
   },
   'cc-by': {
     name: 'CC BY',
@@ -34,10 +56,21 @@ const LICENSE_TYPES = {
     commercial: true,
     derivatives: true,
     attribution: true,
-    color: 'bg-green-500',
+    color: 'bg-green-600',
     textColor: 'text-green-400',
     borderColor: 'border-green-500/50',
-    description: 'Commercial use allowed. Attribution required.'
+    description: '✓ Commercial use allowed. Attribution required.'
+  },
+  'CC BY-SA': {
+    name: 'CC BY-SA',
+    shortName: 'CC BY-SA',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-green-600',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: '✓ Commercial use allowed. Share alike required.'
   },
   'cc-by-sa': {
     name: 'CC BY-SA',
@@ -45,10 +78,43 @@ const LICENSE_TYPES = {
     commercial: true,
     derivatives: true,
     attribution: true,
-    color: 'bg-green-500',
+    color: 'bg-green-600',
     textColor: 'text-green-400',
     borderColor: 'border-green-500/50',
-    description: 'Commercial use allowed. Share alike required.'
+    description: '✓ Commercial use allowed. Share alike required.'
+  },
+  'CC BY / CC BY-SA': {
+    name: 'CC BY/SA',
+    shortName: 'CC BY/SA',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-green-600',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: '✓ Commercial use allowed. Attribution required.'
+  },
+  'CC BY-SA / Public Domain': {
+    name: 'CC/PD',
+    shortName: 'CC/PD',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-emerald-600',
+    textColor: 'text-emerald-400',
+    borderColor: 'border-emerald-500/50',
+    description: '✓ Commercial use allowed. May require attribution.'
+  },
+  'CC BY-NC': {
+    name: 'CC BY-NC',
+    shortName: 'CC NC',
+    commercial: false,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-amber-500',
+    textColor: 'text-amber-400',
+    borderColor: 'border-amber-500/50',
+    description: '⚠ Non-commercial use only. Attribution required.'
   },
   'cc-by-nc': {
     name: 'CC BY-NC',
@@ -59,7 +125,62 @@ const LICENSE_TYPES = {
     color: 'bg-amber-500',
     textColor: 'text-amber-400',
     borderColor: 'border-amber-500/50',
-    description: 'Non-commercial use only. Attribution required.'
+    description: '⚠ Non-commercial use only. Attribution required.'
+  },
+  'CC BY-NC-SA': {
+    name: 'CC BY-NC-SA',
+    shortName: 'CC NC-SA',
+    commercial: false,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-amber-500',
+    textColor: 'text-amber-400',
+    borderColor: 'border-amber-500/50',
+    description: '⚠ Non-commercial use only. Share alike required.'
+  },
+  'CC BY-NC-ND': {
+    name: 'CC BY-NC-ND',
+    shortName: 'CC NC-ND',
+    commercial: false,
+    derivatives: false,
+    attribution: true,
+    color: 'bg-orange-500',
+    textColor: 'text-orange-400',
+    borderColor: 'border-orange-500/50',
+    description: '⚠ Non-commercial, no derivatives. View only.'
+  },
+  'Creative Commons': {
+    name: 'Creative Commons',
+    shortName: 'CC',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-green-600',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: '✓ Creative Commons licensed. Check specific terms.'
+  },
+  'Public Domain / Open': {
+    name: 'Public Domain',
+    shortName: 'PD',
+    commercial: true,
+    derivatives: true,
+    attribution: false,
+    color: 'bg-emerald-600',
+    textColor: 'text-emerald-400',
+    borderColor: 'border-emerald-500/50',
+    description: '✓ Public Domain. Free for any use.'
+  },
+  'Open Access': {
+    name: 'Open Access',
+    shortName: 'OA',
+    commercial: true,
+    derivatives: true,
+    attribution: true,
+    color: 'bg-green-600',
+    textColor: 'text-green-400',
+    borderColor: 'border-green-500/50',
+    description: '✓ Open Access. Free to read and share.'
   },
   'edu-only': {
     name: 'Educational Use',
@@ -70,18 +191,51 @@ const LICENSE_TYPES = {
     color: 'bg-orange-500',
     textColor: 'text-orange-400',
     borderColor: 'border-orange-500/50',
-    description: 'Free for educational/personal use only.'
+    description: '⚠ Free for educational/personal use only.'
+  },
+  'Free': {
+    name: 'Free',
+    shortName: 'Free',
+    commercial: null,
+    derivatives: null,
+    attribution: false,
+    color: 'bg-blue-500',
+    textColor: 'text-blue-400',
+    borderColor: 'border-blue-500/50',
+    description: 'Free to access. Check terms for commercial use.'
+  },
+  'Free + Premium': {
+    name: 'Freemium',
+    shortName: 'Free+',
+    commercial: null,
+    derivatives: null,
+    attribution: false,
+    color: 'bg-blue-500',
+    textColor: 'text-blue-400',
+    borderColor: 'border-blue-500/50',
+    description: 'Some content free, premium features available.'
   },
   'varies': {
-    name: 'Varies',
-    shortName: 'Varies',
+    name: 'Check License',
+    shortName: 'Check',
     commercial: null,
     derivatives: null,
     attribution: null,
     color: 'bg-zinc-500',
     textColor: 'text-zinc-400',
     borderColor: 'border-zinc-500/50',
-    description: 'Each item has its own license. Check before use.'
+    description: '⚠ Each item has its own license. Check before use.'
+  },
+  'Various': {
+    name: 'Various',
+    shortName: 'Various',
+    commercial: null,
+    derivatives: null,
+    attribution: null,
+    color: 'bg-zinc-500',
+    textColor: 'text-zinc-400',
+    borderColor: 'border-zinc-500/50',
+    description: '⚠ Various licenses. Check individual items.'
   }
 };
 
