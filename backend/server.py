@@ -4028,7 +4028,8 @@ async def search_library_of_congress(client: httpx.AsyncClient, query: str, limi
                 "c": min(limit, 25),
                 "fa": "access-restricted:false"
             },
-            headers={"User-Agent": "ContentFlow/1.0"}
+            headers={"User-Agent": "ContentFlow/1.0"},
+            follow_redirects=True
         )
         
         if response.status_code == 200:
@@ -4038,18 +4039,34 @@ async def search_library_of_congress(client: httpx.AsyncClient, query: str, limi
                 title = item.get("title", "Untitled")
                 if isinstance(title, list):
                     title = title[0] if title else "Untitled"
-                    
-                description = item.get("description", [""])[0] if isinstance(item.get("description"), list) else item.get("description", "")
+                
+                # Safe access for description - handle empty lists and None
+                description_raw = item.get("description")
+                if isinstance(description_raw, list) and len(description_raw) > 0:
+                    description = description_raw[0]
+                elif isinstance(description_raw, str):
+                    description = description_raw
+                else:
+                    description = ""
+                
+                # Safe access for image_url - handle empty lists and None
+                image_url_raw = item.get("image_url")
+                if isinstance(image_url_raw, list) and len(image_url_raw) > 0:
+                    thumbnail = image_url_raw[0]
+                elif isinstance(image_url_raw, str):
+                    thumbnail = image_url_raw
+                else:
+                    thumbnail = "🏛️"
                 
                 results.append({
                     "id": f"loc_{item.get('id', '')}",
-                    "title": title[:100],
+                    "title": str(title)[:100] if title else "Untitled",
                     "description": str(description)[:200] if description else f"Primary source from Library of Congress about {query}",
                     "type": "resource",
                     "category": "resource",
                     "source": "Library of Congress",
                     "url": item.get("url", f"https://www.loc.gov/search/?q={query}"),
-                    "thumbnail": item.get("image_url", ["🏛️"])[0] if isinstance(item.get("image_url"), list) else item.get("image_url", "🏛️"),
+                    "thumbnail": thumbnail,
                     "license": "Public Domain",
                     "free": True
                 })
