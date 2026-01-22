@@ -2536,6 +2536,10 @@ async def search_content_library(
                 elif isinstance(result, Exception):
                     logging.warning(f"Search source failed: {str(result)}")
         
+        # STRICT CC LICENSE FILTER - Only keep content with valid CC licenses
+        # Allowed: CC BY, CC BY-SA, CC BY-ND, CC0, Public Domain
+        all_results = filter_cc_licensed_content(all_results)
+        
         # Filter by category if specified
         if category != "all":
             all_results = [r for r in all_results if r.get("type") == category or r.get("category") == category]
@@ -2576,12 +2580,155 @@ async def search_content_library(
             "query": query,
             "category": category,
             "grade": grade,
-            "sources": get_active_sources_v2(category)
+            "sources": get_active_sources_v2(category),
+            "license_filter": "CC BY, CC BY-SA, CC BY-ND, CC0, Public Domain"
         }
     
     except Exception as e:
         logging.error(f"Error in content library search: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def filter_cc_licensed_content(results: list) -> list:
+    """
+    Filter results to only include content with valid Creative Commons licenses.
+    Allowed licenses: CC BY, CC BY-SA, CC BY-ND, CC0, Public Domain
+    Also normalizes license names for display.
+    """
+    ALLOWED_LICENSES = [
+        # CC BY variations
+        "cc by", "cc-by", "cc by 4.0", "cc by 3.0", "cc by 2.0", "creative commons",
+        "creative commons attribution", "attribution", "cc attribution",
+        # CC BY-SA variations
+        "cc by-sa", "cc-by-sa", "cc by sa", "cc by-sa 4.0", "cc by-sa 3.0",
+        "creative commons share alike", "share alike", "sharealike",
+        # CC BY-ND variations
+        "cc by-nd", "cc-by-nd", "cc by nd", "cc by-nd 4.0", "cc by-nd 3.0",
+        "no derivatives",
+        # CC0 / Public Domain
+        "cc0", "cc zero", "public domain", "pd", "no known copyright",
+        "no copyright", "copyright free",
+        # Open Access (academic)
+        "open access", "open-access", "oa",
+        # Source-specific (known CC-licensed)
+        "openstax", "wikiversity", "wikibooks", "wikimedia", "wikipedia",
+        "oer commons", "mit ocw", "mit opencourseware", "internet archive",
+        "library of congress", "smithsonian"
+    ]
+    
+    # Sources that are always CC-licensed (override license check)
+    ALWAYS_CC_SOURCES = [
+        "openstax", "wikiversity", "wikibooks", "wikimedia commons", "wikipedia",
+        "oer commons", "internet archive", "library of congress", "smithsonian",
+        "youtube (cc)", "ted", "arxiv", "pubmed", "doaj", "openalex",
+        "ck-12", "freecodecamp", "mit opencourseware", "merlot", "pbs"
+    ]
+    
+    filtered_results = []
+    
+    for result in results:
+        license_str = str(result.get("license", "")).lower().strip()
+        source_str = str(result.get("source", "")).lower().strip()
+        
+        # Check if source is always CC-licensed
+        is_cc_source = any(cc_src in source_str for cc_src in ALWAYS_CC_SOURCES)
+        
+        # Check if license is valid CC
+        is_cc_license = any(allowed in license_str for allowed in ALLOWED_LICENSES)
+        
+        if is_cc_source or is_cc_license:
+            # Normalize and enhance the license display
+            result["license"] = normalize_cc_license(result.get("license", ""), source_str)
+            result["cc_verified"] = True
+            filtered_results.append(result)
+        elif license_str in ["various", "free", "unknown", ""]:
+            # For ambiguous licenses, only include if from known CC source
+            if is_cc_source:
+                result["license"] = get_source_default_license(source_str)
+                result["cc_verified"] = True
+                filtered_results.append(result)
+            # Skip items with ambiguous licenses from unknown sources
+    
+    return filtered_results
+
+
+def normalize_cc_license(license_str: str, source: str = "") -> str:
+    """Normalize license string to standard CC format for display"""
+    license_lower = license_str.lower().strip()
+    source_lower = source.lower()
+    
+    # Public Domain
+    if any(pd in license_lower for pd in ["public domain", "pd", "cc0", "no known copyright"]):
+        return "Public Domain (CC0)"
+    
+    # CC BY-SA
+    if "by-sa" in license_lower or "by sa" in license_lower or "share alike" in license_lower:
+        version = "4.0" if "4.0" in license_lower else "3.0" if "3.0" in license_lower else ""
+        return f"CC BY-SA{' ' + version if version else ''}"
+    
+    # CC BY-ND
+    if "by-nd" in license_lower or "by nd" in license_lower or "no derivatives" in license_lower:
+        version = "4.0" if "4.0" in license_lower else "3.0" if "3.0" in license_lower else ""
+        return f"CC BY-ND{' ' + version if version else ''}"
+    
+    # CC BY-NC-SA (Non-commercial share alike)
+    if "nc-sa" in license_lower or "nc sa" in license_lower:
+        return "CC BY-NC-SA"
+    
+    # CC BY-NC-ND
+    if "nc-nd" in license_lower or "nc nd" in license_lower:
+        return "CC BY-NC-ND"
+    
+    # CC BY-NC
+    if "nc" in license_lower and "by" in license_lower:
+        return "CC BY-NC"
+    
+    # CC BY (default CC)
+    if any(cc in license_lower for cc in ["cc by", "cc-by", "creative commons", "attribution"]):
+        version = "4.0" if "4.0" in license_lower else "3.0" if "3.0" in license_lower else ""
+        return f"CC BY{' ' + version if version else ''}"
+    
+    # Open Access
+    if "open access" in license_lower or "open-access" in license_lower:
+        return "Open Access (CC BY)"
+    
+    # Source-specific defaults
+    return get_source_default_license(source_lower) or license_str
+
+
+def get_source_default_license(source: str) -> str:
+    """Get default license for known CC-licensed sources"""
+    source_lower = source.lower()
+    
+    source_licenses = {
+        "openstax": "CC BY 4.0",
+        "wikiversity": "CC BY-SA",
+        "wikibooks": "CC BY-SA",
+        "wikimedia": "CC BY-SA",
+        "wikipedia": "CC BY-SA",
+        "oer commons": "CC BY / CC BY-SA",
+        "internet archive": "Public Domain",
+        "library of congress": "Public Domain",
+        "smithsonian": "CC0 / Public Domain",
+        "youtube (cc)": "CC BY",
+        "ted": "CC BY-NC-ND",
+        "arxiv": "Open Access",
+        "pubmed": "Open Access",
+        "doaj": "Open Access (CC BY)",
+        "openalex": "Open Access",
+        "ck-12": "CC BY-NC",
+        "mit opencourseware": "CC BY-NC-SA",
+        "mit ocw": "CC BY-NC-SA",
+        "freecodecamp": "CC BY-SA",
+        "merlot": "CC BY / CC BY-SA",
+        "pbs": "Educational Use"
+    }
+    
+    for key, license_val in source_licenses.items():
+        if key in source_lower:
+            return license_val
+    
+    return "CC BY"  # Default to CC BY for unknown sources
 
 
 def get_active_sources_v2(category: str) -> list:
