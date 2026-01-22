@@ -245,6 +245,11 @@ export const Discover = () => {
   const [prevPageToken, setPrevPageToken] = useState(null);
   const [totalAvailable, setTotalAvailable] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [transcriptVideo, setTranscriptVideo] = useState(null);
+
+  const handleTranscribe = (video) => {
+    setTranscriptVideo(video);
+  };
 
   const handleSearch = async (pageToken = null, isInitialLoad = false) => {
     if (!searchQuery.trim() && videos.length > 0 && !pageToken && !isInitialLoad) return;
