@@ -276,7 +276,21 @@ Implemented comprehensive, multi-source search for all content categories:
 - `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
 
 ## Last Updated
-January 21, 2026 - Added dark/light theme toggle
+January 22, 2026 - Fixed Image Type Filter
+
+### Image Type Filter Fix (Jan 22, 2026) ✅ NEW
+- **Fixed conditional logic** in `/api/images/search` endpoint:
+  - Photos: Searches Unsplash and Pexels (both work)
+  - Illustrations/Vectors: ONLY queries Pixabay (the only source that supports these types)
+- **Clear error messaging** when Pixabay API key is not configured for illustration/vector searches
+- **UI Enhancement**: Added "(Pixabay)" label to Illustrations and Vectors filter buttons to indicate they require Pixabay
+- **Configuration**: Added `PIXABAY_API_KEY` placeholder to `/app/backend/.env`
+
+**Note**: To enable illustration and vector search, users must:
+1. Create a free Pixabay account at https://pixabay.com
+2. Get their API key from the API documentation page
+3. Add `PIXABAY_API_KEY=your_key_here` to `/app/backend/.env`
+
 
 ## Recent Changes (Jan 21, 2026)
 
