@@ -4161,7 +4161,7 @@ async def search_childrens_literature(
         # Fetch more results to support pagination
         fetch_limit = per_page * 3  # Get enough for multiple pages
         
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
             # Search monetization-friendly sources only (NO Internet Archive)
             tasks = [
                 search_gutenberg_children(client, search_query, fetch_limit, page),
