@@ -41,6 +41,12 @@ db = client[os.environ['DB_NAME']]
 
 app = FastAPI(title="ContentFlow API")
 
+# Health check endpoint for Kubernetes/deployment
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Kubernetes liveness/readiness probes"""
+    return {"status": "healthy", "service": "contentflow-api"}
+
 api_router = APIRouter(prefix="/api")
 
 limiter = Limiter(key_func=get_remote_address)
