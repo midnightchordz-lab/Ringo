@@ -353,13 +353,10 @@ class YouTubePersistentCache:
 # ==================== END YOUTUBE API OPTIMIZATION ====================
 
 # ==================== VIDEO TRANSCRIPTION ====================
-# (Endpoints moved after get_current_user definition - see below)
+# Note: These endpoints don't require authentication as they access public YouTube data
 
 @api_router.get("/video/transcript/{video_id}")
-async def get_video_transcript(
-    video_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_video_transcript(video_id: str):
     """
     Get transcript/captions for a YouTube video.
     Uses YouTube's built-in captions - completely free.
@@ -435,7 +432,6 @@ async def get_video_transcript(
                     "segments": segments,
                     "language": language_used,
                     "word_count": word_count,
-                    "user_id": str(current_user.get("_id", current_user.get("user_id", ""))),
                     "created_at": datetime.now(timezone.utc),
                     "updated_at": datetime.now(timezone.utc)
                 }
@@ -469,10 +465,7 @@ async def get_video_transcript(
 
 
 @api_router.get("/video/transcript/{video_id}/cached")
-async def get_cached_transcript(
-    video_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_cached_transcript(video_id: str):
     """Get cached transcript if available"""
     try:
         transcript = await db.video_transcripts.find_one(
@@ -480,6 +473,9 @@ async def get_cached_transcript(
             {"_id": 0}
         )
         if transcript:
+            # Remove datetime fields that aren't JSON serializable
+            transcript.pop("created_at", None)
+            transcript.pop("updated_at", None)
             return {"success": True, "cached": True, **transcript}
         return {"success": False, "cached": False, "error": "No cached transcript"}
     except Exception as e:
