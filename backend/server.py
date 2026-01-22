@@ -30,6 +30,7 @@ import secrets
 import hashlib
 import gzip
 from io import BytesIO
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 
 
 ROOT_DIR = Path(__file__).parent
