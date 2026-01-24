@@ -176,6 +176,7 @@ export const Login = () => {
               </Link>
             </p>
           </motion.div>
+          </div>
         </div>
       </div>
     </div>
