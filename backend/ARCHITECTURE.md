@@ -4,7 +4,7 @@
 
 ```
 /app/backend/
-├── server.py           # Main FastAPI application (entry point) - NEEDS REFACTORING
+├── server.py           # Main FastAPI application (~5800 lines) - REFACTORING IN PROGRESS
 ├── config.py           # Environment variables and configuration ✓
 ├── database.py         # MongoDB connection ✓
 ├── requirements.txt    # Python dependencies
@@ -16,11 +16,11 @@
 │
 ├── routes/             # API route handlers ✓
 │   ├── __init__.py
-│   ├── auth.py         # Authentication routes (ready)
-│   ├── images.py       # Image search routes (ready)
-│   ├── dashboard.py    # Stats/settings routes (ready)
-│   ├── youtube.py      # YouTube/video routes (NEW - Jan 22)
-│   └── content.py      # Content library routes (NEW - Jan 22)
+│   ├── auth.py         # Authentication routes (INTEGRATED - Jan 24)
+│   ├── images.py       # Image search routes (INTEGRATED - Jan 24)
+│   ├── dashboard.py    # Stats/settings routes (INTEGRATED - Jan 24)
+│   ├── youtube.py      # YouTube transcript routes (INTEGRATED - Jan 22)
+│   └── content.py      # Content library routes (INTEGRATED - Jan 24)
 │
 ├── services/           # Business logic and external integrations ✓
 │   ├── __init__.py
@@ -39,136 +39,103 @@
 
 | Module | Status | Description |
 |--------|--------|-------------|
-| `config.py` | ✅ Complete | Environment variables |
+| `config.py` | ✅ Complete | Environment variables + Microsoft OAuth config |
 | `database.py` | ✅ Complete | MongoDB connection |
 | `models/schemas.py` | ✅ Complete | All Pydantic models |
 | `services/youtube_optimizer.py` | ✅ Complete | YouTube caching |
 | `utils/auth.py` | ✅ Complete | Auth utilities |
 | `utils/helpers.py` | ✅ Complete | Helper functions |
-| `routes/auth.py` | ✅ Ready | Auth endpoints |
-| `routes/images.py` | ✅ Ready | Image endpoints |
-| `routes/dashboard.py` | ✅ Ready | Dashboard endpoints |
-| `routes/youtube.py` | ✅ NEW | Video discovery, transcript, clips |
-| `routes/content.py` | ✅ NEW | Content library, favorites, reading lists |
+| `routes/auth.py` | ✅ **INTEGRATED** | Google, Microsoft, Email/Password auth |
+| `routes/images.py` | ✅ **INTEGRATED** | Basic image search/favorites |
+| `routes/dashboard.py` | ✅ **INTEGRATED** | Stats, history, settings |
+| `routes/youtube.py` | ✅ **INTEGRATED** | Video transcript endpoints |
+| `routes/content.py` | ✅ **INTEGRATED** | Content library favorites, reading lists |
 
-## Refactoring Plan (Jan 22, 2026)
+## Refactoring Progress (Jan 24, 2026)
 
-### Current State
-- `server.py` is 6500+ lines - technical debt
-- New modular routes created but not yet integrated
+### Completed
+- ✅ Auth routes fully modularized with Google OAuth, Microsoft OAuth, Email/Password
+- ✅ Dashboard routes (stats, history, settings) moved to modular file
+- ✅ YouTube transcript routes in separate module
+- ✅ Content library favorites/reading lists in separate module
+- ✅ Image search basic routes in separate module
+- ✅ All modular routes integrated via `api_router.include_router()`
+- ✅ Auth dependency injection set up for protected routes
 
-### New Route Modules Created
+### Line Count Progress
+- Original: ~6400 lines
+- Current: ~5800 lines
+- Reduction: ~600 lines (10%)
 
-#### routes/youtube.py
-Contains:
-- `/api/video/transcript/{video_id}` - Get transcript
-- `/api/video/transcript/{video_id}/cached` - Cached transcript
-- `/api/youtube/cache-stats` - Cache statistics
-- `/api/youtube/clear-cache` - Clear cache
-- `/api/discover` - Video discovery
-- `/api/clear-videos` - Clear discovered videos
-- `/api/videos/{video_id}` - Video details
-- `/api/clips/*` - Clip generation endpoints
+### Still in server.py (To Be Migrated)
+1. **Video Discovery & Clips** (~700 lines)
+   - `/api/discover` - Video search
+   - `/api/videos/{video_id}` - Video details  
+   - `/api/clips/*` - Clip generation endpoints
+   - `/api/clear-videos` - Clear videos
 
-#### routes/content.py
-Contains:
-- `/api/content-library/favorites` - CRUD operations
-- `/api/reading-lists/*` - Reading list management
-- License filtering utilities
+2. **Extended Image Search** (~400 lines)
+   - `/api/images/search` - Multi-source image search (Wikimedia, OpenClipart, etc.)
+   - Image favorites (duplicate, can be removed after verification)
 
-### Integration Steps (TODO)
-1. Test new route modules independently
-2. Add routes to api_router in server.py
-3. Remove duplicate endpoints from server.py
-4. Move remaining search functions to content.py
+3. **Content Library Search** (~2500 lines)
+   - `/api/content-library/search` - Main search endpoint
+   - `/api/content-library/gutenberg/search` - Gutenberg books
+   - `/api/content-library/childrens-literature` - Children's books
+   - `/api/content-library/worksheets/search` - Worksheets
+   - `/api/content-library/free-books` - Free books
+   - `/api/content-library/free-books/search` - Free book search
+   - `/api/reading-lists/*` - Reading list management (duplicated)
 
-## Modules
+4. **YouTube API Optimization** (~300 lines)
+   - `YouTubeAPIOptimizer` class
+   - `YouTubePersistentCache` class
 
-### config.py
-Central configuration loading from environment variables:
-- `MONGO_URL`, `DB_NAME` - Database
-- `SECRET_KEY`, `ALGORITHM` - JWT Auth
-- `RESEND_API_KEY`, `SENDER_EMAIL` - Email
-- `YOUTUBE_API_KEY` - YouTube API
-- `EMERGENT_LLM_KEY` - AI features
-- `PEXELS_API_KEY`, `UNSPLASH_API_KEY` - Image search
-
-### database.py
-MongoDB client initialization using Motor (async driver).
-
-### models/schemas.py
-Pydantic models for:
-- Authentication (UserRegister, UserLogin, Token, UserResponse)
-- Videos (VideoMetadata, ClipRequest, PostRequest)
-- Images (ImageFavorite)
-- Content Library (ContentFavorite)
-
-### services/youtube_optimizer.py
-YouTube API optimization with:
-- In-memory caching (30 min TTL)
-- MongoDB persistent caching (6 hour TTL)
-- Field filtering to reduce quota usage
-- ETag conditional requests
-- Batch requests (50 videos per call)
-- Per-user quota tracking (quotaUser)
-
-### utils/auth.py
-Authentication utilities:
-- Password hashing (bcrypt)
-- JWT token creation/validation
-- `get_current_user` dependency for protected routes
-
-### utils/helpers.py
-Common helpers:
-- `parse_youtube_duration()` - Parse ISO 8601 duration
-- `calculate_viral_score()` - Calculate engagement score
-- `format_duration()` - Format seconds to MM:SS
-
-## Refactoring Plan
-
-The current `server.py` (2400+ lines) should be gradually refactored:
-
-1. **Phase 1** (Complete): Create module structure and utilities
-2. **Phase 2**: Move auth routes to `routes/auth.py`
-3. **Phase 3**: Move video routes to `routes/videos.py`
-4. **Phase 4**: Move image routes to `routes/images.py`
-5. **Phase 5**: Move content library routes to `routes/content.py`
-6. **Phase 6**: Move dashboard/stats routes to `routes/dashboard.py`
-
-Each phase should be tested before proceeding to the next.
+### Next Steps
+1. Migrate video discovery/clips to `routes/youtube.py` or new `routes/videos.py`
+2. Consolidate extended image search into `routes/images.py`
+3. Migrate content library search endpoints to `routes/content.py`
+4. Move YouTube caching classes to `services/youtube_optimizer.py`
+5. Remove duplicate endpoints from server.py
 
 ## API Endpoints Summary
 
-### Authentication (`/api/auth/`)
+### Authentication (`/api/auth/`) - **Modularized**
 - POST `/register` - Register new user
 - POST `/login` - Login with email/password
 - GET `/me` - Get current user
 - GET `/verify-email` - Verify email token
 - POST `/resend-verification` - Resend verification email
 - POST `/google-oauth` - Google OAuth callback
+- GET `/microsoft/login` - Microsoft OAuth initiation
+- POST `/microsoft/callback` - Microsoft OAuth callback
 
-### Videos (`/api/`)
-- GET `/discover` - Search CC-BY videos (optimized)
-- GET `/videos/{id}` - Get video details
-- POST `/videos/{id}/generate_clip` - Generate clip
-- POST `/clear-videos` - Clear discovered videos
-- GET `/youtube/cache-stats` - Cache statistics
-- POST `/youtube/clear-cache` - Clear caches
+### Dashboard (`/api/`) - **Modularized**
+- GET `/stats` - Dashboard statistics
+- GET `/history` - Post history
+- POST `/settings/api-keys` - Save API keys
+- GET `/settings/api-keys` - Get API keys (masked)
 
-### Images (`/api/images/`)
-- GET `/search` - Search Pexels/Unsplash
+### Images (`/api/images/`) - **Partially Modularized**
+- GET `/search` - Search images (extended version in server.py)
 - GET `/favorites` - Get user favorites
 - POST `/favorites` - Add to favorites
 - DELETE `/favorites/{id}` - Remove from favorites
 
-### Content Library (`/api/content-library/`)
-- GET `/search` - Dynamic search across web
-- GET `/worksheets/search` - Worksheet-specific search
-- GET `/favorites` - Get favorites
-- POST `/favorites` - Add to favorites
-- DELETE `/favorites/{id}` - Remove from favorites
-- GET `/gutenberg/search` - Search Project Gutenberg
+### YouTube (`/api/`) - **Partially Modularized**
+- GET `/video/transcript/{video_id}` - Get transcript (modularized)
+- GET `/video/transcript/{video_id}/cached` - Cached transcript (modularized)
+- GET `/discover` - Search CC-BY videos (in server.py)
+- GET `/videos/{id}` - Get video details (in server.py)
+- POST `/clips/generate` - Generate clip (in server.py)
 
-### Dashboard (`/api/`)
-- GET `/stats` - Dashboard statistics
-- GET `/history` - Post history
+### Content Library (`/api/content-library/`) - **Partially Modularized**
+- GET `/favorites` - Get favorites (modularized)
+- POST `/favorites` - Add to favorites (modularized)
+- DELETE `/favorites/{id}` - Remove from favorites (modularized)
+- GET `/search` - Dynamic search (in server.py)
+- GET `/gutenberg/search` - Gutenberg search (in server.py)
+- GET `/childrens-literature` - Children's books (in server.py)
+
+### Reading Lists (`/api/reading-lists/`) - **Partially Modularized**
+- Full CRUD operations for reading lists (duplicated - both in module and server.py)
