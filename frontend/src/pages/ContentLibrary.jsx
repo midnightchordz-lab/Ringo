@@ -306,7 +306,7 @@ export const ContentLibrary = () => {
       {/* Search Tab */}
       {activeTab === 'search' && (
         <div>
-          <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex gap-2 mb-6">
+          <form onSubmit={(e) => { e.preventDefault(); handleSearch(1); }} className="flex gap-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
@@ -328,13 +328,22 @@ export const ContentLibrary = () => {
               <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
             </div>
           ) : results.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <AnimatePresence>
-                {results.map((item) => (
-                  <ContentCard key={item.id} item={item} onFavorite={handleFavorite} isFavorited={isFavorited(item)} />
-                ))}
-              </AnimatePresence>
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <AnimatePresence>
+                  {results.map((item) => (
+                    <ContentCard key={item.id} item={item} onFavorite={handleFavorite} isFavorited={isFavorited(item)} />
+                  ))}
+                </AnimatePresence>
+              </div>
+              <Pagination
+                page={searchPage}
+                onPrev={() => handleSearch(searchPage - 1)}
+                onNext={() => handleSearch(searchPage + 1)}
+                hasMore={hasMore}
+                loading={loading}
+              />
+            </>
           ) : (
             <div className="text-center py-20">
               <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
@@ -352,11 +361,20 @@ export const ContentLibrary = () => {
               <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
             </div>
           ) : books.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {books.map((book) => (
-                <BookCard key={book.id} book={book} onFavorite={handleFavorite} isFavorited={isFavorited(book)} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {books.map((book) => (
+                  <BookCard key={book.id} book={book} onFavorite={handleFavorite} isFavorited={isFavorited(book)} />
+                ))}
+              </div>
+              <Pagination
+                page={booksPage}
+                onPrev={() => fetchBooks(booksPage - 1)}
+                onNext={() => fetchBooks(booksPage + 1)}
+                hasMore={hasMore}
+                loading={loading}
+              />
+            </>
           ) : (
             <div className="text-center py-20">
               <Book className="w-12 h-12 text-slate-300 mx-auto mb-4" />
