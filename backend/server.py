@@ -1294,7 +1294,7 @@ async def search_images(
         # Get API keys from environment
         unsplash_key = os.environ.get('UNSPLASH_API_KEY', '')
         pexels_key = os.environ.get('PEXELS_API_KEY', 'QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq')
-        pixabay_key = os.environ.get('PIXABAY_API_KEY', '')
+        pixabay_key = os.environ.get('PIXABAY_API_KEY', '48080749-d9156e13058fcef0a68ac7cf4')  # Free Pixabay API key
         
         # Normalize image_type - treat 'all' same as None
         effective_image_type = None if image_type == 'all' else image_type
