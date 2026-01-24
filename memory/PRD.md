@@ -346,6 +346,53 @@ January 24, 2026 - Content Library Redesign
 
 **Testing**: 100% pass rate - All 6 authentication tests passed
 
+### Backend Refactoring Phase 2 (Jan 24, 2026) ✅ COMPLETED
+- **Goal**: Continue breaking down the monolithic `server.py` and integrate modular routes
+- **Result**: All modular routes integrated, duplicates removed
+
+**Changes Made**:
+1. **Updated `/app/backend/routes/auth.py`** - Complete auth module with:
+   - Google OAuth via Emergent Auth
+   - Microsoft OAuth (Azure AD)
+   - Email/password registration and login
+   - Email verification flow
+   - JWT token creation and validation
+   - `get_current_user` dependency function
+
+2. **Updated `/app/backend/config.py`** - Added Microsoft OAuth config:
+   - `MICROSOFT_CLIENT_ID`
+   - `MICROSOFT_CLIENT_SECRET`
+   - `MICROSOFT_TENANT`
+
+3. **Integrated all modular routers in `server.py`**:
+   - `auth_router` - Authentication endpoints
+   - `youtube_router` - Transcript endpoints
+   - `images_router` - Image search/favorites
+   - `dashboard_router` - Stats, history, settings
+   - `content_router` - Content library favorites, reading lists
+
+4. **Removed duplicate endpoints from server.py**:
+   - Duplicate auth endpoints (Google OAuth, Microsoft OAuth, register, login, etc.)
+   - Duplicate dashboard endpoints (stats, history, settings)
+   - Set up auth dependency injection for protected routes
+
+**Lines Reduced**: 6397 → 5810 (587 lines removed, ~10% reduction)
+
+**Files Changed**:
+- `/app/backend/server.py` - Integrated routers, removed duplicates
+- `/app/backend/routes/auth.py` - Complete auth implementation
+- `/app/backend/config.py` - Added Microsoft OAuth config
+- `/app/backend/ARCHITECTURE.md` - Updated documentation
+
+**Testing**: All APIs verified working (health, stats, history, auth/register, auth/login)
+
+**Remaining in server.py** (~5800 lines):
+- Video discovery (`/api/discover`) and clips endpoints
+- Extended image search (multi-source with Wikimedia, OpenClipart)
+- Content library search endpoints (gutenberg, childrens-literature, worksheets, free-books)
+- Reading lists (duplicated, can be consolidated)
+- YouTube API Optimizer classes
+
 ### Backend Refactoring (Jan 22, 2026) ✅ COMPLETED
 - **Goal**: Break down the monolithic 6500+ line `server.py` into modular route files
 - **Result**: Transcript endpoints moved to `/app/backend/routes/youtube.py`
