@@ -200,21 +200,20 @@ export const ContentLibrary = () => {
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (pageNum = 1) => {
     if (!searchQuery.trim()) {
       toast.error('Please enter a search term');
       return;
     }
     setLoading(true);
     try {
-      const response = await api.get('/content-library/search', { params: { query: searchQuery, per_page: 20 } });
+      const response = await api.get('/content-library/search', { params: { query: searchQuery, per_page: 20, page: pageNum } });
       const searchResults = response.data.results || [];
-      console.log('Search results:', searchResults.length, searchResults);
       setResults(searchResults);
-      if (searchResults.length > 0) {
-        toast.success(`Found ${searchResults.length} results`);
-      } else {
-        toast.info('No results found');
+      setSearchPage(pageNum);
+      setHasMore(response.data.has_next !== false);
+      if (searchResults.length > 0 && pageNum === 1) {
+        toast.success(`Found ${response.data.total || searchResults.length} results`);
       }
     } catch (error) {
       console.error('Search error:', error);
