@@ -84,37 +84,43 @@ const ContentCard = ({ item, onFavorite, isFavorited }) => {
 };
 
 // Book Card Component
-const BookCard = ({ book, onFavorite, isFavorited }) => (
-  <div className="clean-card clean-card-hover overflow-hidden" data-testid="book-card">
-    <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-800 relative">
-      {book.cover ? (
-        <img src={book.cover} alt={book.title} className="w-full h-full object-cover" onError={(e) => e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div>'} />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <Book className="w-8 h-8 text-slate-400" />
-        </div>
-      )}
-      <button
-        onClick={() => onFavorite(book)}
-        className={`absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 dark:bg-slate-800/90 ${isFavorited ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}`}
-      >
-        <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
-      </button>
-    </div>
-    <div className="p-3">
-      <h3 className="font-medium text-sm text-slate-900 dark:text-slate-100 line-clamp-2">{book.title}</h3>
-      {book.author && <p className="text-xs text-slate-500 mt-1">{book.author}</p>}
-      <div className="flex items-center justify-between mt-2">
-        <LicenseBadge license={book.license || 'Public Domain'} />
-        {book.download_url && (
-          <a href={book.download_url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline">
-            Download
-          </a>
+const BookCard = ({ book, onFavorite, isFavorited }) => {
+  // Handle different API response structures
+  const coverImage = book.cover || book.thumbnail || book.cover_image;
+  const downloadUrl = book.download_url || book.url || (book.formats?.epub) || (book.formats?.pdf);
+  
+  return (
+    <div className="clean-card clean-card-hover overflow-hidden" data-testid="book-card">
+      <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-800 relative">
+        {coverImage ? (
+          <img src={coverImage} alt={book.title} className="w-full h-full object-cover" onError={(e) => e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div>'} />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Book className="w-8 h-8 text-slate-400" />
+          </div>
         )}
+        <button
+          onClick={() => onFavorite(book)}
+          className={`absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 dark:bg-slate-800/90 ${isFavorited ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}`}
+        >
+          <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
+        </button>
+      </div>
+      <div className="p-3">
+        <h3 className="font-medium text-sm text-slate-900 dark:text-slate-100 line-clamp-2">{book.title}</h3>
+        {book.author && <p className="text-xs text-slate-500 mt-1 line-clamp-1">{book.author}</p>}
+        <div className="flex items-center justify-between mt-2">
+          <LicenseBadge license={book.license || 'Public Domain'} />
+          {downloadUrl && (
+            <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline">
+              Open
+            </a>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const ContentLibrary = () => {
   const [activeTab, setActiveTab] = useState('search');
