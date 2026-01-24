@@ -24,10 +24,20 @@ Build a full-stack application that:
 ## What's Been Implemented (Latest - Jan 24, 2026)
 
 ### Image Search Bug Fix (Jan 24, 2026) ✅ COMPLETED
-- **Issue**: Image search returned empty results when "All" filter was selected
-- **Root Cause**: The condition `image_type in [None, "photo"]` failed when `image_type="all"` was passed
-- **Fix**: Added normalization to treat `image_type='all'` same as `None` in both `server.py` and `routes/images.py`
-- **Result**: Image search now returns results correctly from Unsplash, Pexels, and other sources
+- **Issue 1**: Image search returned empty results when "All" filter was selected
+  - **Root Cause**: The condition `image_type in [None, "photo"]` failed when `image_type="all"` was passed
+  - **Fix**: Added normalization to treat `image_type='all'` same as `None` in `server.py`
+
+- **Issue 2**: Illustrations tab showed no results
+  - **Root Cause**: Pixabay API key was invalid, and Wikimedia search was too strict
+  - **Fix**: 
+    - Improved Wikimedia illustration search to be more inclusive
+    - Removed invalid Pixabay API key (users need to provide their own)
+    - For illustration searches, trust Wikimedia search results directly
+
+- **Frontend Improvement**: Added auto-search when switching filter tabs (no need to click Search again)
+
+**Result**: All image filters now work correctly - All, Photos, Illustrations, and Vectors
 
 ### Backend Refactoring Phase 2 (Jan 24, 2026) ✅ COMPLETED
 - **Goal**: Continue breaking down the monolithic `server.py` and integrate modular routes
