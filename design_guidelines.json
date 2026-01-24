@@ -1,143 +1,158 @@
 {
-  "identity": {
-    "persona": "E1: The Anti-AI Designer",
-    "mission": "Create a 'Creative Studio' aesthetic that feels like a physical workspace for digital artists. Reject generic SaaS templates. Embrace 'Vibrant Play' mixed with 'Swiss Clarity'.",
-    "principles": [
-      "Fusion: Mix productivity tools with art gallery aesthetics.",
-      "Emotion: Every interaction should feel 'snappy' and 'optimistic'.",
-      "Content is King: The video thumbnails are the heroes; the UI is the frame.",
-      "Negative Space: Use whitespace to create focus, not just to fill space."
-    ]
-  },
-  "typography": {
-    "strategy": "The 'Soft Utility' Archetype",
-    "headings": {
-      "font_family": "Outfit, sans-serif",
-      "weights": ["600", "700"],
-      "tracking": "tracking-tight",
-      "usage": "Use for all page titles, section headers, and feature callouts. Don't be afraid of large sizes (text-4xl+)."
+  "design_system": {
+    "identity": {
+      "name": "ContentFlow",
+      "archetype": "Soft Utility",
+      "vibe": "Professional, Clean, Efficient, Curated",
+      "principles": [
+        "Content First: UI recedes, content pops.",
+        "Density with Breath: High information density (for pros) but with generous padding.",
+        "Soft Utility: Functional but not sterile. Rounded corners, soft borders, no harsh lines.",
+        "No Clutter: If it doesn't help the user find or create, hide it."
+      ]
     },
-    "body": {
-      "font_family": "DM Sans, sans-serif",
-      "weights": ["400", "500"],
-      "tracking": "tracking-normal",
-      "usage": "Use for all UI text, descriptions, and data tables. High legibility is key."
-    },
-    "installation": "Import via Google Fonts in index.css: @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Outfit:wght@400;600;700;800&display=swap');"
-  },
-  "colors": {
-    "theme": "light",
-    "palette": {
-      "primary": {
-        "name": "Electric Azure",
-        "hex": "#006FEE",
-        "tailwind": "bg-blue-600",
-        "usage": "Primary buttons, active states, key brand moments."
+    "typography": {
+      "font_family": {
+        "headings": "Manrope, sans-serif",
+        "body": "Inter, sans-serif",
+        "mono": "JetBrains Mono, monospace"
       },
-      "secondary": {
-        "name": "Vivid Coral",
-        "hex": "#FF5555",
-        "tailwind": "bg-red-500",
-        "usage": "Accents, 'New' badges, viral score highlights."
-      },
-      "accent": {
-        "name": "Sunshine Yellow",
-        "hex": "#FACC15",
-        "tailwind": "bg-yellow-400",
-        "usage": "Highlights, illustrations, 'premium' features."
-      },
-      "background": {
-        "name": "Studio White",
-        "hex": "#FAFAFA",
-        "tailwind": "bg-neutral-50",
-        "usage": "Main app background. Avoid pure white #FFFFFF for the full page background."
-      },
-      "surface": {
-        "name": "Pure White",
-        "hex": "#FFFFFF",
-        "tailwind": "bg-white",
-        "usage": "Cards, sidebars, modals."
-      },
-      "text": {
-        "primary": "#111827",
-        "secondary": "#6B7280",
-        "muted": "#9CA3AF"
+      "scale": {
+        "h1": "text-4xl font-bold tracking-tight lg:text-5xl",
+        "h2": "text-3xl font-semibold tracking-tight",
+        "h3": "text-2xl font-semibold tracking-tight",
+        "h4": "text-xl font-semibold tracking-tight",
+        "body_large": "text-lg leading-relaxed",
+        "body_base": "text-base leading-relaxed",
+        "body_small": "text-sm leading-relaxed text-muted-foreground",
+        "caption": "text-xs text-muted-foreground uppercase tracking-wider"
       }
     },
-    "gradients": {
-      "hero": "bg-gradient-to-br from-blue-50 via-indigo-50 to-white",
-      "button": "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700",
-      "text": "bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600"
-    }
-  },
-  "spacing": {
-    "scale": ["p-1", "p-2", "p-4", "p-6", "p-8", "p-12", "p-16", "p-24", "p-32"],
-    "rules": [
-      "Containers with borders MUST have internal padding (p-6 or p-8).",
-      "Section spacing: py-16 or py-24.",
-      "Grid gaps: gap-6 (dense) to gap-12 (airy)."
-    ]
-  },
-  "layout": {
-    "grid_system": {
-      "marketing": "Mode A: The Tetris Grid (Asymmetrical, Artful). Use col-span-full for heroes, col-span-4 for features.",
-      "dashboard": "Mode B: High Density Grid (Functional). Use col-span-1 for stats, col-span-2/3 for charts."
-    },
-    "containers": {
-      "max_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-      "card_style": "rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
-    }
-  },
-  "components": {
-    "buttons": {
-      "primary": "rounded-full px-8 py-6 font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:-translate-y-0.5",
-      "secondary": "rounded-full px-6 py-6 font-medium bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-all",
-      "ghost": "rounded-full px-4 py-2 font-medium text-neutral-600 hover:text-blue-600 hover:bg-blue-50"
-    },
-    "cards": {
-      "base": "bg-white rounded-2xl border border-neutral-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300",
-      "glass": "bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm"
-    },
-    "inputs": {
-      "style": "rounded-xl border-neutral-200 bg-neutral-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all h-12 px-4"
-    }
-  },
-  "assets": {
-    "images": {
-      "login_hero": {
-        "url": "https://images.unsplash.com/photo-1682056598904-9aa7ea5e8991?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGNyZWF0aXZlJTIwY29udGVudCUyMGNyZWF0b3IlMjB3b3JraW5nJTIwbGFwdG9wJTIwYnJpZ2h0JTIwc3R1ZGlvfGVufDB8fHx8MTc2ODg4MzYyOHww&ixlib=rb-4.1.0&q=85",
-        "alt": "Happy creator working in a bright studio",
-        "usage": "Login/Register page split-screen image"
+    "colors": {
+      "palette": {
+        "primary": {
+          "DEFAULT": "#4F46E5",
+          "foreground": "#FFFFFF",
+          "hover": "#4338CA"
+        },
+        "secondary": {
+          "DEFAULT": "#F1F5F9",
+          "foreground": "#0F172A",
+          "hover": "#E2E8F0"
+        },
+        "background": "#FFFFFF",
+        "foreground": "#0F172A",
+        "muted": {
+          "DEFAULT": "#F8FAFC",
+          "foreground": "#64748B"
+        },
+        "border": "#E2E8F0",
+        "input": "#F1F5F9",
+        "ring": "#4F46E5"
       },
-      "dashboard_avatar": {
-        "url": "https://images.unsplash.com/photo-1564518534518-e79657852a1a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwyfHxoYXBweSUyMGNyZWF0aXZlJTIwY29udGVudCUyMGNyZWF0b3IlMjB3b3JraW5nJTIwbGFwdG9wJTIwYnJpZ2h0JTIwc3R1ZGlvfGVufDB8fHx8MTc2ODg4MzYyOHww&ixlib=rb-4.1.0&q=85",
-        "alt": "User avatar",
-        "usage": "Dashboard user profile"
-      },
-      "abstract_shapes": [
-        "https://images.unsplash.com/photo-1722528490197-fcad1006e762?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMDNkJTIwY29sb3JmdWwlMjBzaGFwZXMlMjBwbGF5ZnVsfGVufDB8fHx8MTc2ODg4MzYzMHww&ixlib=rb-4.1.0&q=85",
-        "https://images.unsplash.com/photo-1767719243883-5d6e8d61c403?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMDNkJTIwY29sb3JmdWwlMjBzaGFwZXMlMjBwbGF5ZnVsfGVufDB8fHx8MTc2ODg4MzYzMHww&ixlib=rb-4.1.0&q=85"
-      ],
-      "placeholders": {
-        "video_thumbnails": [
-          "https://images.unsplash.com/photo-1764752715208-ca8df663d522?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBsYW5kc2NhcGUlMjB2aWJyYW50fGVufDB8fHx8MTc2ODg4MzYzMnww&ixlib=rb-4.1.0&q=85",
-          "https://images.unsplash.com/photo-1761495715892-4002a132ffb6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxuYXR1cmUlMjBsYW5kc2NhcGUlMjB2aWJyYW50fGVufDB8fHx8MTc2ODg4MzYzMnww&ixlib=rb-4.1.0&q=85",
-          "https://images.unsplash.com/photo-1725798595320-0c5c7d718dc9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwzfHxuYXR1cmUlMjBsYW5kc2NhcGUlMjB2aWJyYW50fGVufDB8fHx8MTc2ODg4MzYzMnww&ixlib=rb-4.1.0&q=85"
-        ]
+      "usage": {
+        "dashboard_bg": "bg-neutral-50/50",
+        "card_bg": "bg-white",
+        "sidebar_bg": "bg-white border-r border-neutral-100",
+        "text_primary": "text-neutral-900",
+        "text_secondary": "text-neutral-500"
       }
     },
-    "icons": "Use Lucide React (default). For feature sections, use colorful background circles behind icons."
+    "layout": {
+      "spacing": {
+        "container_padding": "p-6 md:p-8 lg:p-12",
+        "section_gap": "gap-8",
+        "item_gap": "gap-4"
+      },
+      "grids": {
+        "dashboard": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6",
+        "media_gallery": "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6",
+        "sidebar_layout": "flex h-screen overflow-hidden"
+      },
+      "container": "max-w-7xl mx-auto"
+    },
+    "components": {
+      "cards": {
+        "style": "bg-white border border-neutral-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200",
+        "header": "p-6 border-b border-neutral-100",
+        "content": "p-6",
+        "footer": "p-6 bg-neutral-50/50 border-t border-neutral-100 rounded-b-xl"
+      },
+      "buttons": {
+        "primary": "bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-lg font-medium transition-colors",
+        "secondary": "bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-50 h-10 px-4 py-2 rounded-lg font-medium transition-colors",
+        "ghost": "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 h-10 px-4 py-2 rounded-lg transition-colors"
+      },
+      "inputs": {
+        "style": "flex h-10 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      },
+      "badges": {
+        "style": "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        "default": "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        "secondary": "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        "outline": "text-foreground"
+      }
+    },
+    "visual_enhancers": {
+      "shadows": {
+        "soft": "shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+        "hover": "shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+      },
+      "borders": {
+        "subtle": "border border-neutral-100",
+        "default": "border border-neutral-200"
+      },
+      "radius": {
+        "default": "rounded-xl",
+        "small": "rounded-lg",
+        "full": "rounded-full"
+      }
+    },
+    "motion": {
+      "hover": "transition-all duration-200 ease-in-out",
+      "page_transition": "animate-in fade-in slide-in-from-bottom-4 duration-500"
+    },
+    "assets": {
+      "images": {
+        "avatar_placeholder": "https://images.unsplash.com/photo-1576558656222-ba66febe3dec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMHBvcnRyYWl0fGVufDB8fHx8MTc2OTIzMzEzMXww&ixlib=rb-4.1.0&q=85",
+        "hero_bg": "https://images.unsplash.com/photo-1670834416065-5b4419def835?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMHRlY2hub2xvZ3klMjBiYWNrZ3JvdW5kJTIwbWluaW1hbHxlbnwwfHx8fDE3NjkyMzMxMzJ8MA&ixlib=rb-4.1.0&q=85",
+        "content_placeholder": "https://images.unsplash.com/photo-1623680748692-abad0a516c9a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwbGFuZHNjYXBlJTIwbmF0dXJlfGVufDB8fHx8MTc2OTIzMzEzNHww&ixlib=rb-4.1.0&q=85"
+      },
+      "icons": "lucide-react"
+    }
   },
-  "universal_guidelines": [
-    "Avoid 'AI Slop': No generic centered layouts. Use asymmetry.",
-    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
-    "Create depth through layered design elements with z-index hierarchy.",
-    "Use glass-morphism effects with backdrop filters (12-24px blur).",
-    "You MUST NOT apply universal transition. Eg: transition: all.",
-    "You MUST NOT center align the app container.",
-    "Every interaction needs micro-animations.",
-    "Use 2-3x more spacing than feels comfortable.",
-    "All interactive elements MUST include data-testid attribute."
-  ],
-  "instructions_to_main_agent": "1. Update tailwind.config.js with the new color palette and font families. 2. Update index.css to import fonts and set the new base styles. 3. Refactor the Dashboard to use the 'High Density Grid'. 4. Redesign the Login page using the 'Split Screen' layout with the provided hero image. 5. Ensure all cards use the new 'Soft Utility' shadow styles."
+  "instructions_to_main_agent": {
+    "general": [
+      "Remove all 'studio-card', 'glass-card', and 'animate-float' classes. Replace with standard Tailwind classes defined in 'components.cards'.",
+      "Switch font stack to Manrope (headings) and Inter (body). Update index.css imports.",
+      "Simplify the Sidebar: Use a flat white background with a right border. No floating or glass effects.",
+      "Dashboard: Implement the 'Bento Grid' layout. Use 'col-span' classes to create an interesting but organized layout.",
+      "Discover/Images: Use a clean masonry or grid layout. Remove colorful badges unless they indicate status (e.g., 'Live', 'Processing').",
+      "Content Library: Use a clean tabbed interface. Avoid 'boxed' tabs; use 'underline' or 'pill' styles.",
+      "Settings: Use a single-column layout with clear section dividers."
+    ],
+    "specific_files": {
+      "index.css": "Replace the entire 'creative studio' section with the new 'Soft Utility' variables and utility classes.",
+      "tailwind.config.js": "Ensure colors extend the new palette (neutral-50 to neutral-950, primary indigo).",
+      "App.js": "Ensure the main layout wrapper uses 'bg-neutral-50/50' and 'text-neutral-900'."
+    }
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) ONLY for overlays/modals, not main cards.",
+    "You MUST NOT apply universal transition. Eg: `transition: all`. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add `.App { text-align: center; }` in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use `sonner` for toasts"
+  ]
 }
