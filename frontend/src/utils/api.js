@@ -22,7 +22,8 @@ api.interceptors.request.use(
   }
 );
 
-// Handle 401 errors - but DON'T auto-redirect, let components handle it
+// Handle 401 errors - DON'T auto-redirect or clear tokens
+// Let the AuthContext and ProtectedRoute handle authentication state
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,27 +33,12 @@ api.interceptors.response.use(
       return Promise.reject(new Error('Request timed out. Please try again.'));
     }
     
-    // Log 401 errors for debugging but don't auto-logout
-    // This prevents race conditions during navigation
+    // Log 401 errors for debugging but DON'T auto-logout or redirect
+    // This prevents race conditions and unwanted logouts during navigation
     if (error.response?.status === 401) {
       console.warn('401 Unauthorized response:', error.config?.url);
-      // Only clear credentials if it's NOT a timing issue
-      // (i.e., if we made a request without a token at all)
-      const requestHadToken = error.config?.headers?.Authorization;
-      if (!requestHadToken) {
-        // Request was made without token - redirect to login
-        const isOnAuthPage = window.location.pathname.includes('/login') || 
-                             window.location.pathname.includes('/register') ||
-                             window.location.pathname.includes('/verify-email') ||
-                             window.location.pathname.includes('/auth/callback');
-        if (!isOnAuthPage) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
-        }
-      }
-      // If request had token but got 401, token might be expired
-      // Don't auto-redirect - let user retry or the component handle it
+      // Don't clear tokens or redirect - let the component/AuthContext handle it
+      // The ProtectedRoute will redirect to login if needed
     }
     return Promise.reject(error);
   }
