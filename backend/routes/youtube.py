@@ -139,10 +139,28 @@ async def get_video_transcript(video_id: str):
             "video_id": video_id
         }
     except Exception as e:
-        logging.error(f"Error getting transcript for {video_id}: {str(e)}")
+        error_str = str(e)
+        logging.error(f"Error getting transcript for {video_id}: {error_str}")
+        
+        # Check for common YouTube blocking errors
+        if "IP" in error_str and ("blocked" in error_str.lower() or "cloud provider" in error_str.lower()):
+            return {
+                "success": False,
+                "error": "YouTube is blocking transcript requests from this server. This is a known limitation when running from cloud servers. Try using a different video or check if the video has captions enabled.",
+                "error_type": "ip_blocked",
+                "video_id": video_id
+            }
+        elif "Could not retrieve" in error_str:
+            return {
+                "success": False,
+                "error": "Could not retrieve transcript. The video may not have captions, or YouTube may be temporarily blocking requests.",
+                "error_type": "retrieval_failed",
+                "video_id": video_id
+            }
+        
         return {
             "success": False,
-            "error": str(e),
+            "error": "Failed to fetch transcript. Please try again later.",
             "video_id": video_id
         }
 
