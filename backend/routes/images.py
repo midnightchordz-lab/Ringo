@@ -52,9 +52,13 @@ async def search_images(
         # Normalize image_type - treat 'all' same as None
         effective_image_type = None if image_type == 'all' else image_type
         
+        logging.info(f"Image search: query={query}, source={source}, image_type={image_type}, effective={effective_image_type}")
+        logging.info(f"API Keys - Unsplash: {bool(unsplash_key)}, Pexels: {bool(pexels_key)}, Pixabay: {bool(pixabay_key)}")
+        
         async with httpx.AsyncClient() as client:
             # Search Unsplash (supports photos only, not illustrations/vectors)
             if unsplash_key and source in ['all', 'unsplash'] and effective_image_type in [None, 'photo']:
+                logging.info("Searching Unsplash...")
                 try:
                     unsplash_response = await client.get(
                         "https://api.unsplash.com/search/photos",
