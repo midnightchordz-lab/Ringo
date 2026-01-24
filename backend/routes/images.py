@@ -90,7 +90,7 @@ async def search_images(
                     logging.warning(f"Unsplash API error: {str(e)}")
             
             # Search Pexels (supports photos only)
-            if source in ['all', 'pexels'] and image_type in [None, 'photo']:
+            if source in ['all', 'pexels'] and effective_image_type in [None, 'photo']:
                 try:
                     pexels_response = await client.get(
                         "https://api.pexels.com/v1/search",
