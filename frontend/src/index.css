@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Outfit:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,258 +9,251 @@
     @apply border-border;
   }
   
-  /* Light mode (default) */
-  body {
-    @apply bg-neutral-50 text-neutral-900;
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  :root {
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --muted: 210 40% 98%;
+    --muted-foreground: 215 16% 47%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 239 84% 67%;
   }
   
-  /* Dark mode */
+  .dark {
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+    --muted: 217 33% 12%;
+    --muted-foreground: 215 20% 65%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+  }
+  
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
   .dark body {
-    @apply bg-neutral-950 text-neutral-100;
+    @apply bg-slate-950 text-slate-100;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
-    @apply tracking-tight text-neutral-900;
+    font-family: 'Manrope', sans-serif;
+    @apply tracking-tight font-bold text-slate-900;
   }
   
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-    @apply text-neutral-100;
+    @apply text-slate-100;
+  }
+}
+
+@layer components {
+  /* Clean Card - No gradients, minimal shadow */
+  .clean-card {
+    @apply bg-white rounded-xl border border-slate-200 transition-shadow duration-200;
+  }
+  
+  .dark .clean-card {
+    @apply bg-slate-900 border-slate-800;
+  }
+  
+  .clean-card-hover {
+    @apply hover:shadow-md hover:border-slate-300;
+  }
+  
+  .dark .clean-card-hover {
+    @apply hover:border-slate-700;
+  }
+  
+  /* Primary Button - Solid indigo, no gradient */
+  .btn-primary {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg px-4 py-2.5 transition-colors duration-200;
+  }
+  
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-white border border-slate-200 text-slate-700 font-medium rounded-lg px-4 py-2.5 hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200;
+  }
+  
+  .dark .btn-secondary {
+    @apply bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700;
+  }
+  
+  /* Ghost Button */
+  .btn-ghost {
+    @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium rounded-lg px-4 py-2.5 transition-colors duration-200;
+  }
+  
+  .dark .btn-ghost {
+    @apply text-slate-400 hover:text-slate-100 hover:bg-slate-800;
+  }
+  
+  /* Clean Input */
+  .clean-input {
+    @apply w-full h-10 px-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .dark .clean-input {
+    @apply border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500 focus:ring-indigo-400;
+  }
+  
+  /* Badge - Minimal */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-indigo-100 text-indigo-700;
+  }
+  
+  .dark .badge-primary {
+    @apply bg-indigo-900/50 text-indigo-300;
+  }
+  
+  .badge-success {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+  
+  .dark .badge-success {
+    @apply bg-emerald-900/50 text-emerald-300;
+  }
+  
+  .badge-muted {
+    @apply bg-slate-100 text-slate-600;
+  }
+  
+  .dark .badge-muted {
+    @apply bg-slate-800 text-slate-400;
   }
 }
 
 @layer utilities {
-  /* New Creative Studio Card Styles */
-  .studio-card {
-    @apply bg-white rounded-2xl border border-neutral-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300;
+  /* Text colors */
+  .text-primary {
+    @apply text-slate-900;
   }
   
-  .dark .studio-card {
-    @apply bg-neutral-900 border-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)];
+  .dark .text-primary {
+    @apply text-slate-100;
+  }
+  
+  .text-secondary {
+    @apply text-slate-500;
+  }
+  
+  .dark .text-secondary {
+    @apply text-slate-400;
+  }
+  
+  .text-muted {
+    @apply text-slate-400;
+  }
+  
+  .dark .text-muted {
+    @apply text-slate-500;
+  }
+  
+  /* Backwards compatibility - map old classes to new */
+  .studio-card {
+    @apply clean-card;
   }
   
   .studio-card-hover {
-    @apply hover:shadow-[0_12px_32px_rgba(0,111,238,0.12)] hover:-translate-y-1 transition-all duration-300;
+    @apply clean-card-hover;
   }
   
-  /* Glass effect for overlays */
   .glass-card {
-    @apply bg-white/80 backdrop-blur-xl border border-neutral-200/60 rounded-2xl shadow-lg;
+    @apply clean-card bg-white/90 backdrop-blur-sm;
   }
   
   .dark .glass-card {
-    @apply bg-neutral-900/80 border-neutral-700/60;
+    @apply bg-slate-900/90;
   }
   
-  .card-hover {
-    @apply hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300;
-  }
-  
-  /* Primary gradient - Electric Azure to Indigo */
-  .gradient-primary {
-    @apply bg-gradient-to-r from-blue-600 to-indigo-600;
-  }
-  
-  /* Coral accent gradient */
-  .gradient-secondary {
-    @apply bg-gradient-to-r from-red-500 to-orange-500;
-  }
-  
-  /* Sunshine accent */
-  .gradient-accent {
-    @apply bg-gradient-to-r from-yellow-400 to-amber-500;
-  }
-  
-  /* Hero gradient background */
-  .gradient-hero {
-    @apply bg-gradient-to-br from-blue-50 via-indigo-50 to-white;
-  }
-  
-  .dark .gradient-hero {
-    @apply bg-gradient-to-br from-neutral-900 via-neutral-950 to-black;
-  }
-  
-  /* Text gradient */
+  /* Simple text gradient for branding only */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600;
+    @apply text-indigo-600;
   }
   
   .dark .text-gradient {
-    @apply bg-gradient-to-r from-blue-400 to-indigo-400;
+    @apply text-indigo-400;
   }
   
-  /* Viral score badge - now coral colored */
-  .viral-badge {
-    @apply bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold px-3 py-1.5 rounded-full text-sm shadow-lg shadow-red-500/20;
+  /* Remove old gradient utilities - keep simple solid colors */
+  .gradient-primary {
+    @apply bg-indigo-600;
   }
   
-  /* CC License badge - green */
-  .cc-badge {
-    @apply bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 font-bold px-3 py-1 rounded-lg text-xs shadow-md shadow-emerald-500/20;
+  .gradient-secondary {
+    @apply bg-slate-100;
   }
   
-  /* Stats card */
+  .dark .gradient-secondary {
+    @apply bg-slate-800;
+  }
+  
+  /* Clean stat card */
   .stat-card {
-    @apply studio-card p-6 relative overflow-hidden;
+    @apply clean-card p-5;
   }
   
-  .stat-card::before {
-    content: '';
-    @apply absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100/40 to-transparent rounded-full -translate-y-16 translate-x-16;
+  /* Simple viral badge */
+  .viral-badge {
+    @apply badge bg-amber-100 text-amber-700 font-semibold;
   }
   
-  /* Primary button style */
-  .btn-primary {
-    @apply bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-full px-8 py-3 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all duration-300;
+  .dark .viral-badge {
+    @apply bg-amber-900/50 text-amber-300;
   }
   
-  /* Secondary button */
-  .btn-secondary {
-    @apply bg-white border-2 border-neutral-200 text-neutral-700 font-medium rounded-full px-6 py-3 hover:bg-neutral-50 hover:border-neutral-300 hover:-translate-y-0.5 transition-all duration-300;
+  /* CC License badge */
+  .cc-badge {
+    @apply badge badge-success font-semibold;
   }
   
-  .dark .btn-secondary {
-    @apply bg-neutral-800 border-neutral-700 text-neutral-200 hover:bg-neutral-700 hover:border-neutral-600;
-  }
-  
-  /* Input style */
+  /* Input with icon */
   .studio-input {
-    @apply rounded-xl border-neutral-200 bg-neutral-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all h-12 px-4 text-neutral-900 placeholder:text-neutral-400;
+    @apply clean-input;
   }
   
-  .dark .studio-input {
-    @apply border-neutral-700 bg-neutral-800 focus:bg-neutral-900 focus:ring-blue-900 text-neutral-100 placeholder:text-neutral-500;
-  }
-  
-  /* Input with icon - needs more left padding */
   .studio-input-icon {
-    @apply rounded-xl border-neutral-200 bg-neutral-50 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all h-12 pl-12 pr-4 text-neutral-900 placeholder:text-neutral-400;
+    @apply clean-input pl-10;
   }
   
-  .dark .studio-input-icon {
-    @apply border-neutral-700 bg-neutral-800 focus:bg-neutral-900 focus:ring-blue-900 text-neutral-100 placeholder:text-neutral-500;
-  }
-  
-  /* Sidebar active state */
+  /* Sidebar */
   .sidebar-active {
-    @apply bg-blue-50 text-blue-600 border-l-4 border-blue-600;
+    @apply bg-indigo-50 text-indigo-600 border-l-2 border-indigo-600;
   }
   
   .dark .sidebar-active {
-    @apply bg-blue-900/30 text-blue-400;
-  }
-  
-  /* Icon container with color background */
-  .icon-container {
-    @apply w-12 h-12 rounded-xl flex items-center justify-center;
-  }
-  
-  .icon-blue {
-    @apply bg-blue-100 text-blue-600;
-  }
-  
-  .dark .icon-blue {
-    @apply bg-blue-900/40 text-blue-400;
-  }
-  
-  .icon-coral {
-    @apply bg-red-100 text-red-500;
-  }
-  
-  .dark .icon-coral {
-    @apply bg-red-900/40 text-red-400;
-  }
-  
-  .icon-yellow {
-    @apply bg-yellow-100 text-yellow-600;
-  }
-  
-  .dark .icon-yellow {
-    @apply bg-yellow-900/40 text-yellow-400;
-  }
-  
-  .icon-green {
-    @apply bg-emerald-100 text-emerald-600;
-  }
-  
-  .dark .icon-green {
-    @apply bg-emerald-900/40 text-emerald-400;
-  }
-  
-  .icon-purple {
-    @apply bg-purple-100 text-purple-600;
-  }
-  
-  .dark .icon-purple {
-    @apply bg-purple-900/40 text-purple-400;
+    @apply bg-indigo-900/20 text-indigo-400 border-indigo-400;
   }
 }
 
-/* Custom scrollbar - light theme */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-neutral-100;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-neutral-300 rounded-full hover:bg-neutral-400;
-}
-
-/* Dark mode scrollbar */
-.dark ::-webkit-scrollbar-track {
-  @apply bg-neutral-800;
+  @apply bg-slate-300 rounded-full;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  @apply bg-neutral-600 hover:bg-neutral-500;
+  @apply bg-slate-700;
 }
 
-/* Animated gradient background */
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
 }
 
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 15s ease infinite;
-}
-
-/* Floating animation for decorative elements */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Pulse glow effect */
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 111, 238, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(0, 111, 238, 0.4);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-600;
 }
