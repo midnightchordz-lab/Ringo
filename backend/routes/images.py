@@ -124,7 +124,7 @@ async def search_images(
             if source in ['all', 'pixabay']:
                 try:
                     # Pixabay image_type: all, photo, illustration, vector
-                    pixabay_type = image_type if image_type in ['photo', 'illustration', 'vector'] else 'all'
+                    pixabay_type = effective_image_type if effective_image_type in ['photo', 'illustration', 'vector'] else 'all'
                     
                     pixabay_response = await client.get(
                         "https://pixabay.com/api/",
