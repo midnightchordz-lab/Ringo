@@ -108,6 +108,13 @@ export const Images = () => {
     fetchFavorites();
   }, []);
 
+  // Auto-search when image type changes (if there's already a search query)
+  useEffect(() => {
+    if (searchQuery.trim() && images.length > 0) {
+      handleSearch(1);
+    }
+  }, [imageType]);
+
   const fetchFavorites = async () => {
     try {
       const response = await api.get('/images/favorites');
