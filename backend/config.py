@@ -33,3 +33,8 @@ EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
 # Image APIs
 PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY")
 UNSPLASH_API_KEY = os.environ.get("UNSPLASH_API_KEY")
+
+# Microsoft OAuth
+MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID")
+MICROSOFT_CLIENT_SECRET = os.environ.get("MICROSOFT_CLIENT_SECRET")
+MICROSOFT_TENANT = "common"  # Allows any Microsoft account
