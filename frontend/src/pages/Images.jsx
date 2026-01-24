@@ -246,6 +246,7 @@ export const Images = () => {
             <button
               key={option.value}
               onClick={() => setImageType(option.value)}
+              data-testid={`filter-${option.value}`}
               className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                 imageType === option.value
                   ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300'
