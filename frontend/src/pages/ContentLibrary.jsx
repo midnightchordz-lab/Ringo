@@ -175,11 +175,16 @@ export const ContentLibrary = () => {
     setLoading(true);
     try {
       const response = await api.get('/content-library/search', { params: { query: searchQuery, per_page: 20 } });
-      setResults(response.data.results || []);
-      if (response.data.results?.length > 0) {
-        toast.success(`Found ${response.data.results.length} results`);
+      const searchResults = response.data.results || [];
+      console.log('Search results:', searchResults.length, searchResults);
+      setResults(searchResults);
+      if (searchResults.length > 0) {
+        toast.success(`Found ${searchResults.length} results`);
+      } else {
+        toast.info('No results found');
       }
     } catch (error) {
+      console.error('Search error:', error);
       toast.error('Search failed');
     } finally {
       setLoading(false);
