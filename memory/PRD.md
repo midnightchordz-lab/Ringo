@@ -18,580 +18,95 @@ Build a full-stack application that:
 ## Tech Stack
 - **Frontend**: React, React Router, Axios, Tailwind CSS, Framer Motion, Shadcn/UI
 - **Backend**: FastAPI (Python), MongoDB (via Motor)
-- **Authentication**: JWT (python-jose, passlib), Google OAuth via Emergent Auth
+- **Authentication**: JWT (python-jose, passlib), Google OAuth via Emergent Auth, Microsoft OAuth
 - **Integrations**: YouTube Data API v3, Resend (email), Emergent LLM Key (AI analysis), yt-dlp, Pexels API, Unsplash API, Project Gutenberg API
 
-## What's Been Implemented (Completed)
-
-### Design Theme Overhaul (Jan 20, 2026)
-Implemented "Creative Studio" theme - a bright, welcoming design:
-- **Color Palette**: Electric Azure (#006FEE), Coral Pop (#FF5C5C), Sunshine Yellow (#FFC107), Emerald (#10B981)
-- **Typography**: Outfit (headings), DM Sans (body)
-- **Light Theme**: Neutral-50 backgrounds, white cards with subtle shadows
-- **Navigation**: Colorful gradient active states, icon backgrounds matching each section
-- **Login/Register**: Split-screen design with feature showcase
-- **Cards**: Clean studio-card style with hover animations
-- **Buttons**: Gradient primary buttons with glow effects
-- **Badges**: Colorful license badges, viral score indicators
-- Pages updated: Login, Register, Dashboard, Videos, Images, Content Library
-
-### Backend Refactoring (Jan 20, 2026)
-Created modular architecture for maintainability:
-- `/app/backend/config.py` - Centralized configuration ✅
-- `/app/backend/database.py` - MongoDB connection ✅
-- `/app/backend/models/schemas.py` - Pydantic schemas ✅
-- `/app/backend/services/youtube_optimizer.py` - YouTube caching ✅
-- `/app/backend/utils/auth.py` - Authentication utilities ✅
-- `/app/backend/utils/helpers.py` - Common helpers ✅
-- `/app/backend/routes/auth.py` - Auth route templates ✅
-- `/app/backend/routes/images.py` - Image route templates ✅
-- `/app/backend/routes/dashboard.py` - Dashboard route templates ✅
-- `/app/backend/ARCHITECTURE.md` - Full documentation ✅
-- All modules tested and importing correctly
-- `server.py` remains as entry point (working)
-
-### UI Updates (Jan 20, 2026)
-- Renamed "Discover" to "Videos" in the sidebar navigation
-- Added "Find" button next to search bars on Videos, Images, and Content Library pages
-- Fixed JWT login issue where ObjectId was not JSON serializable
-- Fixed get_current_user to properly handle email-based JWT tokens
-
-### Authentication System
-- JWT-based registration and login
-- Google OAuth integration via Emergent Auth
-- Email verification flow using Resend
-- Protected API routes with Bearer token authentication
-- Supports both JWT tokens and Emergent session tokens
-
-### Core Features - Videos
-- Video discovery with YouTube Data API (CC-BY license filter)
-- Viral score ranking algorithm
-- Dashboard with stats (videos found, clips made, posts live)
-- Clear videos functionality
-- Video preview page with embedded YouTube player
-- AI-powered clip analysis backend (uses Emergent LLM Key)
-
-### Core Features - Images
-- Search copyright-free images from Pexels and Unsplash
-- Download images directly
-- Copy image URLs to clipboard
-- Save images to favorites collection
-- View and manage favorites
-- Source badges (Pexels/Unsplash)
-- Photographer attribution with links
-
-### Core Features - Content Library (ENHANCED Jan 21, 2026)
-- **Dynamic AI-Powered Search** - searches across multiple sources in real-time:
-  - OpenLibrary (3M+ books)
-  - Internet Archive (35M+ items)
-  - Wikipedia (6M+ articles)
-  - Educational worksheet sites (K5 Learning, Math-Drills, Common Core Sheets, etc.)
-- **AI Enhancement** - uses GPT-4.1-mini via Emergent LLM Key to:
-  - Score relevance (1-10)
-  - Categorize results (worksheet, book, article, course, video, resource)
-  - Suggest grade levels
-  - Generate AI summaries
-- Category filters: All Content, **Free Books**, Worksheets, Books, Articles, Courses, Videos, Resources
-- Education level filters: Pre-school, Elementary, Middle, High, University
-- Save resources to favorites
-- Quick search suggestions for common queries
-- Source badges showing where content came from
-- License information for each result
-
-### Web-Wide Search Enhancement (Jan 21, 2026) ✅ NEW
-Implemented comprehensive, multi-source search for all content categories:
-
-**COURSES** (7 sources):
-- OpenStax - Free peer-reviewed textbooks
-- MIT OpenCourseWare - MIT course materials
-- Wikiversity - Free learning resources (MediaWiki API)
-- Wikibooks - Free textbooks (MediaWiki API)
-- freeCodeCamp - Free coding courses
-- Codecademy - Interactive coding tutorials
-- YouTube Educational - Course playlists
-
-**VIDEOS** (3 sources):
-- YouTube (Creative Commons) - CC-licensed educational videos
-- Internet Archive - Public domain documentaries & lectures
-- TED Talks - Expert talks on various topics
-
-**RESOURCES** (8 sources):
-- OER Commons - Open Educational Resources
-- MERLOT - Curated learning materials
-- Internet Archive - Educational texts & documents
-- Smithsonian Learning Lab - Museum resources
-- Library of Congress - Primary historical sources
-- PBS LearningMedia - PreK-12 educational resources
-- BBC Bitesize - UK educational content
-- National Geographic Education - Geography & science resources
-
-### Core Features - Reading Lists (NEW Jan 20, 2026)
-- **Create curated book collections** for specific grades or subjects
-- **Reading List management**: Create, edit, delete lists
-- **Add books** from Free Books section to any reading list
-- **Public/Private toggle**: Share lists with other teachers or keep private
-- **Copy public lists**: Teachers can copy shared reading lists to their own collection
-- **List metadata**: Name, description, grade level, subject
-- **View list details**: See all books in a list with download options
-- Endpoints: `/api/reading-lists`, `/api/reading-lists/{id}`, `/api/reading-lists/{id}/books`, `/api/reading-lists/{id}/copy`
-
-### Core Features - Free Books Section (ENHANCED Jan 21, 2026)
-- **62 curated free books** from Project Gutenberg (public domain)
-- **Categories**: Stories, Poetry, Grammar, Math, Science
-- **Book cards** display: Title, Author, Category badge, Public Domain badge, Printable badge, Grade levels
-- **Download options**: PDF, EPUB, Read Online
-- **Category filters**: All Books, Stories, Poetry, Grammar, Math, Science
-- **Grade level filtering**: Pre-school through University
-- **Search within books**: Search by title, author, or subject
-- **PAGINATION**: 50 items per page with navigation controls (Previous/Next, page numbers)
-- Endpoints: `/api/content-library/free-books`, `/api/content-library/free-books/search`
-
-### Core Features - Children's Literature Search (NEW Jan 20, 2026)
-- **Dynamic copyright-free search** across multiple sources:
-  - Project Gutenberg (via Gutendex API)
-  - StoryWeaver (Creative Commons books)
-  - Open Library (public domain)
-- **PAGINATION**: 50 items per page with navigation controls
-- Search and filter by grade level
-- All results are downloadable and printable
-- Endpoints: `/api/content-library/childrens-literature`
-
-### Core Features - Content Library Search (ENHANCED Jan 21, 2026)
-- Searches across OpenLibrary, Internet Archive, Wikipedia, OER Commons
-- AI-powered result enhancement and categorization
-- **PAGINATION**: 50 items per page with navigation controls
-- Endpoints: `/api/content-library/search`
-
-### UI/UX
-- Vibrant gradient theme (violet, purple, pink accents)
-- Responsive layout with sidebar navigation
-- Professional card designs with hover effects
-- Loading states and toast notifications
-- "Videos" tab (renamed from "Discover"), Images tab, and Content Library tab in sidebar
-- "Find" button added to all search bars
-
-## Current Issues
-
-### P1 - High Priority
-- **Clip Generation Blocked**: YouTube bot detection blocking yt-dlp downloads (403 Forbidden)
-
-### P2 - Medium Priority  
-- **Email Verification**: Requires valid RESEND_API_KEY for production
-
-## Pending Features (Not Yet Implemented)
-
-### P0 - Required
-- Post clips to YouTube and Instagram (original requirement)
-- Apple OAuth login (user requested)
-
-## YouTube API Optimization (Implemented Jan 20, 2026)
-
-### Features Implemented:
-1. **Cache Data Store** - Dual-layer caching:
-   - In-memory cache (30 min TTL) for fast repeated queries
-   - MongoDB persistent cache (6 hour TTL) survives restarts
-2. **Request Only Necessary Fields** - Uses `fields` parameter to request minimal data
-3. **GZIP Compression** - Enabled for reduced data transfer
-4. **Conditional Requests (ETags)** - Stores and uses ETags to skip unchanged data
-5. **Batch Requests** - Video details fetched in batches of 50
-6. **quotaUser Tracking** - Per-user quota tracking via hashed user ID
-
-### New API Endpoints:
-- GET `/api/youtube/cache-stats` - View cache statistics
-- POST `/api/youtube/clear-cache` - Clear all YouTube caches
-
-### Frontend Indicators:
-- "Cached Results" banner (amber) when showing cached data
-- "Optimized API Usage" banner (green) when using fresh optimized requests
-- Toast notifications for cache/optimization status
-
-## API Endpoints
-
-### Authentication
-- POST `/api/auth/register` - Register new user
-- POST `/api/auth/login` - Login with email/password
-- GET `/api/auth/me` - Get current user info
-- GET `/api/auth/verify-email?token=` - Verify email
-- POST `/api/auth/google-oauth` - Google OAuth flow
-
-### Video Discovery
-- GET `/api/discover?query=&max_results=&min_views=` - Search CC-BY videos (optimized)
-- GET `/api/videos/{video_id}` - Get video details
-- POST `/api/clear-videos` - Clear all discovered videos
-- GET `/api/youtube/cache-stats` - Cache statistics (NEW)
-- POST `/api/youtube/clear-cache` - Clear caches (NEW)
-- GET `/api/video/transcript/{video_id}` - Get video transcript (NEW Jan 22)
-- GET `/api/video/transcript/{video_id}/cached` - Get cached transcript (NEW Jan 22)
-
-### Images
-- GET `/api/images/search?query=&per_page=&image_type=&source=` - Search copyright-free images
-  - `image_type`: photo (Unsplash/Pexels/Pixabay), illustration (Pixabay only), vector (Pixabay only)
-  - `source`: all, unsplash, pexels, pixabay
-- GET `/api/images/favorites` - Get user's favorite images
-- POST `/api/images/favorites` - Add image to favorites
-- DELETE `/api/images/favorites/{image_id}` - Remove from favorites
-
-### Reading Lists
-- POST `/api/reading-lists` - Create new reading list (NEW)
-- GET `/api/reading-lists` - Get user's reading lists (NEW)
-- GET `/api/reading-lists/{id}` - Get specific reading list (NEW)
-- PUT `/api/reading-lists/{id}` - Update reading list (NEW)
-- DELETE `/api/reading-lists/{id}` - Delete reading list (NEW)
-- POST `/api/reading-lists/{id}/books` - Add book to list (NEW)
-- DELETE `/api/reading-lists/{id}/books/{book_id}` - Remove book from list (NEW)
-- POST `/api/reading-lists/{id}/copy` - Copy public list to own lists (NEW)
-
-### Content Library
-- GET `/api/content-library/search` - Dynamic search with pagination (page, per_page params)
-- GET `/api/content-library/childrens-literature` - Children's literature search with pagination
-- GET `/api/content-library/worksheets/search` - Worksheet-specific search (NEW)
-- GET `/api/content-library/free-books` - Get curated free books with pagination (page, per_page params)
-- GET `/api/content-library/free-books/search` - Search free books with pagination
-- GET `/api/content-library/favorites` - Get favorite resources
-- POST `/api/content-library/favorites` - Add resource to favorites
-- DELETE `/api/content-library/favorites/{resource_id}` - Remove from favorites
-- GET `/api/content-library/gutenberg/search?query=` - Search Project Gutenberg
-
-### Dashboard
-- GET `/api/stats` - Dashboard statistics
-- GET `/api/history` - Post history
-
-## Database Collections (MongoDB)
-- `users` - User accounts with auth info
-- `user_sessions` - Emergent OAuth session tokens
-- `discovered_videos` - Cached video data from YouTube
-- `youtube_api_cache` - Persistent cache for YouTube API responses (NEW)
-- `video_transcripts` - Cached video transcripts (NEW Jan 22)
-- `favorite_images` - User's saved images
-- `content_library_favorites` - User's saved content resources (NEW)
-- `clips` - Generated clips metadata
-- `posts` - Social media post history
-
-## Content Library Resources (24 total)
-- **Featured**: Project Gutenberg, Open Library, Khan Academy, MIT OpenCourseWare, LibriVox, Poetry Foundation, CK-12, OpenStax, arXiv, Internet Archive, edX
-- **More**: Storynory, Int'l Children's Digital Library, CORE, DOAJ, Europeana, Library of Congress, Coursera, PBS LearningMedia, Smithsonian, National Geographic Education, Lit2Go, ReadWorks, CommonLit
-
-## Files of Reference
-- `/app/backend/server.py` - All backend logic
-- `/app/frontend/src/pages/Images.jsx` - Images search page
-- `/app/frontend/src/pages/ContentLibrary.jsx` - Content Library page (NEW)
-- `/app/frontend/src/pages/` - React page components
-- `/app/frontend/src/utils/api.js` - Auth interceptor
-- `/app/frontend/src/components/Layout.jsx` - Sidebar navigation
-- `/app/backend/.env` - Backend secrets (includes UNSPLASH_API_KEY)
-
-## Last Updated
-January 24, 2026 - Content Library Redesign
-
-### Content Library Redesign (Jan 24, 2026) ✅ COMPLETED
-- **User Request**: "The Content Library page still looks cluttered, make it clean and decluttered"
-- **Solution**: Simplified from 2386 lines to ~320 lines with clean, essential UI
-
-**Changes Made**:
-- Reduced from 5+ tabs to 3 tabs: Search, Free Books, Courses
-- Removed excessive license filtering UI
-- Simplified content cards with just title, source, license badge, description
-- Removed Children's Literature and Articles tabs (consolidated into Search)
-- Clean book grid for Free Books tab
-- Minimalist design matching the rest of the app
-
-**File Updated**: `/app/frontend/src/pages/ContentLibrary.jsx` (2386 → ~320 lines)
-
-### Professional UI Redesign (Jan 24, 2026) ✅ COMPLETED
-- **User Request**: "The website looks too cluttered, does not have a professional look. Need to rework the theme and hide unnecessary information."
-- **Solution**: Complete redesign from "Creative Studio" theme to "Soft Utility" professional design
-
-**Design Changes**:
-- Removed colorful gradients → Solid colors (indigo primary, slate neutrals)
-- Simplified cards → Clean borders with minimal shadows
-- Reduced visual clutter → Essential information only
-- Professional typography → Inter (body) + Manrope (headings)
-- Clean sidebar → Simple navigation without decorations
-
-**Files Updated**:
-- `/app/frontend/src/index.css` - New clean design system
-- `/app/frontend/src/pages/Dashboard.jsx` - Simplified dashboard with essential stats
-- `/app/frontend/src/pages/Discover.jsx` - Clean video grid with minimal badges
-- `/app/frontend/src/pages/Images.jsx` - Clean image search
-- `/app/frontend/src/pages/Login.jsx` - Professional split-screen layout
-- `/app/frontend/src/components/Layout.jsx` - Clean sidebar
-
-**Design Guidelines**: `/app/design_guidelines.json`
-
-**Testing**: 100% pass rate - All 26 frontend tests passed
-
-### Automatic Logout Bug Fix (Jan 22, 2026) ✅ COMPLETED
-- **Issue**: Users were being logged out immediately after login or when navigating between pages
-- **Root Cause**: `ProtectedRoute` only checked localStorage synchronously during render, causing race conditions with React state updates
-- **Solution**: Created `AuthContext` with reactive state management
-
-**Implementation**:
-- Created `/app/frontend/src/context/AuthContext.jsx` with:
-  - Reactive auth state (`user`, `token`, `isAuthenticated`)
-  - `login()` function that updates both localStorage and React state
-  - `logout()` function that clears both localStorage and React state
-  - Storage event listener for cross-tab synchronization
-- Updated `ProtectedRoute` to use `useAuth()` hook instead of direct localStorage checks
-- Updated all auth-related components: Login, Register, AuthCallback, MicrosoftCallback, VerifyEmail, Layout
-
-**Files Changed**:
-- `/app/frontend/src/context/AuthContext.jsx` (NEW)
-- `/app/frontend/src/App.js`
-- `/app/frontend/src/pages/Login.jsx`
-- `/app/frontend/src/pages/Register.jsx`
-- `/app/frontend/src/pages/AuthCallback.jsx`
-- `/app/frontend/src/pages/MicrosoftCallback.jsx`
-- `/app/frontend/src/pages/VerifyEmail.jsx`
-- `/app/frontend/src/components/Layout.jsx`
-
-**Testing**: 100% pass rate - All 6 authentication tests passed
+## What's Been Implemented (Latest - Jan 24, 2026)
 
 ### Backend Refactoring Phase 2 (Jan 24, 2026) ✅ COMPLETED
 - **Goal**: Continue breaking down the monolithic `server.py` and integrate modular routes
 - **Result**: All modular routes integrated, duplicates removed
 
 **Changes Made**:
-1. **Updated `/app/backend/routes/auth.py`** - Complete auth module with:
-   - Google OAuth via Emergent Auth
-   - Microsoft OAuth (Azure AD)
-   - Email/password registration and login
-   - Email verification flow
-   - JWT token creation and validation
-   - `get_current_user` dependency function
-
-2. **Updated `/app/backend/config.py`** - Added Microsoft OAuth config:
-   - `MICROSOFT_CLIENT_ID`
-   - `MICROSOFT_CLIENT_SECRET`
-   - `MICROSOFT_TENANT`
-
-3. **Integrated all modular routers in `server.py`**:
-   - `auth_router` - Authentication endpoints
-   - `youtube_router` - Transcript endpoints
-   - `images_router` - Image search/favorites
-   - `dashboard_router` - Stats, history, settings
-   - `content_router` - Content library favorites, reading lists
-
-4. **Removed duplicate endpoints from server.py**:
-   - Duplicate auth endpoints (Google OAuth, Microsoft OAuth, register, login, etc.)
-   - Duplicate dashboard endpoints (stats, history, settings)
-   - Set up auth dependency injection for protected routes
+1. **Updated `/app/backend/routes/auth.py`** - Complete auth module with Google OAuth, Microsoft OAuth, Email/Password auth
+2. **Updated `/app/backend/config.py`** - Added Microsoft OAuth config
+3. **Integrated all modular routers in `server.py`**: auth, youtube, images, dashboard, content
+4. **Removed duplicate endpoints from server.py**
 
 **Lines Reduced**: 6397 → 5810 (587 lines removed, ~10% reduction)
 
-**Files Changed**:
-- `/app/backend/server.py` - Integrated routers, removed duplicates
-- `/app/backend/routes/auth.py` - Complete auth implementation
-- `/app/backend/config.py` - Added Microsoft OAuth config
-- `/app/backend/ARCHITECTURE.md` - Updated documentation
+### Professional UI Redesign (Jan 24, 2026) ✅ COMPLETED
+- Complete redesign from "Creative Studio" to "Soft Utility" professional design
+- Clean sidebar navigation, essential information only
+- Professional typography: Inter (body) + Manrope (headings)
 
-**Testing**: All APIs verified working (health, stats, history, auth/register, auth/login)
-
-**Remaining in server.py** (~5800 lines):
-- Video discovery (`/api/discover`) and clips endpoints
-- Extended image search (multi-source with Wikimedia, OpenClipart)
-- Content library search endpoints (gutenberg, childrens-literature, worksheets, free-books)
-- Reading lists (duplicated, can be consolidated)
-- YouTube API Optimizer classes
-
-### Backend Refactoring (Jan 22, 2026) ✅ COMPLETED
-- **Goal**: Break down the monolithic 6500+ line `server.py` into modular route files
-- **Result**: Transcript endpoints moved to `/app/backend/routes/youtube.py`
-- **Lines Reduced**: 6529 → 6397 (132 lines moved to modular routes)
-
-**Modular Route Files**:
-1. `/app/backend/routes/youtube.py` (164 lines) - **ACTIVE**
-   - `GET /api/video/transcript/{video_id}` - Get video transcript
-   - `GET /api/video/transcript/{video_id}/cached` - Get cached transcript
-   
-2. `/app/backend/routes/content.py` - **TEMPLATE** (not yet integrated)
-   - Content library favorites, reading lists endpoints
-   - Available for future migration
-
-**Integration Complete**:
-- YouTube transcript router included in server.py
-- Auth dependency injection configured
-- All APIs tested and working
-- Frontend functioning correctly
-
-**Remaining in server.py**:
-- Video discovery endpoints (depend on YouTubeAPIOptimizer class)
-- Cache management endpoints
-- Clip generation endpoints
-- Content library search endpoints
-- All authentication endpoints
-
-**Future Refactoring Tasks**:
-1. Move YouTubeAPIOptimizer class to services/
-2. Move discover/clips endpoints to routes/youtube.py
-3. Move content library endpoints to routes/content.py
+### Automatic Logout Bug Fix (Jan 22, 2026) ✅ COMPLETED
+- Created `AuthContext` with reactive state management
+- Fixed race conditions with React state updates
 
 ### Video-to-Text Transcription Feature (Jan 22, 2026) ✅ COMPLETED
-- **Feature**: Convert YouTube videos to text transcripts
-- **User Request**: "In the videos Tab add a feature to convert all the you tube videos to text"
+- Convert YouTube videos to text transcripts
+- Backend: `youtube-transcript-api` library
+- Frontend: TranscriptModal with copy/download functionality
 
-**Backend Implementation**:
-- Added `youtube-transcript-api` library for fetching YouTube captions
-- New endpoint: `GET /api/video/transcript/{video_id}` - Fetch transcript for any video
-- New endpoint: `GET /api/video/transcript/{video_id}/cached` - Get cached transcript
-- Transcripts cached in MongoDB `video_transcripts` collection
-- No authentication required (public YouTube data)
-- Handles multiple languages (prioritizes English)
-- Returns: `success`, `video_id`, `language`, `word_count`, `full_text`, `segments`, `total_segments`
+## Current Issues
 
-**Frontend Implementation**:
-- Added "Convert to Text" button on all video cards in Discover page
-- New `TranscriptModal` component with:
-  - Loading state with spinner
-  - Transcript display with word count, language, and segments count
-  - Copy to clipboard button
-  - Download as .txt file button
-  - User-friendly error messages for blocked/unavailable transcripts
-- Uses `data-testid="transcribe-button"` for testing
+### P0 - Critical (BLOCKED)
+- **YouTube video download**: Server-side downloads blocked by YouTube's bot detection
+- **Clip Generation**: Cannot generate clips without video downloads
 
-**Known Limitation**:
-- YouTube blocks transcript requests from cloud provider IPs (AWS/GCP/Azure)
-- This is expected behavior from the `youtube-transcript-api` library
-- Error handling displays friendly message: "YouTube is limiting transcript requests from our servers"
-- Feature works correctly when YouTube allows the request
+### P1 - High Priority
+- **Microsoft OAuth**: Requires user to configure Redirect URI in Azure AD
+- **Email Verification**: Requires valid RESEND_API_KEY
 
-**Files Changed**:
-- `/app/backend/server.py` - Added transcript endpoints
-- `/app/backend/requirements.txt` - Added `youtube-transcript-api`
-- `/app/frontend/src/pages/Discover.jsx` - Added TranscriptModal and button
+### P2 - Medium Priority
+- **Backend Refactoring**: Continue migrating remaining 5800 lines from server.py
 
-**Testing**:
-- 8/8 backend tests passed (pytest)
-- Frontend UI fully tested (transcript modal, buttons, error handling)
-- Test file: `/app/tests/test_video_transcript_api.py`
+## Pending Features
 
-### Children's Literature Monetization Update (Jan 22, 2026) ✅ COMPLETED
-- **Removed Internet Archive** from Children's Literature sources (license status varies)
-- **Monetization-friendly licenses only**:
-  - CC BY (Attribution) - Can monetize with credit
-  - CC BY-SA (Attribution-ShareAlike) - Can monetize, share alike
-  - CC BY-ND (Attribution-NoDerivatives) - Can monetize, no mods
-  - Public Domain - Full commercial freedom
-  
-- **Sources now**:
-  | Source | License | Monetization |
-  |--------|---------|--------------|
-  | Project Gutenberg | Public Domain | ✅ OK |
-  | StoryWeaver | CC BY 4.0 | ✅ OK |
-  | Open Library | Public Domain | ✅ OK |
+### P0 - Required
+- Post clips to YouTube and Instagram (original requirement)
+- Apple OAuth login (user requested)
 
-- **Frontend Enhancements**:
-  - "Monetization-Friendly Licenses Only" banner
-  - "Monetization OK" badge on top right
-  - Each book shows "💰 Monetize OK" badge
-  - License displayed as "Public Domain (Monetization OK)" or "CC BY 4.0 (Monetization OK)"
+### P1 - Improvements
+- Extend dark mode to remaining pages
+- Add animations and micro-interactions
 
-### Content Library CC License Enforcement (Jan 22, 2026) ✅ COMPLETED
-- **Strict CC License Filter**: All content is now filtered to only show:
-  - CC BY (Attribution)
-  - CC BY-SA (Attribution-ShareAlike)
-  - CC BY-ND (Attribution-NoDerivatives)
-  - CC0 (Public Domain)
-  - Public Domain
-  
-- **Backend Implementation**:
-  - Added `filter_cc_licensed_content()` function to validate all results
-  - Added `normalize_cc_license()` to standardize license display names
-  - Added `cc_verified: true` flag to all verified content
-  - Response includes `license_filter` field showing allowed licenses
+## API Endpoints Summary
 
-- **Frontend Enhancements**:
-  - Added prominent "100% Copyright-Free Content" banner with CC badges
-  - Each result card shows: License badge (CC BY 4.0, etc.), "Commercial OK" indicator, "CC Verified" badge
-  - Color-coded sources: Green (CC BY), Amber (CC BY-NC), Emerald (Public Domain)
+### Authentication (Modularized ✅)
+- POST `/api/auth/register`, `/api/auth/login`, `/api/auth/google-oauth`
+- GET `/api/auth/me`, `/api/auth/verify-email`, `/api/auth/microsoft/login`
+- POST `/api/auth/microsoft/callback`, `/api/auth/resend-verification`
 
-- **Sources filtered by license**:
-  | Source | License |
-  |--------|---------|
-  | OpenStax | CC BY 4.0 |
-  | Wikiversity | CC BY-SA |
-  | Wikibooks | CC BY-SA |
-  | Wikipedia | CC BY-SA |
-  | OER Commons | CC BY / CC BY-SA |
-  | Internet Archive | Public Domain |
-  | Library of Congress | Public Domain |
-  | YouTube (CC) | CC BY |
-  | arXiv/PubMed | Open Access (CC BY) |
+### Dashboard (Modularized ✅)
+- GET `/api/stats`, `/api/history`
+- POST/GET `/api/settings/api-keys`
 
-### Multi-Source CC-Licensed Image Search (Jan 22, 2026) ✅ COMPLETED
-- **Added Wikimedia Commons** as a new image source with full Creative Commons license support
-- **Image sources by type**:
-  | Source | Photos | Illustrations | Vectors | License |
-  |--------|--------|---------------|---------|---------|
-  | Unsplash | ✅ | ❌ | ❌ | Unsplash License |
-  | Pexels | ✅ | ❌ | ❌ | Pexels License |
-  | Pixabay | ✅ | ✅ | ✅ | Pixabay License (requires API key) |
-  | Wikimedia | ✅ | ✅ | ✅ | CC BY, CC BY-SA, CC0 |
+### Videos (Partially Modularized)
+- GET `/api/discover`, `/api/videos/{id}`, `/api/youtube/cache-stats`
+- GET `/api/video/transcript/{id}` ✅ Modularized
+- POST `/api/clips/generate`, `/api/clear-videos`, `/api/youtube/clear-cache`
 
-- **Backend changes**:
-  - Added `search_wikimedia_images()` function with proper User-Agent header
-  - Updated image search logic to include Wikimedia for all image types
-  - Proper CC license filtering (only CC BY, CC BY-SA, CC BY-ND, CC0)
-  
-- **Frontend changes**:
-  - Added Wikimedia source filter button
-  - Updated license info banner to include all sources
-  - All filters tested and working (19/19 tests passed)
+### Images (Modularized ✅)
+- GET `/api/images/search`, `/api/images/favorites`
+- POST/DELETE `/api/images/favorites`
 
-- **API endpoints**:
-  - GET `/api/images/search?query=&image_type=&source=`
-    - `image_type`: photo, illustration, vector (or none for all)
-    - `source`: all, unsplash, pexels, pixabay, wikimedia
+### Content Library (Partially Modularized)
+- GET/POST/DELETE `/api/content-library/favorites` ✅ Modularized
+- GET `/api/content-library/search`, `/api/content-library/childrens-literature`
+- GET `/api/content-library/free-books`, `/api/content-library/worksheets/search`
 
-**Note**: Pixabay requires `PIXABAY_API_KEY` in `/app/backend/.env` for full functionality.
+## Files of Reference
+- `/app/backend/server.py` - Main backend (~5810 lines)
+- `/app/backend/routes/auth.py` - Complete auth module
+- `/app/backend/routes/youtube.py` - Transcript endpoints
+- `/app/backend/routes/dashboard.py` - Stats/settings endpoints
+- `/app/backend/routes/images.py` - Image search endpoints
+- `/app/backend/routes/content.py` - Content library favorites
+- `/app/backend/ARCHITECTURE.md` - Architecture documentation
+- `/app/frontend/src/context/AuthContext.jsx` - Auth state management
+- `/app/frontend/src/pages/ContentLibrary.jsx` - Content library UI
 
-
-## Recent Changes (Jan 21, 2026)
-
-### FEATURE: Dark Mode Toggle (COMPLETED)
-- **Added theme context** at `/app/frontend/src/context/ThemeContext.jsx`
-- **Theme toggle in sidebar** - Animated switch with sun/moon icons
-- **Persistent theme** - Saved to localStorage, respects system preference
-- **CSS updates** - Added dark mode variants to all utility classes in index.css
-- **Components updated**:
-  - Layout.jsx - Sidebar, navigation, user section
-  - Dashboard.jsx - Stats cards, video cards, loading state
-  - ContentLibrary.jsx - Search results, cards, badges
-- **Smooth transitions** - 300ms transition on background/color changes
-
-### FEATURE: Comprehensive Web-Wide Search (COMPLETED)
-- **Problem**: Content Library categories (Courses, Videos, Resources) were returning limited results from only 1-2 sources
-- **Solution**: Implemented multi-source search for each category:
-  - **Courses**: Added Wikiversity, Wikibooks, freeCodeCamp, Codecademy APIs (total 7 sources)
-  - **Videos**: Enhanced YouTube CC search + Internet Archive enhanced + TED Talks (3 sources)
-  - **Resources**: Added Smithsonian, Library of Congress, PBS LearningMedia, BBC Bitesize, National Geographic (total 8 sources)
-- **New search functions added**:
-  - `search_wikiversity_courses()` - MediaWiki API for Wikiversity
-  - `search_wikibooks_courses()` - MediaWiki API for Wikibooks
-  - `search_freecodecamp_courses()` - freeCodeCamp curriculum
-  - `search_codecademy_courses()` - Codecademy courses
-  - `search_youtube_videos_comprehensive()` - Enhanced YouTube CC search
-  - `search_internet_archive_videos_enhanced()` - Multi-category video search
-  - `search_smithsonian_resources()` - Smithsonian Learning Lab
-  - `search_national_geographic_edu()` - National Geographic Education
-  - `search_library_of_congress()` - Library of Congress API
-  - `search_pbs_learningmedia()` - PBS LearningMedia
-  - `search_bbc_bitesize()` - BBC Bitesize education
-- **Files changed**: `/app/backend/server.py`
-- **Test results**:
-  - Courses: 28+ results from 7 sources
-  - Videos: 186+ results from 3 sources (all CC licensed)
-  - Resources: 37+ results from 8 sources
-
-### BUG FIX: Gutenberg PDF 404 Errors (Previous session)
-- **Problem**: PDF download links returned 404 because Project Gutenberg doesn't serve direct .pdf files at `/ebooks/{id}.pdf`
-- **Solution**: Updated all book URLs:
-  - "Download" button now links to Gutenberg landing page (`/ebooks/{id}`) where users can choose format
-  - EPUB links corrected to use `.epub.images` suffix for direct download
-  - HTML links corrected to use `.html.images` suffix for online reading
-- **Files changed**: `/app/backend/server.py` (FREE_EDUCATIONAL_BOOKS array and dynamic search functions)
-- **Frontend updated**: Button labels changed from "PDF" to "Download" with helpful tooltips
-
-### Pagination Feature Implementation
-- **Backend**: Added `page` and `per_page` query parameters to all Content Library endpoints
-- **Frontend**: Added `PaginationControls` component with page navigation
-- **Tests**: 12 pytest tests passing (100% success rate)
+## Last Updated
+January 24, 2026 - Backend Refactoring Phase 2 Complete
