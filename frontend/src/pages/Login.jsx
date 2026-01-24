@@ -76,29 +76,31 @@ export const Login = () => {
       </div>
 
       {/* Right - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white dark:bg-slate-950">
-        <div className="w-full max-w-sm">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-600 rounded-xl mb-3">
-              <Video className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">ContentFlow</h1>
+      <div className="w-full lg:w-1/2 flex flex-col p-6 lg:p-12 bg-white dark:bg-slate-950">
+        {/* ContentFlow Branding - Desktop (Top aligned) */}
+        <div className="hidden lg:flex items-center gap-3 mb-16">
+          <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
+            <Video className="w-6 h-6 text-white" />
           </div>
+          <span className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent tracking-tight">
+            ContentFlow
+          </span>
+        </div>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            {/* ContentFlow Branding - Desktop */}
-            <div className="hidden lg:flex items-center gap-3 mb-8">
-              <div className="w-11 h-11 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
+        {/* Centered Form Container */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-sm">
+            {/* Mobile Logo */}
+            <div className="lg:hidden text-center mb-8">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-600 rounded-xl mb-3">
                 <Video className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent tracking-tight">
-                ContentFlow
-              </span>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">ContentFlow</h1>
             </div>
 
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">Welcome back</h2>
-            <p className="text-slate-500 mb-6">Sign in to your account</p>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">Welcome back</h2>
+              <p className="text-slate-500 mb-6">Sign in to your account</p>
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
