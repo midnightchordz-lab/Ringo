@@ -23,6 +23,12 @@ Build a full-stack application that:
 
 ## What's Been Implemented (Latest - Jan 24, 2026)
 
+### Image Search Bug Fix (Jan 24, 2026) ✅ COMPLETED
+- **Issue**: Image search returned empty results when "All" filter was selected
+- **Root Cause**: The condition `image_type in [None, "photo"]` failed when `image_type="all"` was passed
+- **Fix**: Added normalization to treat `image_type='all'` same as `None` in both `server.py` and `routes/images.py`
+- **Result**: Image search now returns results correctly from Unsplash, Pexels, and other sources
+
 ### Backend Refactoring Phase 2 (Jan 24, 2026) ✅ COMPLETED
 - **Goal**: Continue breaking down the monolithic `server.py` and integrate modular routes
 - **Result**: All modular routes integrated, duplicates removed
