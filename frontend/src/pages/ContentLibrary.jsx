@@ -108,37 +108,124 @@ const ContentCard = ({ item, onFavorite, isFavorited }) => {
   );
 };
 
-// Book Card Component
+// Book Card Component - Rich version with all badges and actions
 const BookCard = ({ book, onFavorite, isFavorited }) => {
   // Handle different API response structures
   const coverImage = book.cover || book.thumbnail || book.cover_image;
-  const downloadUrl = book.download_url || book.url || (book.formats?.epub) || (book.formats?.pdf);
+  const downloadUrl = book.download_url || book.url;
+  const epubUrl = book.formats?.epub || book.epub_url;
+  const readOnlineUrl = book.read_online_url || book.url || downloadUrl;
+  
+  // Determine license info
+  const isPublicDomain = book.license?.toLowerCase().includes('public') || 
+                         book.license?.toLowerCase().includes('cc0') ||
+                         !book.license;
+  const isMonetizable = isPublicDomain || book.monetization_ok || book.commercial_ok;
+  const isPrintable = book.printable !== false;
+  
+  // Get subjects/categories
+  const subjects = book.subjects || book.categories || [];
+  const subjectText = Array.isArray(subjects) ? subjects.slice(0, 2).join(', ') : subjects;
+  
+  // Age level
+  const ageLevel = book.age_level || book.grade_level || 'All Ages';
   
   return (
     <div className="clean-card clean-card-hover overflow-hidden" data-testid="book-card">
+      {/* Cover Image */}
       <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-800 relative">
         {coverImage ? (
-          <img src={coverImage} alt={book.title} className="w-full h-full object-cover" onError={(e) => e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div>'} />
+          <img src={coverImage} alt={book.title} className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Book className="w-8 h-8 text-slate-400" />
+            <Book className="w-10 h-10 text-slate-300" />
           </div>
         )}
         <button
           onClick={() => onFavorite(book)}
-          className={`absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 dark:bg-slate-800/90 ${isFavorited ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}`}
+          className={`absolute top-2 right-2 p-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-sm ${isFavorited ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}`}
         >
           <Heart className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} />
         </button>
       </div>
-      <div className="p-3">
-        <h3 className="font-medium text-sm text-slate-900 dark:text-slate-100 line-clamp-2">{book.title}</h3>
-        {book.author && <p className="text-xs text-slate-500 mt-1 line-clamp-1">{book.author}</p>}
-        <div className="flex items-center justify-between mt-2">
-          <LicenseBadge license={book.license || 'Public Domain'} />
+      
+      {/* Content */}
+      <div className="p-3 space-y-2">
+        {/* Title & Author */}
+        <div>
+          <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100 line-clamp-2">{book.title}</h3>
+          {book.author && <p className="text-xs text-slate-500 mt-0.5">{book.author}</p>}
+        </div>
+        
+        {/* License Badges */}
+        <div className="flex flex-wrap gap-1">
+          {isPublicDomain && (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs rounded">
+              <CheckCircle className="w-3 h-3" />
+              Public Domain
+            </span>
+          )}
+          {isMonetizable && (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-xs rounded">
+              <DollarSign className="w-3 h-3" />
+              Monetize OK
+            </span>
+          )}
+          {isPrintable && (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 text-xs rounded">
+              <Printer className="w-3 h-3" />
+              Printable
+            </span>
+          )}
+        </div>
+        
+        {/* Description/Subjects */}
+        {subjectText && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+            {book.description || `Subjects: ${subjectText}`}
+          </p>
+        )}
+        
+        {/* Age Level */}
+        {ageLevel && (
+          <span className="inline-block px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs rounded">
+            {ageLevel}
+          </span>
+        )}
+        
+        {/* Action Buttons */}
+        <div className="flex gap-1.5 pt-1">
           {downloadUrl && (
-            <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:underline">
-              Open
+            <a
+              href={downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded transition-colors"
+            >
+              <Download className="w-3 h-3" />
+              Download
+            </a>
+          )}
+          {epubUrl && (
+            <a
+              href={epubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded transition-colors"
+            >
+              <Download className="w-3 h-3" />
+              EPUB
+            </a>
+          )}
+          {readOnlineUrl && (
+            <a
+              href={readOnlineUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded transition-colors"
+            >
+              <Globe className="w-3 h-3" />
+              Read
             </a>
           )}
         </div>
