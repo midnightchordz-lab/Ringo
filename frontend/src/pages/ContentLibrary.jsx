@@ -324,6 +324,29 @@ export const ContentLibrary = () => {
         </div>
       )}
 
+      {/* Children's Books Tab */}
+      {activeTab === 'children' && (
+        <div>
+          <p className="text-sm text-slate-500 mb-4">Free children's books with monetization-friendly licenses</p>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            </div>
+          ) : childrenBooks.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {childrenBooks.map((book) => (
+                <BookCard key={book.id} book={book} onFavorite={handleFavorite} isFavorited={isFavorited(book)} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <Baby className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500">No children's books found</p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Courses Tab */}
       {activeTab === 'courses' && (
         <div>
