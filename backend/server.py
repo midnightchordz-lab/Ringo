@@ -1526,12 +1526,16 @@ async def search_wikimedia_images(client: httpx.AsyncClient, query: str, page: i
     """Search Wikimedia Commons for CC-licensed images (CC BY, CC BY-SA)
     Supports photos, illustrations, and SVG vectors"""
     try:
-        # Build search query based on image type
+        # Build search query based on image type - be more specific
         search_query = query
         if image_type == "vector":
-            search_query = f"{query} filetype:svg"
+            search_query = f'"{query}" filetype:svg'
         elif image_type == "illustration":
-            search_query = f"{query} illustration OR drawing OR artwork"
+            # More specific search for illustrations related to query
+            search_query = f'"{query}" (illustration OR drawing OR cartoon OR artwork OR clipart)'
+        else:
+            # For photos, search the exact query
+            search_query = f'"{query}"'
         
         # Calculate offset for pagination
         offset = (page - 1) * per_page
