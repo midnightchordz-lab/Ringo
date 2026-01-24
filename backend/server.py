@@ -1577,18 +1577,34 @@ async def search_wikimedia_images(client: httpx.AsyncClient, query: str, page: i
                 
                 # Determine image type based on mime type
                 mime = imageinfo.get("mime", "")
-                if "svg" in mime:
-                    img_type = "vector"
-                elif any(ext in page_data.get("title", "").lower() for ext in [".svg"]):
+                title_lower = page_data.get("title", "").lower()
+                
+                if "svg" in mime or ".svg" in title_lower:
                     img_type = "vector"
                 else:
-                    # Check categories for illustration hints
+                    # Check categories and title for illustration hints
                     categories = [c.get("title", "") for c in page_data.get("categories", [])]
-                    is_illustration = any("illustration" in cat.lower() or "drawing" in cat.lower() or "artwork" in cat.lower() for cat in categories)
+                    cat_text = " ".join(categories).lower()
+                    
+                    is_illustration = (
+                        "illustration" in cat_text or 
+                        "drawing" in cat_text or 
+                        "artwork" in cat_text or
+                        "illustration" in title_lower or
+                        "drawing" in title_lower or
+                        "art" in title_lower or
+                        "cartoon" in title_lower or
+                        "clip art" in title_lower
+                    )
                     img_type = "illustration" if is_illustration else "photo"
                 
-                # Filter by requested type
-                if image_type and image_type != img_type:
+                # For illustration searches, include all results from Wikimedia
+                # since search query already filters for illustrations
+                if image_type == "illustration":
+                    img_type = "illustration"  # Trust the search results
+                
+                # Filter by requested type only for photos and vectors
+                if image_type and image_type not in ["illustration"] and image_type != img_type:
                     continue
                 
                 # Get artist/author
