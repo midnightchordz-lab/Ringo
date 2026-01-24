@@ -65,22 +65,7 @@ SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-secret-key-change-in-product
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
-# Password hashing using bcrypt directly (no passlib)
-def hash_password(password: str) -> str:
-    """Hash a password using bcrypt"""
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash"""
-    try:
-        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-    except Exception:
-        return False
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-
-# Email setup
+# Email setup (for legacy code that may still reference these)
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
 if RESEND_API_KEY:
