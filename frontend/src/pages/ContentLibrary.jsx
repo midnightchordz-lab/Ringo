@@ -121,6 +121,7 @@ export const ContentLibrary = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [books, setBooks] = useState([]);
+  const [childrenBooks, setChildrenBooks] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -132,6 +133,7 @@ export const ContentLibrary = () => {
 
   useEffect(() => {
     if (activeTab === 'books') fetchBooks();
+    if (activeTab === 'children') fetchChildrenBooks();
     if (activeTab === 'courses') fetchCourses();
   }, [activeTab]);
 
@@ -151,6 +153,18 @@ export const ContentLibrary = () => {
       setBooks(response.data.books || []);
     } catch (error) {
       toast.error('Failed to fetch books');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchChildrenBooks = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/content-library/childrens-literature', { params: { per_page: 20 } });
+      setChildrenBooks(response.data.books || []);
+    } catch (error) {
+      toast.error('Failed to fetch children\'s books');
     } finally {
       setLoading(false);
     }
