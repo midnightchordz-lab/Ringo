@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Clock, LogOut, Image, Library, Video, Sun, Moon, Settings } from 'lucide-react';
+import { Home, Clock, LogOut, Image, Library, Video, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useTheme } from '../context/ThemeContext';
