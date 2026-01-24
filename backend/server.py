@@ -6375,11 +6375,22 @@ async def copy_reading_list(
 
 
 # Include modular routers
-# YouTube router: transcript endpoints only (discover/cache remain in server.py)
+# Auth router: Google, Microsoft, Email/Password authentication
+api_router.include_router(auth_router, tags=["Authentication"])
+
+# YouTube router: transcript endpoints
 api_router.include_router(youtube_router, prefix="", tags=["YouTube"])
 
-# Content router disabled - endpoints still in server.py
-# api_router.include_router(content_router)
+# Images router: search and favorites
+set_images_auth(get_current_user)
+api_router.include_router(images_router, tags=["Images"])
+
+# Dashboard router: stats, history, settings
+api_router.include_router(dashboard_router, tags=["Dashboard"])
+
+# Content library router: favorites and reading lists
+set_content_auth(get_current_user)
+api_router.include_router(content_router, tags=["Content Library"])
 
 app.include_router(api_router)
 
