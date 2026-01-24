@@ -42,8 +42,8 @@ function AppRouter() {
   const location = useLocation();
   
   // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-  // Detect session_id in URL fragment synchronously during render
-  if (location.hash?.includes('session_id=') || location.pathname === '/auth/callback') {
+  // Detect session_id in URL fragment synchronously during render (can appear on any route after OAuth redirect)
+  if (location.hash?.includes('session_id=')) {
     return <AuthCallback />;
   }
   
@@ -54,6 +54,7 @@ function AppRouter() {
       <Route path="/register" element={<Register />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/pending-verification" element={<PendingVerification />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/auth/microsoft/callback" element={<MicrosoftCallback />} />
       
       {/* Protected routes */}
