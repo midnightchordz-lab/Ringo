@@ -108,12 +108,15 @@ export const Images = () => {
     fetchFavorites();
   }, []);
 
-  // Auto-search when image type changes (if there's already a search query)
+  // Track if user has searched at least once
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Auto-search when image type changes (if user has already searched)
   useEffect(() => {
-    if (searchQuery.trim() && images.length > 0) {
-      handleSearch(1);
+    if (hasSearched && searchQuery.trim()) {
+      performSearch(1);
     }
-  }, [imageType]);
+  }, [imageType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchFavorites = async () => {
     try {
@@ -124,12 +127,7 @@ export const Images = () => {
     }
   };
 
-  const handleSearch = async (newPage = 1) => {
-    if (!searchQuery.trim()) {
-      toast.error('Please enter a search term');
-      return;
-    }
-
+  const performSearch = async (newPage = 1) => {
     setLoading(true);
     try {
       const response = await api.get('/images/search', {
@@ -145,13 +143,24 @@ export const Images = () => {
       setPage(newPage);
       
       if (response.data.images?.length > 0) {
-        toast.success(`Found ${response.data.images.length} images`);
+        toast.success(`Found ${response.data.images.length} images from ${response.data.sources?.join(', ') || 'various sources'}`);
+      } else {
+        toast.info('No images found. Try a different search term or filter.');
       }
     } catch (error) {
       toast.error('Failed to search images');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = async (newPage = 1) => {
+    if (!searchQuery.trim()) {
+      toast.error('Please enter a search term');
+      return;
+    }
+    setHasSearched(true);
+    await performSearch(newPage);
   };
 
   const handleFavorite = async (image) => {
