@@ -45,10 +45,10 @@ export const Login = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 p-12 flex-col justify-between">
         <div>
           <div className="flex items-center gap-3 mb-16">
-            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-              <Video className="w-5 h-5 text-white" />
+            <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center">
+              <Video className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-white">ContentFlow</span>
+            <span className="text-2xl font-extrabold text-white tracking-tight">ContentFlow</span>
           </div>
           
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
