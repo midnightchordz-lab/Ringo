@@ -1246,75 +1246,11 @@ async def post_to_social(post_request: PostRequest):
         logging.error(f"Error posting to social: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/history")
-async def get_post_history(limit: int = 50):
-    try:
-        posts = await db.social_posts.find({}, {"_id": 0}).sort("posted_at", -1).limit(limit).to_list(length=limit)
-        return {"posts": posts, "total": len(posts)}
-    
-    except Exception as e:
-        logging.error(f"Error getting history: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/stats")
-async def get_dashboard_stats():
-    try:
-        total_videos = await db.discovered_videos.count_documents({})
-        total_clips = await db.processed_clips.count_documents({})
-        total_posts = await db.social_posts.count_documents({})
-        
-        top_videos = await db.discovered_videos.find(
-            {}, {"_id": 0}
-        ).sort("viral_score", -1).limit(5).to_list(length=5)
-        
-        recent_posts = await db.social_posts.find(
-            {}, {"_id": 0}
-        ).sort("posted_at", -1).limit(5).to_list(length=5)
-        
-        return {
-            "total_videos_discovered": total_videos,
-            "total_clips_generated": total_clips,
-            "total_posts_published": total_posts,
-            "top_videos": top_videos,
-            "recent_posts": recent_posts
-        }
-    
-    except Exception as e:
-        logging.error(f"Error getting stats: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.post("/settings/api-keys")
-async def save_api_keys(keys: APIKeysModel):
-    try:
-        await db.settings.update_one(
-            {"type": "api_keys"},
-            {"$set": {
-                "youtube_api_key": keys.youtube_api_key,
-                "instagram_access_token": keys.instagram_access_token,
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }},
-            upsert=True
-        )
-        return {"success": True, "message": "API keys saved successfully"}
-    except Exception as e:
-        logging.error(f"Error saving API keys: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/settings/api-keys")
-async def get_api_keys():
-    try:
-        keys = await db.settings.find_one({"type": "api_keys"}, {"_id": 0})
-        if keys:
-            if keys.get('youtube_api_key'):
-                keys['youtube_api_key'] = '***' + keys['youtube_api_key'][-4:] if len(keys['youtube_api_key']) > 4 else '***'
-            if keys.get('instagram_access_token'):
-                keys['instagram_access_token'] = '***' + keys['instagram_access_token'][-4:] if len(keys['instagram_access_token']) > 4 else '***'
-        return keys or {}
-    except Exception as e:
-        logging.error(f"Error getting API keys: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+# Dashboard endpoints (history, stats, settings) are now in routes/dashboard.py
 
 # ==================== IMAGE SEARCH ENDPOINTS ====================
+# Note: Basic image search/favorites are in routes/images.py
+# Advanced image search with additional sources kept here for now
 
 class FavoriteImageModel(BaseModel):
     image_id: str
@@ -1327,17 +1263,7 @@ class FavoriteImageModel(BaseModel):
     width: int
     height: int
 
-@api_router.get("/images/search")
-async def search_images(
-    query: str = Query(..., description="Search query for images"),
-    page: int = Query(default=1, ge=1),
-    per_page: int = Query(default=50, le=100),
-    source: str = Query(default="all", description="Filter by source: all, unsplash, pexels, pixabay, wikimedia, openclipart"),
-    image_type: str = Query(default=None, description="Filter by type: photo, illustration, vector"),
-    current_user: dict = Depends(get_current_user)
-):
-    """Search for copyright-free images from multiple CC-licensed sources
-    
+# Extended image search helper functions
     Sources and their capabilities:
     - Unsplash: Photos only (Unsplash License - free for commercial use)
     - Pexels: Photos only (Pexels License - free for commercial use)
