@@ -170,8 +170,8 @@ async def search_images(
                     logging.warning(f"Pixabay API error: {str(e)}")
         
         # Filter by image_type if specified (for cases where API didn't filter)
-        if image_type and image_type != 'all':
-            images = [img for img in images if img.get("image_type") == image_type]
+        if effective_image_type:
+            images = [img for img in images if img.get("image_type") == effective_image_type]
         
         # Interleave results from all sources for variety
         unsplash_images = [img for img in images if img["source"] == "unsplash"]
