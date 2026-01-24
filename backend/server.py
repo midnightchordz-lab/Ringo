@@ -1296,10 +1296,13 @@ async def search_images(
         pexels_key = os.environ.get('PEXELS_API_KEY', 'QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq')
         pixabay_key = os.environ.get('PIXABAY_API_KEY', '')
         
+        # Normalize image_type - treat 'all' same as None
+        effective_image_type = None if image_type == 'all' else image_type
+        
         # Determine which sources support the requested image type
-        is_photo_type = image_type in [None, "photo"]
-        is_illustration_type = image_type in [None, "illustration"]
-        is_vector_type = image_type in [None, "vector"]
+        is_photo_type = effective_image_type in [None, "photo"]
+        is_illustration_type = effective_image_type in [None, "illustration"]
+        is_vector_type = effective_image_type in [None, "vector"]
         
         # Create HTTP client with proper User-Agent for Wikimedia API
         headers = {
