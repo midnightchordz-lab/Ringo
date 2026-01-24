@@ -131,16 +131,22 @@ export const ContentLibrary = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
-  const [page, setPage] = useState(1);
+  
+  // Pagination state for each tab
+  const [searchPage, setSearchPage] = useState(1);
+  const [booksPage, setBooksPage] = useState(1);
+  const [childrenPage, setChildrenPage] = useState(1);
+  const [coursesPage, setCoursesPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     fetchFavorites();
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'books') fetchBooks();
-    if (activeTab === 'children') fetchChildrenBooks();
-    if (activeTab === 'courses') fetchCourses();
+    if (activeTab === 'books') fetchBooks(1);
+    if (activeTab === 'children') fetchChildrenBooks(1);
+    if (activeTab === 'courses') fetchCourses(1);
   }, [activeTab]);
 
   const fetchFavorites = async () => {
@@ -152,11 +158,13 @@ export const ContentLibrary = () => {
     }
   };
 
-  const fetchBooks = async () => {
+  const fetchBooks = async (pageNum = 1) => {
     setLoading(true);
     try {
-      const response = await api.get('/content-library/free-books', { params: { per_page: 20 } });
+      const response = await api.get('/content-library/free-books', { params: { per_page: 20, page: pageNum } });
       setBooks(response.data.books || []);
+      setBooksPage(pageNum);
+      setHasMore(response.data.has_next !== false);
     } catch (error) {
       toast.error('Failed to fetch books');
     } finally {
@@ -164,12 +172,13 @@ export const ContentLibrary = () => {
     }
   };
 
-  const fetchChildrenBooks = async () => {
+  const fetchChildrenBooks = async (pageNum = 1) => {
     setLoading(true);
     try {
-      const response = await api.get('/content-library/childrens-literature', { params: { per_page: 20 } });
-      // API returns 'results' not 'books'
+      const response = await api.get('/content-library/childrens-literature', { params: { per_page: 20, page: pageNum } });
       setChildrenBooks(response.data.results || response.data.books || []);
+      setChildrenPage(pageNum);
+      setHasMore(response.data.has_next !== false);
     } catch (error) {
       toast.error('Failed to fetch children\'s books');
     } finally {
@@ -177,11 +186,13 @@ export const ContentLibrary = () => {
     }
   };
 
-  const fetchCourses = async () => {
+  const fetchCourses = async (pageNum = 1) => {
     setLoading(true);
     try {
-      const response = await api.get('/content-library/search', { params: { query: 'programming course', type: 'course', per_page: 20 } });
+      const response = await api.get('/content-library/search', { params: { query: 'programming course', type: 'course', per_page: 20, page: pageNum } });
       setCourses(response.data.results || []);
+      setCoursesPage(pageNum);
+      setHasMore(response.data.has_next !== false);
     } catch (error) {
       toast.error('Failed to fetch courses');
     } finally {
