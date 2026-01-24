@@ -22,7 +22,7 @@ RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
 
 # Frontend URL for email links
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://reel-crafter-1.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://viraltube-5.preview.emergentagent.com")
 
 # YouTube API
 YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
