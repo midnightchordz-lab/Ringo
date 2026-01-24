@@ -30,6 +30,31 @@ const LicenseBadge = ({ license }) => {
   );
 };
 
+// Pagination Component
+const Pagination = ({ page, onPrev, onNext, hasMore, loading }) => (
+  <div className="flex justify-center gap-2 mt-6">
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={onPrev}
+      disabled={page === 1 || loading}
+      className="btn-secondary"
+    >
+      <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+    </Button>
+    <span className="flex items-center px-3 text-sm text-slate-500">Page {page}</span>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={onNext}
+      disabled={!hasMore || loading}
+      className="btn-secondary"
+    >
+      Next <ChevronRight className="w-4 h-4 ml-1" />
+    </Button>
+  </div>
+);
+
 // Content Card Component
 const ContentCard = ({ item, onFavorite, isFavorited }) => {
   const TypeIcon = getTypeIcon(item.type);
