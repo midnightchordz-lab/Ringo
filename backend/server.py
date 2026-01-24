@@ -1263,7 +1263,17 @@ class FavoriteImageModel(BaseModel):
     width: int
     height: int
 
-# Extended image search helper functions
+@api_router.get("/images/search")
+async def search_images(
+    query: str = Query(..., description="Search query for images"),
+    page: int = Query(default=1, ge=1),
+    per_page: int = Query(default=50, le=100),
+    source: str = Query(default="all", description="Filter by source: all, unsplash, pexels, pixabay, wikimedia, openclipart"),
+    image_type: str = Query(default=None, description="Filter by type: photo, illustration, vector"),
+    current_user: dict = Depends(get_current_user)
+):
+    """Search for copyright-free images from multiple CC-licensed sources
+    
     Sources and their capabilities:
     - Unsplash: Photos only (Unsplash License - free for commercial use)
     - Pexels: Photos only (Pexels License - free for commercial use)
