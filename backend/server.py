@@ -50,13 +50,17 @@ async def health_check():
 
 api_router = APIRouter(prefix="/api")
 
-# Import modular routes (transcript endpoints moved to routes/youtube.py)
-from routes.youtube import router as youtube_router, set_auth_dependency as set_youtube_auth
+# Import modular routes
+from routes.youtube import router as youtube_router
+from routes.auth import router as auth_router, get_current_user, create_access_token
+from routes.images import router as images_router, set_auth_dependency as set_images_auth
+from routes.dashboard import router as dashboard_router
+from routes.content import router as content_router, set_auth_dependency as set_content_auth
 
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 
-# Authentication setup
+# Authentication setup (from config)
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-secret-key-change-in-production-09876543210")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
