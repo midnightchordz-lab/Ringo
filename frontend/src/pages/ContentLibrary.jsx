@@ -393,11 +393,20 @@ export const ContentLibrary = () => {
               <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
             </div>
           ) : childrenBooks.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {childrenBooks.map((book) => (
-                <BookCard key={book.id} book={book} onFavorite={handleFavorite} isFavorited={isFavorited(book)} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {childrenBooks.map((book) => (
+                  <BookCard key={book.id} book={book} onFavorite={handleFavorite} isFavorited={isFavorited(book)} />
+                ))}
+              </div>
+              <Pagination
+                page={childrenPage}
+                onPrev={() => fetchChildrenBooks(childrenPage - 1)}
+                onNext={() => fetchChildrenBooks(childrenPage + 1)}
+                hasMore={hasMore}
+                loading={loading}
+              />
+            </>
           ) : (
             <div className="text-center py-20">
               <Baby className="w-12 h-12 text-slate-300 mx-auto mb-4" />
@@ -415,11 +424,20 @@ export const ContentLibrary = () => {
               <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
             </div>
           ) : courses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {courses.map((course) => (
-                <ContentCard key={course.id} item={course} onFavorite={handleFavorite} isFavorited={isFavorited(course)} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {courses.map((course) => (
+                  <ContentCard key={course.id} item={course} onFavorite={handleFavorite} isFavorited={isFavorited(course)} />
+                ))}
+              </div>
+              <Pagination
+                page={coursesPage}
+                onPrev={() => fetchCourses(coursesPage - 1)}
+                onNext={() => fetchCourses(coursesPage + 1)}
+                hasMore={hasMore}
+                loading={loading}
+              />
+            </>
           ) : (
             <div className="text-center py-20">
               <GraduationCap className="w-12 h-12 text-slate-300 mx-auto mb-4" />
