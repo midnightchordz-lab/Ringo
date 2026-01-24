@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, BookOpen, GraduationCap, FileText, ExternalLink, Heart, Loader2, Book, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, BookOpen, GraduationCap, FileText, ExternalLink, Heart, Loader2, Book, Baby } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 const TABS = [
   { id: 'search', label: 'Search', icon: Search },
   { id: 'books', label: 'Free Books', icon: Book },
+  { id: 'children', label: "Children's Books", icon: Baby },
   { id: 'courses', label: 'Courses', icon: GraduationCap },
 ];
 
