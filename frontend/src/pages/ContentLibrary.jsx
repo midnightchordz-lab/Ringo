@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Search, BookOpen, GraduationCap, FileText, ExternalLink, Heart, Loader2, Book, Baby, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, BookOpen, GraduationCap, FileText, ExternalLink, Heart, Loader2, Book, Baby, ChevronLeft, ChevronRight, Download, CheckCircle, DollarSign, Printer, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
