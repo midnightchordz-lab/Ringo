@@ -162,7 +162,8 @@ export const ContentLibrary = () => {
     setLoading(true);
     try {
       const response = await api.get('/content-library/childrens-literature', { params: { per_page: 20 } });
-      setChildrenBooks(response.data.books || []);
+      // API returns 'results' not 'books'
+      setChildrenBooks(response.data.results || response.data.books || []);
     } catch (error) {
       toast.error('Failed to fetch children\'s books');
     } finally {
