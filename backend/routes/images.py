@@ -49,9 +49,12 @@ async def search_images(
         pexels_key = PEXELS_API_KEY or 'QsPCgrnUhMSwyA25GWLfqMdYdJZw2Rthp33l24iYFCrTpuJcwUEBGAhq'
         pixabay_key = os.environ.get('PIXABAY_API_KEY', '48aborj-d9156e13058fcef0a68ac7cf4')  # Free API key
         
+        # Normalize image_type - treat 'all' same as None
+        effective_image_type = None if image_type == 'all' else image_type
+        
         async with httpx.AsyncClient() as client:
             # Search Unsplash (supports photos only, not illustrations/vectors)
-            if unsplash_key and source in ['all', 'unsplash'] and image_type in [None, 'photo']:
+            if unsplash_key and source in ['all', 'unsplash'] and effective_image_type in [None, 'photo']:
                 try:
                     unsplash_response = await client.get(
                         "https://api.unsplash.com/search/photos",
