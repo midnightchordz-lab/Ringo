@@ -128,8 +128,6 @@ export const Register = () => {
               </div>
             )}
 
-            {/* Google OAuth temporarily disabled - service unavailable */}
-            {/*
             <Button
               type="button"
               onClick={handleGoogleSignIn}
@@ -144,35 +142,6 @@ export const Register = () => {
               </svg>
               Sign up with Google
             </Button>
-            
-            <p className="text-xs text-center text-neutral-400 mb-3">
-              Having trouble with Google? Use email registration below.
-            </p>
-
-            <Button
-              type="button"
-              onClick={handleMicrosoftSignIn}
-              className="w-full bg-white border-2 border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 font-semibold rounded-xl py-6 mb-6 flex items-center justify-center gap-3 transition-all"
-              data-testid="microsoft-signup-button"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#F25022" d="M1 1h10v10H1z"/>
-                <path fill="#00A4EF" d="M1 13h10v10H1z"/>
-                <path fill="#7FBA00" d="M13 1h10v10H13z"/>
-                <path fill="#FFB900" d="M13 13h10v10H13z"/>
-              </svg>
-              Sign up with Microsoft
-            </Button>
-
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-neutral-500">or register with email</span>
-              </div>
-            </div>
-            */}
 
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
