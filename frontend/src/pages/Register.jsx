@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Sparkles, ArrowRight, CheckCircle, Image, BookOpen, Video } from 'lucide-react';
+import { Mail, Lock, User, Sparkles, ArrowRight, CheckCircle, Image, BookOpen, Video, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -17,8 +17,24 @@ export const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [oauthError, setOauthError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  // Check for OAuth errors in URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const error = params.get('error');
+    if (error) {
+      if (error.includes('permission') || error.includes('forbidden')) {
+        setOauthError('Google sign-up is temporarily unavailable. Please register with email/password.');
+      } else {
+        setOauthError('Authentication failed. Please try again or register with email/password.');
+      }
+      window.history.replaceState({}, '', '/register');
+    }
+  }, [location]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -58,6 +74,7 @@ export const Register = () => {
 
   const handleGoogleSignIn = () => {
     // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+    setOauthError(null);
     const redirectUrl = window.location.origin + '/dashboard';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
