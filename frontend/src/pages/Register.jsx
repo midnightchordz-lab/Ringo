@@ -128,7 +128,8 @@ export const Register = () => {
               </div>
             )}
 
-            {/* Google Sign Up */}
+            {/* Google OAuth temporarily disabled - service unavailable */}
+            {/*
             <Button
               type="button"
               onClick={handleGoogleSignIn}
@@ -144,12 +145,10 @@ export const Register = () => {
               Sign up with Google
             </Button>
             
-            {/* Note about Google OAuth */}
             <p className="text-xs text-center text-neutral-400 mb-3">
               Having trouble with Google? Use email registration below.
             </p>
 
-            {/* Microsoft Sign Up */}
             <Button
               type="button"
               onClick={handleMicrosoftSignIn}
@@ -164,6 +163,16 @@ export const Register = () => {
               </svg>
               Sign up with Microsoft
             </Button>
+
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-neutral-500">or register with email</span>
+              </div>
+            </div>
+            */}
 
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
