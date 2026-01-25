@@ -120,6 +120,14 @@ export const Register = () => {
             transition={{ delay: 0.1 }}
             className="studio-card p-8"
           >
+            {/* OAuth Error Alert */}
+            {oauthError && (
+              <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-amber-800 dark:text-amber-200">{oauthError}</p>
+              </div>
+            )}
+
             {/* Google Sign Up */}
             <Button
               type="button"
@@ -135,6 +143,11 @@ export const Register = () => {
               </svg>
               Sign up with Google
             </Button>
+            
+            {/* Note about Google OAuth */}
+            <p className="text-xs text-center text-neutral-400 mb-3">
+              Having trouble with Google? Use email registration below.
+            </p>
 
             {/* Microsoft Sign Up */}
             <Button
