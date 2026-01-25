@@ -174,6 +174,8 @@ export const Login = () => {
               </Button>
             </form>
 
+            {/* Google OAuth temporarily disabled - service unavailable */}
+            {/* 
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-200 dark:border-slate-700" />
@@ -198,10 +200,10 @@ export const Login = () => {
               Continue with Google
             </Button>
             
-            {/* Note about Google OAuth */}
             <p className="text-xs text-center text-slate-400 mt-2">
               Having trouble with Google? Use email login above.
             </p>
+            */}
 
             <p className="text-center text-sm text-slate-500 mt-6">
               Don&apos;t have an account?{' '}
