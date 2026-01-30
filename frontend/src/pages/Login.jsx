@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Video, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Video, AlertCircle, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import PhoneLogin from '../components/PhoneLogin';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -16,6 +17,7 @@ export const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [oauthError, setOauthError] = useState(null);
+  const [showPhoneLogin, setShowPhoneLogin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
