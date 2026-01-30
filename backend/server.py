@@ -1307,7 +1307,7 @@ async def search_images(
         
         # Create HTTP client with proper User-Agent for Wikimedia API
         headers = {
-            "User-Agent": "ContentFlow/1.0 (https://viraltube-5.preview.emergentagent.com; support@contentflow.app)"
+            "User-Agent": "ContentFlow/1.0 (https://contentai-51.preview.emergentagent.com; support@contentflow.app)"
         }
         
         async with httpx.AsyncClient(timeout=15.0, headers=headers, follow_redirects=True) as client:
