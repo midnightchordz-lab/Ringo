@@ -8,6 +8,23 @@ import { toast } from 'sonner';
 
 const ImageCard = ({ image, onFavorite, isFavorited }) => {
   const [downloading, setDownloading] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(image.thumbnail);
+
+  // Fallback placeholder for broken images
+  const placeholderImage = `https://placehold.co/400x300/1e293b/94a3b8?text=${encodeURIComponent(image.source)}`;
+
+  const handleImageError = () => {
+    if (!imageError) {
+      setImageError(true);
+      // Try the full URL if thumbnail fails
+      if (imageSrc === image.thumbnail && image.url) {
+        setImageSrc(image.url);
+      } else {
+        setImageSrc(placeholderImage);
+      }
+    }
+  };
 
   const handleDownload = async () => {
     setDownloading(true);
