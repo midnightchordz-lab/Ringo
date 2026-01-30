@@ -5814,6 +5814,9 @@ api_router.include_router(dashboard_router, tags=["Dashboard"])
 set_content_auth(get_current_user)
 api_router.include_router(content_router, tags=["Content Library"])
 
+# Phone OTP authentication router
+api_router.include_router(phone_auth_router, tags=["Phone Authentication"])
+
 app.include_router(api_router)
 
 app.add_middleware(
