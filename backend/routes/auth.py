@@ -74,8 +74,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+        sub: str = payload.get("sub")
+        if sub is None:
             raise credentials_exception
     except JWTError:
         # Check if it's an Emergent OAuth session token
@@ -91,7 +91,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
                 return user
         raise credentials_exception
     
-    user = await db.users.find_one({"email": email})
+    # Try to find user by email first
+    user = await db.users.find_one({"email": sub})
+    
+    # If not found by email, try phone number (for phone auth users)
+    if user is None:
+        user = await db.users.find_one({"phone_number": sub})
+    
     if user is None:
         raise credentials_exception
     
