@@ -163,11 +163,11 @@ async def verify_otp(request: VerifyOTPRequest):
             if expires_at.tzinfo is None:
                 expires_at = expires_at.replace(tzinfo=timezone.utc)
             if expires_at < datetime.now(timezone.utc):
-            await db.phone_otps.delete_one({"phone_number": phone_number})
-            raise HTTPException(
-                status_code=400,
-                detail="OTP has expired. Please request a new code."
-            )
+                await db.phone_otps.delete_one({"phone_number": phone_number})
+                raise HTTPException(
+                    status_code=400,
+                    detail="OTP has expired. Please request a new code."
+                )
         
         # Check attempts (max 5)
         attempts = otp_record.get("attempts", 0)
