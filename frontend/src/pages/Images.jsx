@@ -57,10 +57,11 @@ const ImageCard = ({ image, onFavorite, isFavorited }) => {
     >
       <div className="relative aspect-[4/3] bg-slate-100 dark:bg-slate-800">
         <img
-          src={image.thumbnail}
+          src={imageSrc}
           alt={image.title}
           className="w-full h-full object-cover"
           loading="lazy"
+          onError={handleImageError}
         />
         
         {/* Hover Actions */}
