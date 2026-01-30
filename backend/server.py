@@ -56,6 +56,7 @@ from routes.auth import router as auth_router, get_current_user, create_access_t
 from routes.images import router as images_router, set_auth_dependency as set_images_auth
 from routes.dashboard import router as dashboard_router
 from routes.content import router as content_router, set_auth_dependency as set_content_auth
+from routes.phone_auth import router as phone_auth_router
 
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
